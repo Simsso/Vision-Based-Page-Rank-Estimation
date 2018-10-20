@@ -8,14 +8,15 @@
 
 # cefsimple sources.
 set(CEFSIMPLE_SRCS
-        experiment_main.cc
+        experiment_main.cpp
+        experiment_client.h
+        experiment_client.cpp
+        experiment_handler.cpp
+        experiment_handler.h
   )
+
 APPEND_PLATFORM_SOURCES(CEFSIMPLE_SRCS)
 source_group(cefsimple FILES ${CEFSIMPLE_SRCS})
-
-set(CEFSIMPLE_SRCS_LINUX
-  cefsimple_linux.cc
-        )
 
 APPEND_PLATFORM_SOURCES(CEFSIMPLE_RES_SRCS)
 source_group(cefsimple\\\\res FILES ${CEFSIMPLE_RES_SRCS})
@@ -54,6 +55,16 @@ if(OS_LINUX)
   add_dependencies(${CEF_TARGET} libcef_dll_wrapper)
   target_link_libraries(${CEF_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
 
+  # Add OpenCV-3.4.1
+  SET(OpenCV_DIR "${CEF_ROOT}/OpenCV/installation/OpenCV-3.4.1/share/OpenCV/")
+  find_package(OpenCV REQUIRED)
+  target_link_libraries(${CEF_TARGET} ${OpenCV_LIBS})
+
+
+  # Copy OpenCV resources to target
+  SET(OPENCV_RESOURCE_DIR "${CEF_ROOT}/OpenCV/installation/OpenCV-3.4.1/lib/")
+  SET(OPENCV_RESOURCE_FILES  libopencv_imgproc.so.3.4 libopencv_imgcodecs.so.3.4 libopencv_core.so.3.4 libopencv_highgui.so.3.4  )
+
   # Set rpath so that libraries can be placed next to the executable.
   set_target_properties(${CEF_TARGET} PROPERTIES INSTALL_RPATH "$ORIGIN")
   set_target_properties(${CEF_TARGET} PROPERTIES BUILD_WITH_INSTALL_RPATH TRUE)
@@ -62,6 +73,7 @@ if(OS_LINUX)
   # Copy binary and resource files to the target output directory.
   COPY_FILES("${CEF_TARGET}" "${CEF_BINARY_FILES}" "${CEF_BINARY_DIR}" "${CEF_TARGET_OUT_DIR}")
   COPY_FILES("${CEF_TARGET}" "${CEF_RESOURCE_FILES}" "${CEF_RESOURCE_DIR}" "${CEF_TARGET_OUT_DIR}")
+  COPY_FILES("${CEF_TARGET}" "${OPENCV_RESOURCE_FILES}" "${OPENCV_RESOURCE_DIR}" "${CEF_TARGET_OUT_DIR}")
 
   # Set SUID permissions on the chrome-sandbox target.
   SET_LINUX_SUID_PERMISSIONS("${CEF_TARGET}" "${CEF_TARGET_OUT_DIR}/chrome-sandbox")

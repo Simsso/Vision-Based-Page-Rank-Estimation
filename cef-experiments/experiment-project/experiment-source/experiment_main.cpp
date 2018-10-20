@@ -19,7 +19,7 @@ int main(int argc, char* argv[]){
     // Initialize CEF for the browser process
     CefInitialize(mainArgs, cefSettings, NULL, NULL);
 
-    ExperimentHandler* experimentHandler = new ExperimentHandler(800, 600);
+    ExperimentHandler* experimentHandler = new ExperimentHandler(1920, 1080);
 
     // CefRefPtr represents a SmartPointer (Releases Object once function returns)
     //

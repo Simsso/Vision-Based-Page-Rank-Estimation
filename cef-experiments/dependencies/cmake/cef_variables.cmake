@@ -93,8 +93,8 @@ if(OS_LINUX)
     -std=c99                        # Use the C99 language standard
     )
   list(APPEND CEF_CXX_COMPILER_FLAGS
-    -fno-exceptions                 # Disable exceptions
-    -fno-rtti                       # Disable real-time type information
+    #-fno-exceptions                 # Disable exceptions
+    #-fno-rtti                       # Disable real-time type information
     -fno-threadsafe-statics         # Don't generate thread-safe statics
     -fvisibility-inlines-hidden     # Give hidden visibility to inlined class member functions
     -std=gnu++11                    # Use the C++11 language standard including GNU extensions

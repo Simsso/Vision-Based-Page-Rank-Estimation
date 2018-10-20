@@ -1,2 +1,5 @@
 dependencies/Debug/*
 dependencies/Release/*
+dependencies/OpenCV/installation/*
+dependencies/OpenCV/opencv/*
+dependencies/OpenCV/opencv_contrib/*
