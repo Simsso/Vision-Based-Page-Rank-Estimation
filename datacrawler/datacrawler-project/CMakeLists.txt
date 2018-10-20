@@ -117,7 +117,7 @@ set(CMAKE_CONFIGURATION_TYPES Debug Release)
 
 # Project name.
 # TODO: Change this line to match your project name when you copy this file.
-project(experiment-project)
+project(datacrawler-project)
 
 # Use folders in the resulting project files.
 set_property(GLOBAL PROPERTY OS_FOLDERS ON)
@@ -152,7 +152,9 @@ set_property(GLOBAL PROPERTY OS_FOLDERS ON)
 #    files as an example.
 # D. Comment in these lines:
 #
-set(CEF_ROOT "/home/samed/Desktop/Pagerank-Estimation-Deep-Graph-Networks/cef-experiments/dependencies")
+get_filename_component(PARENT_DIR ${CMAKE_SOURCE_DIR} PATH)
+
+set(CEF_ROOT "${PARENT_DIR}/dependencies")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CEF_ROOT}/cmake")
 
 # Example 3: The binary distribution is in a separate directory from your
@@ -198,8 +200,8 @@ add_subdirectory(${CEF_LIBCEF_DLL_WRAPPER_PATH} libcef_dll_wrapper)
 # Include application targets.
 # Comes from the <target>/CMakeLists.txt file in the current directory.
 # TODO: Change these lines to match your project target when you copy this file.
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/experiment-source")
-  add_subdirectory(experiment-source)
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/datacrawler-source")
+  add_subdirectory(datacrawler-source)
 endif()
 
 # Display configuration settings.
