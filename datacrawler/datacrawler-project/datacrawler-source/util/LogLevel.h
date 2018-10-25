@@ -1,0 +1,11 @@
+//
+// Created by samed on 25.10.18.
+//
+
+#ifndef DATACRAWLER_PROJECT_LOGLEVEL_H
+#define DATACRAWLER_PROJECT_LOGLEVEL_H
+
+enum LogLevel {
+    LOG_ALL = 6, LOG_DEBUG = 5, LOG_INFO = 4, LOG_WARN = 3, LOG_ERROR = 2, LOG_FATAL = 1, LOG_OFF = 0
+};
+#endif //DATACRAWLER_PROJECT_LOGLEVEL_H

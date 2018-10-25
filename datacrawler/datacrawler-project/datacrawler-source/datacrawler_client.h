@@ -5,9 +5,8 @@
 #ifndef EXPERIMENT_PROJECT_EXPERIMENT_APP_H
 #define EXPERIMENT_PROJECT_EXPERIMENT_APP_H
 
-
 #include <include/cef_app.h>
-#include "experiment_handler.h"
+#include "datacrawler_handler.h"
 
 class ExperimentClient: public CefClient {
 private:
@@ -23,10 +22,8 @@ public:
         return experimentHandler;
     }
 
-
 private:
     IMPLEMENT_REFCOUNTING(ExperimentClient)
 };
-
 
 #endif //EXPERIMENT_PROJECT_EXPERIMENT_APP_H

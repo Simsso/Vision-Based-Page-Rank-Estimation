@@ -8,11 +8,11 @@
 
 # cefsimple sources.
 set(CEFSIMPLE_SRCS
-        experiment_main.cpp
-        experiment_client.h
-        experiment_client.cpp
-        experiment_handler.cpp
-        experiment_handler.h
+        datacrawler_main.cpp
+        datacrawler_client.h
+        datacrawler_client.cpp
+        datacrawler_handler.cpp
+        datacrawler_handler.h
   )
 
 APPEND_PLATFORM_SOURCES(CEFSIMPLE_SRCS)
@@ -24,7 +24,21 @@ source_group(cefsimple\\\\res FILES ${CEFSIMPLE_RES_SRCS})
 set(CEFSIMPLE_SRCS
   ${CEFSIMPLE_SRCS}
   ${CEFSIMPLE_RES_SRCS}
-  )
+        datacrawler.cpp
+        datacrawler.h
+        DatacrawlerConfiguration.cpp
+        DatacrawlerConfiguration.h
+        DataModulesEnum.h
+        datamodule-configs/DataModuleBaseConfiguration.cpp
+        datamodule-configs/DataModuleBaseConfiguration.h
+        datamodule-configs/ScreenshotConfiguration.cpp
+        datamodule-configs/ScreenshotConfiguration.h
+        datamodules/DataModuleBase.cpp
+        datamodules/DataModuleBase.h
+        graph/NodeElement.cpp
+        graph/NodeElement.h
+        datamodules/ScreenshotDataModule.cpp
+        datamodules/ScreenshotDataModule.h util/Logger.cpp util/Logger.h util/LogLevel.h)
 
 APPEND_PLATFORM_SOURCES(CEFSIMPLE_HELPER_SRCS)
 source_group(cefsimple FILES ${CEFSIMPLE_HELPER_SRCS})
@@ -34,7 +48,7 @@ source_group(cefsimple FILES ${CEFSIMPLE_HELPER_SRCS})
 #
 
 # Target executable names.
-set(CEF_TARGET "cefsimple")
+set(CEF_TARGET "datacrawler")
 
 
 # Logical target used to link the libcef library.
@@ -50,7 +64,7 @@ SET_CEF_TARGET_OUT_DIR()
 
 if(OS_LINUX)
   # Executable target.
-  add_executable(${CEF_TARGET} ${CEFSIMPLE_SRCS} experiment_handler.cpp experiment_handler.h experiment_client.cpp experiment_client.h)
+  add_executable(${CEF_TARGET} ${CEFSIMPLE_SRCS} datacrawler_handler.cpp datacrawler_handler.h datacrawler_client.cpp datacrawler_client.h)
   SET_EXECUTABLE_TARGET_PROPERTIES(${CEF_TARGET})
   add_dependencies(${CEF_TARGET} libcef_dll_wrapper)
   target_link_libraries(${CEF_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
@@ -63,7 +77,7 @@ if(OS_LINUX)
 
   # Copy OpenCV resources to target
   SET(OPENCV_RESOURCE_DIR "${CEF_ROOT}/OpenCV/installation/OpenCV-3.4.1/lib/")
-  SET(OPENCV_RESOURCE_FILES  libopencv_imgproc.so.3.4 libopencv_imgcodecs.so.3.4 libopencv_core.so.3.4 libopencv_highgui.so.3.4  )
+  SET(OPENCV_RESOURCE_FILES  libopencv_imgproc.so.3.4 libopencv_imgcodecs.so.3.4 libopencv_core.so.3.4)
 
   # Set rpath so that libraries can be placed next to the executable.
   set_target_properties(${CEF_TARGET} PROPERTIES INSTALL_RPATH "$ORIGIN")
