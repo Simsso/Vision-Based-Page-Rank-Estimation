@@ -9,10 +9,6 @@
 # cefsimple sources.
 set(CEFSIMPLE_SRCS
         datacrawler_main.cpp
-        datacrawler_client.h
-        datacrawler_client.cpp
-        datacrawler_handler.cpp
-        datacrawler_handler.h
   )
 
 APPEND_PLATFORM_SOURCES(CEFSIMPLE_SRCS)
@@ -37,8 +33,11 @@ set(CEFSIMPLE_SRCS
         datamodules/DataModuleBase.h
         graph/NodeElement.cpp
         graph/NodeElement.h
-        datamodules/ScreenshotDataModule.cpp
-        datamodules/ScreenshotDataModule.h util/Logger.cpp util/Logger.h util/LogLevel.h)
+        datamodules/screenshot-datamodule/ScreenshotDataModule.cpp
+        datamodules/screenshot-datamodule/ScreenshotDataModule.h
+        util/Logger.cpp
+        util/Logger.h
+        util/LogLevel.h datamodules/screenshot-datamodule/ScreenshotClient.cpp datamodules/screenshot-datamodule/ScreenshotClient.h datamodules/screenshot-datamodule/ScreenshotHandler.cpp datamodules/screenshot-datamodule/ScreenshotHandler.h)
 
 APPEND_PLATFORM_SOURCES(CEFSIMPLE_HELPER_SRCS)
 source_group(cefsimple FILES ${CEFSIMPLE_HELPER_SRCS})
@@ -70,14 +69,14 @@ if(OS_LINUX)
   target_link_libraries(${CEF_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
 
   # Add OpenCV-3.4.1
-  SET(OpenCV_DIR "${CEF_ROOT}/OpenCV/installation/OpenCV-3.4.1/share/OpenCV/")
-  find_package(OpenCV REQUIRED)
-  target_link_libraries(${CEF_TARGET} ${OpenCV_LIBS})
+  # SET(OpenCV_DIR "${CEF_ROOT}/OpenCV/installation/OpenCV-3.4.1/share/OpenCV/")
+  # find_package(OpenCV OPTIONAL)
+  # target_link_libraries(${CEF_TARGET} ${OpenCV_LIBS})
 
 
   # Copy OpenCV resources to target
-  SET(OPENCV_RESOURCE_DIR "${CEF_ROOT}/OpenCV/installation/OpenCV-3.4.1/lib/")
-  SET(OPENCV_RESOURCE_FILES  libopencv_imgproc.so.3.4 libopencv_imgcodecs.so.3.4 libopencv_core.so.3.4)
+  # SET(OPENCV_RESOURCE_DIR "${CEF_ROOT}/OpenCV/installation/OpenCV-3.4.1/lib/")
+  # SET(OPENCV_RESOURCE_FILES  libopencv_imgproc.so.3.4 libopencv_imgcodecs.so.3.4 libopencv_core.so.3.4)
 
   # Set rpath so that libraries can be placed next to the executable.
   set_target_properties(${CEF_TARGET} PROPERTIES INSTALL_RPATH "$ORIGIN")

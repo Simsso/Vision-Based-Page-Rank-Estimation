@@ -1,0 +1,14 @@
+//
+// Created by samed on 01.11.18.
+//
+
+#ifndef DATACRAWLER_PROJECT_SCREENSHOTCLIENT_H
+#define DATACRAWLER_PROJECT_SCREENSHOTCLIENT_H
+
+
+class ScreenshotClient {
+
+};
+
+
+#endif //DATACRAWLER_PROJECT_SCREENSHOTCLIENT_H

@@ -7,7 +7,6 @@
 
 #include <include/cef_render_handler.h>
 #include <include/cef_client.h>
-#include "opencv2/opencv.hpp"
 #include "iostream"
 
 class ExperimentHandler : public CefRenderHandler {
@@ -35,7 +34,7 @@ public:
 
     void OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects, const void *buffer,
                  int width, int height) OVERRIDE {
-        unsigned char* img = (unsigned char*)buffer;
+       /* unsigned char* img = (unsigned char*)buffer;
         printf("frame rendered (pixel[0]: (%d %d %d - %d)\n", img[2], img[1], img[0], img[3]);
         printf("frame rendered (pixel[1]: (%d %d %d - %d)\n", img[6], img[5], img[4], img[7]);
         printf("width: %d height: %d\n", width, height);
@@ -54,7 +53,7 @@ public:
         }
 
         if(result)
-            std::cout << "Image written!" << std::endl;
+            std::cout << "Image written!" << std::endl; */
     }
 
 private:

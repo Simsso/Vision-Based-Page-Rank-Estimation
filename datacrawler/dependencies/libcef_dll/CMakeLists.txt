@@ -425,6 +425,7 @@ set(LIBCEF_INCLUDE_SRCS
   )
 set(LIBCEF_INCLUDE_SRCS_MACOSX
   ../include/cef_application_mac.h
+  ../include/cef_sandbox_mac.h
   )
 set(LIBCEF_INCLUDE_SRCS_WINDOWS
   ../include/cef_sandbox_win.h
@@ -657,6 +658,10 @@ set(LIBCEF_INCLUDE_WRAPPER_SRCS
   ../include/wrapper/cef_xml_object.h
   ../include/wrapper/cef_zip_archive.h
   )
+set(LIBCEF_INCLUDE_WRAPPER_SRCS_MACOSX
+  ../include/wrapper/cef_library_loader.h
+  )
+LIBCEF_APPEND_PLATFORM_SOURCES(LIBCEF_INCLUDE_WRAPPER_SRCS)
 source_group(include\\\\wrapper FILES ${LIBCEF_INCLUDE_WRAPPER_SRCS})
 
 set(LIBCEF_WRAPPER_SRCS
@@ -672,6 +677,11 @@ set(LIBCEF_WRAPPER_SRCS
   wrapper/libcef_dll_wrapper.cc
   wrapper/libcef_dll_wrapper2.cc
   )
+set(LIBCEF_WRAPPER_SRCS_MACOSX
+  wrapper/cef_library_loader_mac.mm
+  wrapper/libcef_dll_dylib.cc
+  )
+LIBCEF_APPEND_PLATFORM_SOURCES(LIBCEF_WRAPPER_SRCS)
 source_group(libcef_dll\\\\wrapper FILES ${LIBCEF_WRAPPER_SRCS})
 
 add_library(${CEF_TARGET}

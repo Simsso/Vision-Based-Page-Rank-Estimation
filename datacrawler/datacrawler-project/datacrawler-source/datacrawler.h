@@ -10,7 +10,7 @@
 #include <include/internal/cef_linux.h>
 #include "DatacrawlerConfiguration.h"
 #include "datamodules/DataModuleBase.h"
-#include "datamodules/ScreenshotDataModule.h"
+#include "datamodules/screenshot-datamodule/ScreenshotDataModule.h"
 #include "util/Logger.h"
 
 using namespace std;
@@ -18,23 +18,16 @@ using namespace std;
 class Datacrawler {
 
 private:
-   string URL;
    DatacrawlerConfiguration datacrawlerConfiguration;
    list<DataModuleBase*> dataModules;
    Logger* logger;
 
 public:
-    Datacrawler(){
-        logger = Logger::getInstance();
-    }
-
-    Datacrawler(string URL){
-        this->URL = URL;
-        logger = Logger::getInstance();
-    }
-
-    bool process();
+    NodeElement* process(string);
     void init();
+
+    Datacrawler();
+    ~Datacrawler();
 };
 
 

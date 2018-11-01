@@ -6,7 +6,7 @@
 #define DATACRAWLER_PROJECT_SCREENSHOTCONFIGURATION_H
 
 #include "DataModuleBaseConfiguration.h"
-#include "../datamodules/ScreenshotDataModule.h"
+#include "../datamodules/screenshot-datamodule/ScreenshotDataModule.h"
 
 class ScreenshotConfiguration: public DataModuleBaseConfiguration {
 private:

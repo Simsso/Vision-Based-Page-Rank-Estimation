@@ -17,6 +17,6 @@ ScreenshotConfiguration::ScreenshotConfiguration(int width, int height){
 ScreenshotConfiguration::~ScreenshotConfiguration(){}
 
 DataModuleBase* ScreenshotConfiguration::createInstance() {
-    return new ScreenshotDataModule();
+    return new ScreenshotDataModule(height, width);
 }
 

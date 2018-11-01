@@ -12,8 +12,10 @@ class DataModuleBase {
 
 protected:
     Logger* logger;
+    string url;
+
 public:
-    virtual NodeElement* process();
+    virtual NodeElement* process(string);
 
     DataModuleBase();
     ~DataModuleBase();
