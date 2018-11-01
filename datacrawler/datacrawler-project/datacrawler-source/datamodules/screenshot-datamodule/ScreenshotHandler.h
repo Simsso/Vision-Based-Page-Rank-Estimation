@@ -7,11 +7,14 @@
 
 
 #include <include/cef_render_handler.h>
+#include "../../util/Logger.h"
 
 class ScreenshotHandler : public CefRenderHandler {
 private:
-    int height;
-    int width;
+    IMPLEMENT_REFCOUNTING(ScreenshotHandler);
+    Logger *logger;
+    int renderHeight;
+    int renderWidth;
 
 public:
     bool GetViewRect(CefRefPtr<CefBrowser> , CefRect &) OVERRIDE;

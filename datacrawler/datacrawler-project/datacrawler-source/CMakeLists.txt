@@ -37,7 +37,11 @@ set(CEFSIMPLE_SRCS
         datamodules/screenshot-datamodule/ScreenshotDataModule.h
         util/Logger.cpp
         util/Logger.h
-        util/LogLevel.h datamodules/screenshot-datamodule/ScreenshotClient.cpp datamodules/screenshot-datamodule/ScreenshotClient.h datamodules/screenshot-datamodule/ScreenshotHandler.cpp datamodules/screenshot-datamodule/ScreenshotHandler.h)
+        util/LogLevel.h
+        datamodules/screenshot-datamodule/ScreenshotClient.cpp
+        datamodules/screenshot-datamodule/ScreenshotClient.h
+        datamodules/screenshot-datamodule/ScreenshotHandler.cpp
+        datamodules/screenshot-datamodule/ScreenshotHandler.h)
 
 APPEND_PLATFORM_SOURCES(CEFSIMPLE_HELPER_SRCS)
 source_group(cefsimple FILES ${CEFSIMPLE_HELPER_SRCS})
@@ -63,7 +67,7 @@ SET_CEF_TARGET_OUT_DIR()
 
 if(OS_LINUX)
   # Executable target.
-  add_executable(${CEF_TARGET} ${CEFSIMPLE_SRCS} datacrawler_handler.cpp datacrawler_handler.h datacrawler_client.cpp datacrawler_client.h)
+  add_executable(${CEF_TARGET} ${CEFSIMPLE_SRCS})
   SET_EXECUTABLE_TARGET_PROPERTIES(${CEF_TARGET})
   add_dependencies(${CEF_TARGET} libcef_dll_wrapper)
   target_link_libraries(${CEF_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})

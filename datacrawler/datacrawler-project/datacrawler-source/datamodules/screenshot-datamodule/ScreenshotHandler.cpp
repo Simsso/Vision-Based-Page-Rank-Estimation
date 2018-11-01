@@ -8,7 +8,19 @@ ScreenshotHandler::~ScreenshotHandler() {
 
 }
 
+ScreenshotHandler::ScreenshotHandler() {
+    renderHeight = 600;
+    renderWidth = 800;
+    logger = Logger::getInstance();
+
+}
 bool ScreenshotHandler::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect) {
-    rect = CefRect(0, 0, height, width);
+    rect = CefRect(0, 0, renderHeight, renderWidth);
     return true;
+}
+
+void ScreenshotHandler::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects,
+        const void *buffer, int width, int height) {
+
+    logger->info("Painting!");
 }

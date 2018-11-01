@@ -3,3 +3,11 @@
 //
 
 #include "ScreenshotClient.h"
+
+ScreenshotClient::ScreenshotClient(ScreenshotHandler* screenshotHandler){
+    this->screenshotHandler = screenshotHandler;
+}
+
+CefRefPtr<CefRenderHandler> ScreenshotClient::GetRenderHandler() {
+    return screenshotHandler;
+}
