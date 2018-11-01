@@ -4,6 +4,10 @@
 
 #include "ScreenshotClient.h"
 
+ScreenshotClient::ScreenshotClient(){}
+
+ScreenshotClient::~ScreenshotClient(){}
+
 ScreenshotClient::ScreenshotClient(ScreenshotHandler* screenshotHandler){
     this->screenshotHandler = screenshotHandler;
 }

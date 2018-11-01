@@ -14,6 +14,14 @@ ScreenshotHandler::ScreenshotHandler() {
     logger = Logger::getInstance();
 
 }
+
+ScreenshotHandler::ScreenshotHandler(int renderHeight, int renderWidth) {
+    this->renderHeight = renderHeight;
+    this->renderWidth = renderWidth;
+    logger = Logger::getInstance();
+
+}
+
 bool ScreenshotHandler::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect) {
     rect = CefRect(0, 0, renderHeight, renderWidth);
     return true;

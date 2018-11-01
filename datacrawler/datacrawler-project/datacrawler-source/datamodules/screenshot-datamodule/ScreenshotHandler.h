@@ -21,7 +21,7 @@ public:
     void OnPaint(CefRefPtr<CefBrowser>, PaintElementType, const RectList &, const void*, int, int) OVERRIDE;
     
     ScreenshotHandler();
-    ScreenshotHandler(int height, int width);
+    ScreenshotHandler(int, int);
     ~ScreenshotHandler();
 
 };
