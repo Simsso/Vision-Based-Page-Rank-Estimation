@@ -19,7 +19,10 @@ NodeElement *ScreenshotDataModule::process(string url) {
     logger->info("Running ScreenshotDataModule ..");
     this->url = url;
 
-    screenshotHandler = new ScreenshotHandler(height, width);
+    NodeElement * nodeElement = new NodeElement();
+
+    // no mutex needed since MessageLoops is only exited, when painting is over
+    screenshotHandler = new ScreenshotHandler(nodeElement, height, width);
     screenshotClient = new ScreenshotClient(screenshotHandler);
 
     CefWindowInfo cefWindowInfo;
@@ -32,7 +35,6 @@ NodeElement *ScreenshotDataModule::process(string url) {
 
     CefRunMessageLoop();
 
-    NodeElement *tmp = new NodeElement();
     logger->info("Running ScreenshotDataModule .. finished !");
-    return tmp;
+    return nodeElement;
 }
