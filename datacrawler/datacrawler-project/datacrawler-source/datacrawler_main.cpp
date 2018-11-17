@@ -30,8 +30,8 @@ int main(int argc, char* argv[]){
         Datacrawler datacrawler;
         datacrawler.init();
 
-       // datacrawler.process("https://google.com/");
-       datacrawler.process("https://youtube.de");
+        //datacrawler.process("https://haberturk.com/");
+       datacrawler.process("file:///home/samed/Desktop/index.html");
         logger->info("Datacrawler execution finished!");
     }
 

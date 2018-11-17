@@ -19,7 +19,7 @@ NodeElement *ScreenshotDataModule::process(string url) {
     logger->info("Running ScreenshotDataModule ..");
     this->url = url;
 
-    NodeElement * nodeElement = new NodeElement();
+    NodeElement * nodeElement = nullptr;
 
     // no mutex needed since MessageLoops is only exited, when painting is over
     screenshotHandler = new ScreenshotHandler(nodeElement, height, width);
@@ -30,8 +30,25 @@ NodeElement *ScreenshotDataModule::process(string url) {
 
     // TODO Detect when website has finished loading
     CefBrowserSettings browserSettings;
-    browserSettings.windowless_frame_rate = 1;
+    browserSettings.windowless_frame_rate = 60;
     browser = CefBrowserHost::CreateBrowserSync(cefWindowInfo, screenshotClient.get(), url, browserSettings, NULL);
+
+    std::thread timeout([&]() {
+        std::this_thread::sleep_for(std::chrono::seconds(SCREENSHOT_TIMEOUT));
+        screenshotHandler->getMutex().lock();
+
+        if(screenshotHandler->hasPainted()){
+            logger->info("ScreenshotDataModule timed out! Returning current screenshot result!");
+        } else {
+            // TODO Add placeholder screenshot
+            logger->error("ScreenshotDataModule has failed to take a screenshot! Returning placeholder!");
+            throw "ScreenshotDataModule has failed to take a screenshot!";
+        }
+
+        CefQuitMessageLoop();
+        screenshotModuleMutex.unlock();
+    });
+
 
     CefRunMessageLoop();
 

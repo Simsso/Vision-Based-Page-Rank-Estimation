@@ -11,11 +11,9 @@
 #include "../../util/Logger.h"
 #include "../../graph/NodeElement.h"
 
-#include <chrono>
-#include <list>
 #include <cmath>
+#include <mutex>
 
-using namespace std::chrono;
 
 class ScreenshotHandler : public CefRenderHandler {
 private:
@@ -24,18 +22,24 @@ private:
     int renderHeight;
     int renderWidth;
     NodeElement* nodeElement;
-    int32_t deltaNorm;
-    int32_t lastL1Norm;
+    unsigned char* lastScreenshot;
+    std::mutex screenshotModuleMutex;
+    bool mHasPainted;
+    int32_t sum;
+    int32_t average;
+    int32_t num;
 
 public:
     bool GetViewRect(CefRefPtr<CefBrowser> , CefRect &) OVERRIDE;
     void OnPaint(CefRefPtr<CefBrowser>, PaintElementType, const RectList &, const void*, int, int) OVERRIDE;
-    int32_t calculateL1Norm(const void*, int32_t , int32_t);
+    int32_t calculateL1Distance(unsigned char*, unsigned char*, int32_t , int32_t);
+
+    bool hasPainted();
+    std::mutex& getMutex();
     
     ScreenshotHandler();
     ScreenshotHandler(NodeElement*, int, int);
     ~ScreenshotHandler();
-
 };
 
 

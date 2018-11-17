@@ -5,14 +5,20 @@
 #ifndef DATACRAWLER_PROJECT_SCREENSHOTDATAMODULE_H
 #define DATACRAWLER_PROJECT_SCREENSHOTDATAMODULE_H
 
+#include <thread>
+#include <chrono>
+#include <mutex>
+
 #include <include/internal/cef_ptr.h>
 #include "../DataModuleBase.h"
 #include "ScreenshotHandler.h"
 #include "ScreenshotClient.h"
 
+#define SCREENSHOT_TIMEOUT 100
 
 class ScreenshotDataModule : public DataModuleBase {
 private:
+    std::mutex screenshotModuleMutex;
     int height;
     int width;
     ScreenshotHandler* screenshotHandler;

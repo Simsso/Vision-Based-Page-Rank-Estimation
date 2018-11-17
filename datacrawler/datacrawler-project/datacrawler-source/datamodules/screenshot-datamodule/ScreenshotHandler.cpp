@@ -11,18 +11,21 @@ ScreenshotHandler::~ScreenshotHandler() {
 ScreenshotHandler::ScreenshotHandler() {
     renderHeight = 600;
     renderWidth = 800;
-    deltaNorm = 1;
     logger = Logger::getInstance();
-
+    lastScreenshot = nullptr;
+    mHasPainted = false;
 }
 
 ScreenshotHandler::ScreenshotHandler(NodeElement* nodeElement, int renderHeight, int renderWidth) {
     this->nodeElement = nodeElement;
     this->renderHeight = renderHeight;
     this->renderWidth = renderWidth;
-    deltaNorm = 1;
     logger = Logger::getInstance();
-
+    lastScreenshot = nullptr;
+    mHasPainted = false;
+    num =0;
+    average = 0;
+    sum = 0;
 }
 
 bool ScreenshotHandler::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect) {
@@ -32,35 +35,46 @@ bool ScreenshotHandler::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect
 
 void ScreenshotHandler::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects,
         const void *buffer, int width, int height) {
-
-
-    //milliseconds invokeTime = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
-    //invokes.push_back(invokeTime.count());
-
+    screenshotModuleMutex.lock();
     logger->info("Painting!");
-    //logger->info(std::to_string(invokes.front()));
-    auto norm = calculateL1Norm(buffer, width, height);
-    deltaNorm = abs(lastL1Norm - norm);
+    unsigned char* screenshot = (unsigned char*) buffer;
+    mHasPainted = true;
 
-    logger->info("L1 distance between screenshots: "+std::to_string(deltaNorm));
+    int32_t deltaNorm = 0;
+
+    if (lastScreenshot != nullptr){
+        deltaNorm = calculateL1Distance(lastScreenshot, screenshot, width, height);
+        logger->info("L1 distance between screenshots: "+std::to_string(deltaNorm));
+        delete lastScreenshot;
+        ++num;
+        sum += deltaNorm;
+
+        average = sum /  num;
+        logger->info("Num: "+std::to_string(num)+" Avg: "+std::to_string(average));
+    }
 
     nodeElement = nullptr;
 
    /* if(deltaNorm == 0)
         CefQuitMessageLoop();
     else */
-        lastL1Norm = norm;
 
+    lastScreenshot = new unsigned char[height * width *4];
+    memcpy(lastScreenshot, buffer, sizeof(unsigned char) * height * width * 4);
+    screenshotModuleMutex.unlock();
 }
 
- int32_t ScreenshotHandler::calculateL1Norm(const void* mat, int32_t  numCol, int32_t numRow) {
-    unsigned char * matrix = (unsigned char *) mat;
+ int32_t ScreenshotHandler::calculateL1Distance(unsigned char* firstMatrix, unsigned char* secMatrix, int32_t numCol, int32_t numRow) {
     int32_t l1 = 0;
 
-     // our matrix is an array each pixel is represented by 4 * 2 Bytes due BRGA
-     // if we take a screenshot of 640*420 = 268800 pixels, we have to consider 1075200 pixels
+    // our matrix is an array each pixel is represented by 4 * 2 Bytes due BRGA
+    // if we take a screenshot of 640*420 = 268800 pixels, we have to consider 1075200 pixels
     for(int32_t i = 0; i < numRow*numCol * 4; i++ )
-            l1 +=  (int32_t) *(matrix + i);
+            l1 +=  abs((int32_t) *(firstMatrix + i) - (int32_t) *(secMatrix + i));
 
     return l1;
 }
+
+bool ScreenshotHandler::hasPainted(){ return mHasPainted;}
+
+std::mutex& ScreenshotHandler::getMutex() { return screenshotModuleMutex;}
