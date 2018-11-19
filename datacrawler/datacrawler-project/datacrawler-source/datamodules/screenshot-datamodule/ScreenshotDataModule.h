@@ -14,7 +14,7 @@
 #include "ScreenshotHandler.h"
 #include "ScreenshotClient.h"
 
-#define SCREENSHOT_TIMEOUT 100
+#define SCREENSHOT_TIMEOUT 1000
 
 class ScreenshotDataModule : public DataModuleBase {
 private:

@@ -14,6 +14,11 @@ ScreenshotHandler::ScreenshotHandler() {
     logger = Logger::getInstance();
     lastScreenshot = nullptr;
     mHasPainted = false;
+    numInvokations = 0;
+    averageL1Distance = 0;
+    lastAverageL1Distance = 0;
+    sumL1Distance = 0;
+    changeRateL1Distance = 0;
 }
 
 ScreenshotHandler::ScreenshotHandler(NodeElement* nodeElement, int renderHeight, int renderWidth) {
@@ -23,9 +28,11 @@ ScreenshotHandler::ScreenshotHandler(NodeElement* nodeElement, int renderHeight,
     logger = Logger::getInstance();
     lastScreenshot = nullptr;
     mHasPainted = false;
-    num =0;
-    average = 0;
-    sum = 0;
+    numInvokations = 0;
+    averageL1Distance = 0;
+    lastAverageL1Distance = 0;
+    sumL1Distance = 0;
+    changeRateL1Distance = 0;
 }
 
 bool ScreenshotHandler::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect) {
@@ -36,21 +43,29 @@ bool ScreenshotHandler::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect
 void ScreenshotHandler::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects,
         const void *buffer, int width, int height) {
     screenshotModuleMutex.lock();
-    logger->info("Painting!");
+    //logger->info("Painting!");
     unsigned char* screenshot = (unsigned char*) buffer;
     mHasPainted = true;
 
     int32_t deltaNorm = 0;
 
+
+    // TODO  Quit, when last onPaint() is older than 1000ms
     if (lastScreenshot != nullptr){
         deltaNorm = calculateL1Distance(lastScreenshot, screenshot, width, height);
         logger->info("L1 distance between screenshots: "+std::to_string(deltaNorm));
         delete lastScreenshot;
-        ++num;
-        sum += deltaNorm;
+        ++numInvokations;
 
-        average = sum /  num;
-        logger->info("Num: "+std::to_string(num)+" Avg: "+std::to_string(average));
+        lastAverageL1Distance = averageL1Distance;
+        sumL1Distance += deltaNorm;
+        averageL1Distance = sumL1Distance /  numInvokations;
+
+        if(averageL1Distance != 0)
+            changeRateL1Distance = abs(1 - ((double) lastAverageL1Distance / (double) averageL1Distance));
+
+        logger->info("Sum: "+std::to_string(sumL1Distance)+" Invokations: "+std::to_string(numInvokations)+
+        " Avg: "+std::to_string(averageL1Distance)+" Change-Rate: "+std::to_string(changeRateL1Distance));
     }
 
     nodeElement = nullptr;

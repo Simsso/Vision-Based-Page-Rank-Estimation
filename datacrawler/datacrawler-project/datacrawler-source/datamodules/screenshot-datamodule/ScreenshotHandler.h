@@ -25,9 +25,11 @@ private:
     unsigned char* lastScreenshot;
     std::mutex screenshotModuleMutex;
     bool mHasPainted;
-    int32_t sum;
-    int32_t average;
-    int32_t num;
+    int64_t sumL1Distance;
+    int32_t averageL1Distance;
+    int32_t lastAverageL1Distance;
+    int32_t numInvokations;
+    double changeRateL1Distance;
 
 public:
     bool GetViewRect(CefRefPtr<CefBrowser> , CefRect &) OVERRIDE;

@@ -31,7 +31,7 @@ int main(int argc, char* argv[]){
         datacrawler.init();
 
         //datacrawler.process("https://haberturk.com/");
-       datacrawler.process("file:///home/samed/Desktop/index.html");
+        datacrawler.process("file:///home/samed/Desktop/index.html");
         logger->info("Datacrawler execution finished!");
     }
 
