@@ -15,10 +15,11 @@ ScreenshotHandler::ScreenshotHandler() {
     lastScreenshot = nullptr;
     mHasPainted = false;
     numInvokations = 0;
-    averageL1Distance = 0;
-    lastAverageL1Distance = 0;
     sumL1Distance = 0;
-    changeRateL1Distance = 0;
+    initialInvoke = true;
+
+    for(int i = 0; i < 4; i++)
+        averageL1Distances[i] = 0;
 }
 
 ScreenshotHandler::ScreenshotHandler(NodeElement* nodeElement, int renderHeight, int renderWidth) {
@@ -29,10 +30,11 @@ ScreenshotHandler::ScreenshotHandler(NodeElement* nodeElement, int renderHeight,
     lastScreenshot = nullptr;
     mHasPainted = false;
     numInvokations = 0;
-    averageL1Distance = 0;
-    lastAverageL1Distance = 0;
     sumL1Distance = 0;
-    changeRateL1Distance = 0;
+    initialInvoke = true;
+
+    for(int i = 0; i < 4; i++)
+        averageL1Distances[i] = 0;
 }
 
 bool ScreenshotHandler::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect) {
@@ -49,34 +51,40 @@ void ScreenshotHandler::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType 
 
     int32_t deltaNorm = 0;
 
-
-    // TODO  Quit, when last onPaint() is older than 1000ms
-    if (lastScreenshot != nullptr){
+    // TODO  Quit, when last onPaint() is older than 1000m
+    // TODO  Calculate a change matrix (consisting of 1 and 0) and calculate the L1 distance
+    if (!initialInvoke){
         deltaNorm = calculateL1Distance(lastScreenshot, screenshot, width, height);
-        logger->info("L1 distance between screenshots: "+std::to_string(deltaNorm));
         delete lastScreenshot;
         ++numInvokations;
 
-        lastAverageL1Distance = averageL1Distance;
         sumL1Distance += deltaNorm;
-        averageL1Distance = sumL1Distance /  numInvokations;
+        insertAverageL1Distance(sumL1Distance /  numInvokations);
 
-        if(averageL1Distance != 0)
-            changeRateL1Distance = abs(1 - ((double) lastAverageL1Distance / (double) averageL1Distance));
+        if(averageL1Distances[0] != 0){
+            changeRatesL1distances.push_back(calculateChangeRate());
+            logger->info("Sum: "+std::to_string(sumL1Distance)+" Invokations: "+std::to_string(numInvokations)+
+        +" Current L1-Distance: "+ std::to_string(deltaNorm)+" Avg: "+std::to_string(averageL1Distances[3])+" Average change-rate: "+std::to_string(changeRatesL1distances.back()));
 
-        logger->info("Sum: "+std::to_string(sumL1Distance)+" Invokations: "+std::to_string(numInvokations)+
-        " Avg: "+std::to_string(averageL1Distance)+" Change-Rate: "+std::to_string(changeRateL1Distance));
+            if( abs(1 - (changeRatesL1distances.at(0) / changeRatesL1distances.back())) <= 0.05){
+                logger->info("Change-rate dropped is under 5% of the initial change-rate!");
+            }
+        }
+
+
     }
 
     nodeElement = nullptr;
 
-   /* if(deltaNorm == 0)
-        CefQuitMessageLoop();
-    else */
-
     lastScreenshot = new unsigned char[height * width *4];
     memcpy(lastScreenshot, buffer, sizeof(unsigned char) * height * width * 4);
     screenshotModuleMutex.unlock();
+    initialInvoke = false;
+}
+
+// TODO Refactor the function to calculate the change rate
+ double ScreenshotHandler::calculateChangeRate(){
+    return (double) (-2 * averageL1Distances[0] + 9 * averageL1Distances[1] - 18 * averageL1Distances[2] + 11 * averageL1Distances[3]) / (double) 6;
 }
 
  int32_t ScreenshotHandler::calculateL1Distance(unsigned char* firstMatrix, unsigned char* secMatrix, int32_t numCol, int32_t numRow) {
@@ -88,6 +96,14 @@ void ScreenshotHandler::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType 
             l1 +=  abs((int32_t) *(firstMatrix + i) - (int32_t) *(secMatrix + i));
 
     return l1;
+}
+
+ void ScreenshotHandler::insertAverageL1Distance(int32_t value){
+
+    for(int i = 0; i < 3; i++) {
+        averageL1Distances[i] = averageL1Distances[i+1];
+    }
+    averageL1Distances[3] = value;
 }
 
 bool ScreenshotHandler::hasPainted(){ return mHasPainted;}

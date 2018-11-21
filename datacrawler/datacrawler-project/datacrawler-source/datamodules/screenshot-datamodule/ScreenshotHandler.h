@@ -13,7 +13,7 @@
 
 #include <cmath>
 #include <mutex>
-
+#include <list>
 
 class ScreenshotHandler : public CefRenderHandler {
 private:
@@ -25,16 +25,19 @@ private:
     unsigned char* lastScreenshot;
     std::mutex screenshotModuleMutex;
     bool mHasPainted;
+    bool initialInvoke;
+    int32_t averageL1Distances[4];
     int64_t sumL1Distance;
-    int32_t averageL1Distance;
-    int32_t lastAverageL1Distance;
     int32_t numInvokations;
-    double changeRateL1Distance;
+    vector<double> changeRatesL1distances;
+
 
 public:
     bool GetViewRect(CefRefPtr<CefBrowser> , CefRect &) OVERRIDE;
     void OnPaint(CefRefPtr<CefBrowser>, PaintElementType, const RectList &, const void*, int, int) OVERRIDE;
     int32_t calculateL1Distance(unsigned char*, unsigned char*, int32_t , int32_t);
+    double calculateChangeRate();
+    void insertAverageL1Distance(int32_t);
 
     bool hasPainted();
     std::mutex& getMutex();
