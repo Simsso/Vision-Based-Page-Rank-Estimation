@@ -5,21 +5,19 @@
 #ifndef DATACRAWLER_PROJECT_NODEELEMENT_H
 #define DATACRAWLER_PROJECT_NODEELEMENT_H
 
-#include "iostream"
-
-using namespace std;
+#include "../datamodules/DataBase.h"
+#include <vector>
 
 class NodeElement {
 
 private:
-    string type;
+   std::vector<DataBase*>* data;
 
 public:
-
-    string getType();
+    void addData(DataBase*);
+    std::vector<DataBase*> * getData();
 
     NodeElement();
-    NodeElement(string type);
     ~NodeElement();
 };
 

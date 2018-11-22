@@ -12,10 +12,10 @@ class DataModuleBase {
 
 protected:
     Logger* logger;
-    string url;
+    std::string url;
 
 public:
-    virtual NodeElement* process(string);
+    virtual DataBase* process(std::string);
 
     DataModuleBase();
     ~DataModuleBase();

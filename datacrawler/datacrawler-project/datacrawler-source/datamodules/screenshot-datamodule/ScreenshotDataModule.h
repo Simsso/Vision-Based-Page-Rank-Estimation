@@ -9,16 +9,19 @@
 #include <chrono>
 #include <mutex>
 
+
 #include <include/internal/cef_ptr.h>
 #include "../DataModuleBase.h"
 #include "ScreenshotHandler.h"
 #include "ScreenshotClient.h"
+#include "Screenshot.h"
+#include "ScreenshotData.h"
 
-#define SCREENSHOT_TIMEOUT 1000
+#define ONPAINT_TIMEOUT 10
+#define ELAPSED_TIME_ONPAINT_TIMEOUT 2500
 
 class ScreenshotDataModule : public DataModuleBase {
 private:
-    std::mutex screenshotModuleMutex;
     int height;
     int width;
     ScreenshotHandler* screenshotHandler;
@@ -26,7 +29,7 @@ private:
     CefRefPtr<CefBrowser> browser;
 
 public:
-    NodeElement* process(string);
+    DataBase* process(std::string);
 
     ScreenshotDataModule();
     ScreenshotDataModule(int, int);

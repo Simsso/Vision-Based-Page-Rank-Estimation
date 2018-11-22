@@ -7,12 +7,18 @@
 #include "datacrawler.h"
 
 
+/**
+ * Datacrawler
+ */
 Datacrawler::Datacrawler(){
     logger = Logger::getInstance();
 }
 
 Datacrawler::~Datacrawler(){}
 
+/**
+ * init - Loads all user-defined DataModules and prepares Datacrawler to crawl given url
+ */
 void Datacrawler::init() {
         logger->info("Initialising Datacrawler !");
 
@@ -29,15 +35,22 @@ void Datacrawler::init() {
         logger->info("Initialising Datacrawler finished!");
 }
 
+/**
+ * process - Process given url with loaded DataModules
+ * @param url which should be processed
+ * @return NodeElement which represents a node in the graph with all data the user defined for the graph
+ */
 NodeElement* Datacrawler::process(string url) {
         logger->info("Processing <"+url+">");
         logger->info("Running DataModules!");
 
+        NodeElement * newNode = new NodeElement();
+
         for (auto x: dataModules) {
-            x->process(url);
+           newNode->addData(x->process(url));
         }
 
         logger->info("<"+url+"> processed!");
 
-    return nullptr;
+    return newNode;
 }

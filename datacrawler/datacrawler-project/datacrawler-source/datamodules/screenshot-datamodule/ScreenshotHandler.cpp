@@ -4,108 +4,219 @@
 
 #include "ScreenshotHandler.h"
 
+/**
+ * ~ScreenshotHandler
+ */
 ScreenshotHandler::~ScreenshotHandler() {
-
+    delete lastScreenshot;
+    delete lastL1Norms;
 }
 
-ScreenshotHandler::ScreenshotHandler() {
-    renderHeight = 600;
-    renderWidth = 800;
+/**
+ * ScreenshotHandler - Initializies ScreenshotHandler
+ *
+ * @param countLastL1Norms represents the number of the last n screenshots for whom the average should
+ * be calculated. The average is later used to calculate the deviation from the total average.
+ * @param changePixelThreshold represents a threshold in percent. If the deviation between the average of the last n
+ * and the total average of all screenshots falls below this threshold, a screenshot will be taken.
+ * @param renderHeight represents the height of the screenshot.
+ * @param renderWidth represents the width of the screenshot.
+ *
+ */
+ScreenshotHandler::ScreenshotHandler(bool * quitMessageLoop, int countLastL1Norms, float changePixelThreshold, int renderHeight, int renderWidth) {
     logger = Logger::getInstance();
-    lastScreenshot = nullptr;
-    mHasPainted = false;
-    numInvokations = 0;
-    sumL1Distance = 0;
-    initialInvoke = true;
 
-    for(int i = 0; i < 4; i++)
-        averageL1Distances[i] = 0;
-}
-
-ScreenshotHandler::ScreenshotHandler(NodeElement* nodeElement, int renderHeight, int renderWidth) {
-    this->nodeElement = nodeElement;
     this->renderHeight = renderHeight;
     this->renderWidth = renderWidth;
-    logger = Logger::getInstance();
-    lastScreenshot = nullptr;
-    mHasPainted = false;
-    numInvokations = 0;
-    sumL1Distance = 0;
-    initialInvoke = true;
 
-    for(int i = 0; i < 4; i++)
-        averageL1Distances[i] = 0;
+    mHasPainted = false;
+    initialInvoke = true;
+    this->quitMessageLoop = quitMessageLoop;
+
+    lastScreenshot = nullptr;
+
+    numInvokations = 0;
+    sumL1Norm = 0;
+    averageL1Norm = 0;
+    this->countLastL1Norms = countLastL1Norms;
+    lastL1Norms = new int32_t[countLastL1Norms];
+
+    for (int i = 0; i < countLastL1Norms; i++)
+        lastL1Norms[i] = 0;
+
+    this->changePixelThreshold = changePixelThreshold;
 }
 
+/**
+ * GetViewRect - Sets height and width of the given CefRect-instance
+ * @param browser represents the current CefBrowser-instance
+ * @param rect represents the CefRect-instance of the given CefBrowser-instance
+ * @return This will return true.
+ */
 bool ScreenshotHandler::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect) {
     rect = CefRect(0, 0, renderHeight, renderWidth);
     return true;
 }
 
+/**
+ * OnPaint - Logic for taking a screenshot of the website. Called if the @param buffer was updated. It is not longer called
+ * being called. CefQuitMessageLoop() is called in following cases:
+ *
+ * (a) the deviation between total average of L1-norms and the last n screenshots falls below the specified threshold
+ * (b) external: onPaint() was not called for over a specified time (ELAPSED_TIME_ONPAINT_TIMEOUT in ScreenshotDataModule.h)
+ * (c) external: onPaint() timed-out (ONPAINT_TIMEOUT in ScreenshotDataModule.h)
+ *
+ * @param browser represents the current CefBrowser-instance.
+ * @param type specifies if a pop-up or view has has been painted.
+ * @param dirtyRects specifies the areas, which are 'dirty' and were repainted
+ * @param buffer represents the raw BGRA buffer. The size of the buffer is 4 Bytes * height * width
+ * @param width represents the width of the screenshot
+ * @param height represents the height of the screenhot
+ */
 void ScreenshotHandler::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects,
-        const void *buffer, int width, int height) {
-    screenshotModuleMutex.lock();
-    //logger->info("Painting!");
-    unsigned char* screenshot = (unsigned char*) buffer;
+                                const void *buffer, int width, int height) {
+
+    timeOnPaintInvoke = std::chrono::steady_clock::now();
+
+    auto *screenshot = (unsigned char *) buffer;
+
     mHasPainted = true;
 
-    int32_t deltaNorm = 0;
-
-    // TODO  Quit, when last onPaint() is older than 1000m
-    // TODO  Calculate a change matrix (consisting of 1 and 0) and calculate the L1 distance
-    if (!initialInvoke){
-        deltaNorm = calculateL1Distance(lastScreenshot, screenshot, width, height);
-        delete lastScreenshot;
+    if (!initialInvoke) {
         ++numInvokations;
 
-        sumL1Distance += deltaNorm;
-        insertAverageL1Distance(sumL1Distance /  numInvokations);
+        unsigned char *changeMatrix = calculateChangeMatrix(lastScreenshot, screenshot, renderHeight, renderWidth);
+        int32_t l1Norm = calculateL1Norm(changeMatrix, renderWidth, renderHeight);
 
-        if(averageL1Distances[0] != 0){
-            changeRatesL1distances.push_back(calculateChangeRate());
-            logger->info("Sum: "+std::to_string(sumL1Distance)+" Invokations: "+std::to_string(numInvokations)+
-        +" Current L1-Distance: "+ std::to_string(deltaNorm)+" Avg: "+std::to_string(averageL1Distances[3])+" Average change-rate: "+std::to_string(changeRatesL1distances.back()));
+        logger->info("Current L1-Norm: " + std::to_string(l1Norm));
 
-            if( abs(1 - (changeRatesL1distances.at(0) / changeRatesL1distances.back())) <= 0.05){
-                logger->info("Change-rate dropped is under 5% of the initial change-rate!");
+        sumL1Norm += l1Norm;
+        averageL1Norm = sumL1Norm / numInvokations;
+        insertL1Norm(l1Norm);
+
+        if (lastL1Norms[0] != 0) {
+            int32_t averageLastL1Norms = 0;
+
+            for (int i = 0; i < countLastL1Norms; i++)
+                averageLastL1Norms += lastL1Norms[i];
+
+            averageLastL1Norms = averageLastL1Norms / countLastL1Norms;
+
+            if ((double) averageLastL1Norms / (double) averageL1Norm < changePixelThreshold) {
+                logger->info("Less than " + std::to_string(changePixelThreshold * 100) +
+                             "% of the pixels changed! Taking screenshot!");
+                // lock variable from other threads such as timeout
+                quitMessageLoopMutex.lock();
+                *quitMessageLoop = true;
+                quitMessageLoopMutex.unlock();
+                return;
             }
         }
 
-
+        delete lastScreenshot;
+        delete changeMatrix;
     }
 
-    nodeElement = nullptr;
-
-    lastScreenshot = new unsigned char[height * width *4];
-    memcpy(lastScreenshot, buffer, sizeof(unsigned char) * height * width * 4);
-    screenshotModuleMutex.unlock();
+    lastScreenshot = new unsigned char[height * width * 4];
+    memcpy(lastScreenshot, screenshot, sizeof(unsigned char) * height * width * 4);
     initialInvoke = false;
 }
 
-// TODO Refactor the function to calculate the change rate
- double ScreenshotHandler::calculateChangeRate(){
-    return (double) (-2 * averageL1Distances[0] + 9 * averageL1Distances[1] - 18 * averageL1Distances[2] + 11 * averageL1Distances[3]) / (double) 6;
+/** calculateChangeMatrix - Calculates a change matrix between two matrices from R^(nxm). Each element of the change
+ *  matrix represents a state and is mapped to 4 Bytes of each input matrices. The state is 1 if the selected 4 Bytes of
+ *  both matrices differ from each other, else 0.
+ *
+ * @param firstMatrix represents the first matrix
+ * @param secMatrix represents the second matrix
+ * @param numCol represents the number of columns of the matrix (width of screenshot)
+ * @param numRow represents the number of rows of the matrix (height of screenshot)
+ * @return A matrix A ∈ R^(numCol x numRow), where a_i,j ∈ {0,1}.
+ *         a_i,j = 1, if there was a change in this point between firstMatrix and secondMatrix
+ *         a_i,j = 0, if there was no change.
+ */
+unsigned char *
+ScreenshotHandler::calculateChangeMatrix(unsigned char *firstMatrix, unsigned char *secMatrix, int32_t numCol,
+                                         int32_t numRow) {
+    auto *changeMatrix = new unsigned char[numCol * numRow]{0};
+
+    for (int32_t i = 0, k = 0; i < numRow * numCol * 4; i += 4, k++) {
+        if (*(firstMatrix + i) != *(secMatrix + i) ||
+            *(firstMatrix + i + 1) != *(secMatrix + i + 1) ||
+            *(firstMatrix + i + 2) != *(secMatrix + i + 2) ||
+            *(firstMatrix + i + 3) != *(secMatrix + i + 3)) {
+            changeMatrix[k] = 1;
+        }
+    }
+
+    return changeMatrix;
 }
 
- int32_t ScreenshotHandler::calculateL1Distance(unsigned char* firstMatrix, unsigned char* secMatrix, int32_t numCol, int32_t numRow) {
+/**
+ * calculateL1Norm - Calculates the L1-norm of a given matrix
+ *
+ * @param matrix represents the matrix the L1-norm to be calculated for
+ * @param numCol represents the number of columns of the matrix
+ * @param numRow represents the number of rows of the matrix
+ * @return The L1-norm of the given matrix
+ */
+int32_t ScreenshotHandler::calculateL1Norm(unsigned char *matrix, int32_t numCol, int32_t numRow) {
     int32_t l1 = 0;
 
-    // our matrix is an array each pixel is represented by 4 * 2 Bytes due BRGA
-    // if we take a screenshot of 640*420 = 268800 pixels, we have to consider 1075200 pixels
-    for(int32_t i = 0; i < numRow*numCol * 4; i++ )
-            l1 +=  abs((int32_t) *(firstMatrix + i) - (int32_t) *(secMatrix + i));
+    for (int32_t i = 0; i < numRow * numCol; i++)
+        l1 += abs((int32_t) *(matrix + i));
 
     return l1;
 }
 
- void ScreenshotHandler::insertAverageL1Distance(int32_t value){
+/**
+ * insertL1Norm - Inserts into lastL1Norms in our case the last calculated L1-norm in a FiFo-manner.
+ */
+void ScreenshotHandler::insertL1Norm(int32_t value) {
 
-    for(int i = 0; i < 3; i++) {
-        averageL1Distances[i] = averageL1Distances[i+1];
+    for (int i = 0; i < countLastL1Norms; i++) {
+        lastL1Norms[i] = lastL1Norms[i + 1];
     }
-    averageL1Distances[3] = value;
+
+    lastL1Norms[countLastL1Norms - 1] = value;
 }
 
-bool ScreenshotHandler::hasPainted(){ return mHasPainted;}
+/**
+ * getTimeSinceLastPaint - Calculate the elapsed time since the last onPain()-invoke
+ * @return Elapsed time since the last onPaint()-invoke
+ */
+long ScreenshotHandler::getTimeSinceLastPaint(){
+    std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
+    return std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - timeOnPaintInvoke).count();
+}
 
-std::mutex& ScreenshotHandler::getMutex() { return screenshotModuleMutex;}
+/**
+ * hasPainted
+ * @return True if onPaint() was invoked, else false.
+ */
+bool ScreenshotHandler::hasPainted() { return mHasPainted; }
+
+/**
+ * getScreenshot - Returns the last screenshot painted.
+ *
+ * @return Screenshot in size 4 Bytes * width of screenshot * height screenshot
+ */
+unsigned char* ScreenshotHandler::getScreenshot(){
+
+    if(lastScreenshot == nullptr)
+        throw "Something went very very wrong!";
+
+    auto* screenshot = new unsigned char[renderHeight * renderWidth * 4];
+
+    // copying, since lastScreenshot will be cleaned after destructor call
+    for(int i = 0; i < renderHeight * renderWidth * 4; i++){
+        *(screenshot + i) = *(lastScreenshot + i);
+    }
+
+    return screenshot;
+}
+
+/** qetQuitMessageLoopMutex
+ *
+ * @return Mutex to lock variable for quitting the message loop.
+ */
+std::mutex& ScreenshotHandler::getQuitMessageLoopMutex() { return quitMessageLoopMutex;}

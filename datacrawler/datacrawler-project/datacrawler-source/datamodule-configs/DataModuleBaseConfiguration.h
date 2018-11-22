@@ -14,7 +14,7 @@ public:
      virtual DataModuleBase* createInstance();
 
      DataModuleBaseConfiguration();
-     ~DataModuleBaseConfiguration();
+     virtual ~DataModuleBaseConfiguration();
 };
 
 
