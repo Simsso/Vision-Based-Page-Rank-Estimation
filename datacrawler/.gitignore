@@ -1,3 +1,8 @@
+dependencies/Resources/*
+dependencies/libcef_dll/*
+dependencies/cmake/cef_macros.cmake
+dependencies/cmake/FindCEF.cmake
+dependencies/include/*
 dependencies/Debug/*
 dependencies/Release/*
 dependencies/OpenCV/installation/*
