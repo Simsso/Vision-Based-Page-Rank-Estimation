@@ -1,7 +1,3 @@
-//
-// Created by samed on 23.10.18.
-//
-
 #include "NodeElement.h"
 
 /**

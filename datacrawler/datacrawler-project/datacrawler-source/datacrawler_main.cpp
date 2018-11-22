@@ -1,7 +1,3 @@
-//
-// Created by Samed Güner on 18.10.18.
-//
-
 #include <include/cef_app.h>
 #include <include/wrapper/cef_helpers.h>
 #include "datacrawler.h"

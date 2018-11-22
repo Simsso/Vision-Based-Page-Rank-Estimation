@@ -1,7 +1,3 @@
-//
-// Created by doktorgibson on 11/22/18.
-//
-
 #ifndef DATACRAWLER_PROJECT_SCREENSHOT_H
 #define DATACRAWLER_PROJECT_SCREENSHOT_H
 

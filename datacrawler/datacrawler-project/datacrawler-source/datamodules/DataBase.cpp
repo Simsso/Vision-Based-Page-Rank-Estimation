@@ -1,7 +1,3 @@
-//
-// Created by doktorgibson on 11/22/18.
-//
-
 #include "DataBase.h"
 
 /**
