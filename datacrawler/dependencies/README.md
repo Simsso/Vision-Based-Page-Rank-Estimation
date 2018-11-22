@@ -1,7 +1,7 @@
-#### Dependencies
+## Dependencies
 This folder includes all dependencies required for successful compilation of CEF and projects consuming CEF.
 
-#### Missing Dependencies
+### Missing Dependencies
 Due large binary dependencies and large amount of files following dependencies were removed and have to be installed manually:
 
 ##### CEF
@@ -20,4 +20,4 @@ Due large binary dependencies and large amount of files following dependencies w
 3) Open your project with an IDE and compile!
 
 ##### OpenCV
-`OpenCV-3.4.1` - Contains OpenCV libary, which can/is consumed in the project. Please just run `OpenCV/installOpenCV-18-04.sh` (Caution: Ubuntu 18.04 only), beforehand make sure you have at least 10 GB of space. Depending on your computer, this may take several minutes. After installation you can remove following folders. 
+`OpenCV-3.4.1` - Contains OpenCV libary, which can/is consumed in the project. Please just run `OpenCV/installOpenCV-18-04.sh` (Caution: Ubuntu 18.04 only), beforehand make sure you have at least 10 GB of space. Depending on your computer, this may take several minutes.
