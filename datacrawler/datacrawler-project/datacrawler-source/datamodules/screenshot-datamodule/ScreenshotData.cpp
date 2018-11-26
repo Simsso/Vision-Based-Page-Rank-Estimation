@@ -22,7 +22,7 @@ std::vector<Screenshot*>  ScreenshotData::getScreenshots() { return screenshots;
  * @param width of the screenshot
  */
 void ScreenshotData::addScreenshot(unsigned char *screenshot, int height, int width) {
-    screenshots.push_back( new Screenshot(screenshot, height, width));
+   addScreenshot(new Screenshot(screenshot, height, width));
 }
 
 /**

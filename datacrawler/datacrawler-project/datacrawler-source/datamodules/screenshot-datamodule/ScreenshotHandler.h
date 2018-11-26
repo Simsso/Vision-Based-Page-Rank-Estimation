@@ -30,7 +30,6 @@ private:
 
     int32_t numInvokations;
     int64_t sumL1Norm;
-    int64_t averageL1Norm;
     int countLastL1Norms;
     int32_t* lastL1Norms;
     float changePixelThreshold;

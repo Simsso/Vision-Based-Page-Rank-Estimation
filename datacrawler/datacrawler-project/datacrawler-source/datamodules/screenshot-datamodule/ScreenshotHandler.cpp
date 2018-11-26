@@ -33,12 +33,8 @@ ScreenshotHandler::ScreenshotHandler(bool * quitMessageLoop, int countLastL1Norm
 
     numInvokations = 0;
     sumL1Norm = 0;
-    averageL1Norm = 0;
     this->countLastL1Norms = countLastL1Norms;
-    lastL1Norms = new int32_t[countLastL1Norms];
-
-    for (int i = 0; i < countLastL1Norms; i++)
-        lastL1Norms[i] = 0;
+    lastL1Norms = new int32_t[countLastL1Norms]{0};
 
     this->changePixelThreshold = changePixelThreshold;
 }
@@ -74,20 +70,18 @@ void ScreenshotHandler::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType 
 
     timeOnPaintInvoke = std::chrono::steady_clock::now();
 
-    auto *screenshot = (unsigned char *) buffer;
-
     mHasPainted = true;
 
     if (!initialInvoke) {
         ++numInvokations;
 
-        unsigned char *changeMatrix = calculateChangeMatrix(lastScreenshot, screenshot, renderHeight, renderWidth);
+        unsigned char *changeMatrix = calculateChangeMatrix(lastScreenshot, (unsigned char*) buffer, renderHeight, renderWidth);
         int32_t l1Norm = calculateL1Norm(changeMatrix, renderWidth, renderHeight);
 
         logger->info("Current L1-Norm: " + std::to_string(l1Norm));
 
         sumL1Norm += l1Norm;
-        averageL1Norm = sumL1Norm / numInvokations;
+        int64_t averageL1Norm = sumL1Norm / numInvokations;
         insertL1Norm(l1Norm);
 
         if (lastL1Norms[0] != 0) {
@@ -114,7 +108,7 @@ void ScreenshotHandler::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType 
     }
 
     lastScreenshot = new unsigned char[height * width * 4];
-    memcpy(lastScreenshot, screenshot, sizeof(unsigned char) * height * width * 4);
+    memcpy(lastScreenshot, buffer, sizeof(unsigned char) * height * width * 4);
     initialInvoke = false;
 }
 
@@ -156,9 +150,9 @@ ScreenshotHandler::calculateChangeMatrix(unsigned char *firstMatrix, unsigned ch
  * @return The L1-norm of the given matrix
  */
 int32_t ScreenshotHandler::calculateL1Norm(unsigned char *matrix, int32_t numCol, int32_t numRow) {
-    int32_t l1 = 0;
+    int64_t l1 = 0;
 
-    for (int32_t i = 0; i < numRow * numCol; i++)
+    for (int64_t i = 0; i < numRow * numCol; i++)
         l1 += abs((int32_t) *(matrix + i));
 
     return l1;
@@ -199,7 +193,7 @@ bool ScreenshotHandler::hasPainted() { return mHasPainted; }
 unsigned char* ScreenshotHandler::getScreenshot(){
 
     if(lastScreenshot == nullptr)
-        throw "Something went very very wrong!";
+        throw "Fatal: The lastScreenshot is null! Stopping datacrawler!";
 
     auto* screenshot = new unsigned char[renderHeight * renderWidth * 4];
 

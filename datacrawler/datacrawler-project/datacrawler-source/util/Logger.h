@@ -1,7 +1,3 @@
-//
-// Created by samed on 24.10.18.
-//
-
 #ifndef DATACRAWLER_PROJECT_LOGGER_H
 #define DATACRAWLER_PROJECT_LOGGER_H
 
