@@ -9,8 +9,9 @@ ScreenshotConfiguration::~ScreenshotConfiguration(){}
  * ScreenshotConfiguration - Standard configuration of the ScreenshotDataModule with 800x600 as screenshot size
  */
 ScreenshotConfiguration::ScreenshotConfiguration(){
-    width = 800;
-    height = 600;
+    width = 1920;
+    height = 1080;
+    mobile = false;
 }
 
 /**
@@ -18,9 +19,10 @@ ScreenshotConfiguration::ScreenshotConfiguration(){
  * @param width specifies the width of the screenshot to be taken
  * @param height specifies the height of the screenshot to be taken
  */
-ScreenshotConfiguration::ScreenshotConfiguration(int width, int height){
-    this->width = width;
+ScreenshotConfiguration::ScreenshotConfiguration(int width, int height, bool mobile){
+    this->width  = width;
     this->height = height;
+    this->mobile = mobile;
 }
 
 /**
@@ -28,6 +30,6 @@ ScreenshotConfiguration::ScreenshotConfiguration(int width, int height){
  * @return instance of the ScreenshotDataModule
  */
 DataModuleBase* ScreenshotConfiguration::createInstance() {
-    return new ScreenshotDataModule(height, width);
+    return new ScreenshotDataModule(height, width, mobile);
 }
 

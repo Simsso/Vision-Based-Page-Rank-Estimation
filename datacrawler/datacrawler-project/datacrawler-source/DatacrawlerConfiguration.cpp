@@ -13,7 +13,8 @@ DatacrawlerConfiguration::~DatacrawlerConfiguration() {
  * DatacrawlerConfiguration - Loads all user-defined configurations for the graph to be generated
  */
 DatacrawlerConfiguration::DatacrawlerConfiguration() {
-    configurations[SCREENSHOT_MODULE] = new ScreenshotConfiguration(800,600);
+    configurations[SCREENSHOT_MODULE] = new ScreenshotConfiguration(1920, 1080, false);
+    //configurations[SCREENSHOT_MOBILE_MODULE] = new ScreenshotConfiguration(400, 400, true);
 }
 
 /**

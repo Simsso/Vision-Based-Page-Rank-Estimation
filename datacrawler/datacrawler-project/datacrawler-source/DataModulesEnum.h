@@ -7,7 +7,8 @@
 enum DataModulesEnum {
     NO_MODULE = 0,
     SCREENSHOT_MODULE = 1,
-    URL_MODULE = 2
+    SCREENSHOT_MOBILE_MODULE = 2,
+    URL_MODULE = 3
 };
 
 

@@ -8,12 +8,13 @@ class ScreenshotConfiguration: public DataModuleBaseConfiguration {
 private:
     int height;
     int width;
+    bool mobile;
 
 public:
     DataModuleBase* createInstance();
 
     ScreenshotConfiguration();
-    ScreenshotConfiguration(int width, int height);
+    ScreenshotConfiguration(int, int, bool);
     ~ScreenshotConfiguration();
 
 };
