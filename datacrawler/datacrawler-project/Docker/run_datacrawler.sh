@@ -1,6 +1,5 @@
 #!/bin/bash
 
-echo $URL
 Xvfb :99 &
 export DISPLAY=:99
 

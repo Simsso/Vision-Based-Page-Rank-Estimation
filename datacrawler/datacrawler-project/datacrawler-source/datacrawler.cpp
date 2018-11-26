@@ -46,7 +46,7 @@ NodeElement *Datacrawler::process(string url) {
     NodeElement *newNode = new NodeElement();
 
     for (auto x: dataModules) {
-                    x->process(mainArgs, url);
+       newNode->addData(x->process(mainArgs, url));
     }
 
     logger->info("<" + url + "> processed!");

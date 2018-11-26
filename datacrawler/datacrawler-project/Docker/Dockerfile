@@ -19,5 +19,8 @@ RUN chmod +x /opt/apt/run_datacrawler.sh
 RUN chmod +x /opt/apt/datacrawler/datacrawler
 
 # To analyse given domain, set URL env as follows:
-# docker run -e URL=<url> ...
+# 	docker run -e URL=<url> URL_RANK=<rank> OUTPUT_PATH=<output path for results> 
+# 	DATAMODULE=<name of datamodule to run>
+# 	--mount source=datacrawler-test,target=/data
+
 ENTRYPOINT ["/bin/bash", "/opt/apt/run_datacrawler.sh"]

@@ -7,20 +7,46 @@ Logger *Logger::instance = 0;
 #ifdef DATASET_VERSION_1
 
 int main(int argc, char *argv[]) {
+    Logger *logger = Logger::getInstance();
+    char *url = std::getenv("URL");
+    char *urlRank = getenv("URL_RANK");
+    char *outputPath = getenv("OUTPUT_PATH");
+
+    if(urlRank == NULL){
+     logger->fatal("URL_RANK not specified! Exiting!");
+     exit(1);
+    }
+
+    if(outputPath == NULL){
+     logger->fatal("OUTPUT_PATH not specified! Exiting!");
+     exit(1);
+    }
+
+    long rank = atol(urlRank);
 
     CefMainArgs mainArgs(argc, argv);
     CefExecuteProcess(mainArgs, NULL, NULL);
 
-    Logger *logger = Logger::getInstance();
-
     logger->info("Starting Datacrawler !");
 
-    char *url = std::getenv("URL");
-
     Datacrawler datacrawler(&mainArgs);
+
     datacrawler.init();
 
-    datacrawler.process(url);
+    NodeElement * node = datacrawler.process(url);
+
+    vector<DataBase*>* dataBase = node->getData();
+
+    for(auto x: *dataBase){
+        DataModulesEnum dataModulesEnum = x->getDataModuleType();
+
+        if(dataModulesEnum == SCREENSHOT_MODULE || dataModulesEnum == SCREENSHOT_MOBILE_MODULE) {
+            logger->info("We have screenshots! Saving to disk!");
+        } else {
+            logger->info("No data has been produced!");
+        }
+    }
+
     logger->info("Datacrawler execution finished!");
 }
 

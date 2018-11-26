@@ -12,6 +12,7 @@ class DatacrawlerConfiguration {
 
 private:
     map<DataModulesEnum, DataModuleBaseConfiguration*> configurations;
+    Logger* logger;
 
 public:
     DataModuleBaseConfiguration* getConfiguration(DataModulesEnum);

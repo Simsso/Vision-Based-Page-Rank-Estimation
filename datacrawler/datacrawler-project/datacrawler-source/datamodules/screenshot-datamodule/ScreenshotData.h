@@ -8,6 +8,7 @@
 class ScreenshotData: public DataBase {
 private:
     std::vector<Screenshot*> screenshots;
+    bool mobile;
 
 public:
     std::vector<Screenshot*> getScreenshots();
@@ -16,6 +17,7 @@ public:
 
     DataModulesEnum getDataModuleType();
 
+    ScreenshotData(bool);
     ~ScreenshotData();
 };
 

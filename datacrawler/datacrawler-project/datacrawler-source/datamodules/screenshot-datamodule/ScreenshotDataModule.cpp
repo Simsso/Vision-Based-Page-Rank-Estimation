@@ -106,7 +106,7 @@ DataBase *ScreenshotDataModule::process(CefMainArgs* mainArgs, std::string url) 
         CefDoMessageLoopWork();
     }
 
-    ScreenshotData *screenshotData = new ScreenshotData();
+    ScreenshotData *screenshotData = new ScreenshotData(mobile);
     screenshotData->addScreenshot(screenshotHandler->getScreenshot(), height, width);
 
     logger->info("Waiting for all threads to terminate ..");

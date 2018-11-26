@@ -9,6 +9,10 @@ ScreenshotData::~ScreenshotData(){
     }
 }
 
+ScreenshotData::ScreenshotData(bool mobile){
+    this->mobile = mobile;
+}
+
 /**
  * getScreenshots
  * @return return all Screenshot instances
@@ -37,4 +41,7 @@ void ScreenshotData::addScreenshot(Screenshot* screenshot) {
  * getDataModuleType
  * @return Value of DataModulesEnum, which shows from which data this DataBase derivate actually is
  */
-DataModulesEnum ScreenshotData::getDataModuleType() { return SCREENSHOT_MODULE;}
+DataModulesEnum ScreenshotData::getDataModuleType() {
+    if(mobile) return SCREENSHOT_MOBILE_MODULE;
+    return SCREENSHOT_MODULE;
+}
