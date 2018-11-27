@@ -70,6 +70,11 @@ void ScreenshotHandler::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType 
 
     timeOnPaintInvoke = std::chrono::steady_clock::now();
 
+    // hide vertical and horizontal scrollbars
+    CefRefPtr<CefFrame> mainFrame = browser.get()->GetMainFrame();
+    mainFrame->ExecuteJavaScript("document.documentElement.style.overflow = 'hidden'; document.body.scroll = \"no\";",
+                                 mainFrame->GetURL(), 0);
+
     mHasPainted = true;
 
     if (!initialInvoke) {

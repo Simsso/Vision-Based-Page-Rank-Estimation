@@ -116,6 +116,7 @@ DataBase *ScreenshotDataModule::process(CefMainArgs* mainArgs, std::string url) 
     logger->info("Running ScreenshotDataModule .. finished !");
 
     browser.get()->Release();
+
     CefShutdown();
     logger->info("Shut down CEF!");
 
