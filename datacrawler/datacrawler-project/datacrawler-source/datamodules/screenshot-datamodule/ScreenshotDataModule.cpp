@@ -18,10 +18,14 @@ ScreenshotDataModule::ScreenshotDataModule() {}
  * @param height represents the height of the screenshot to take
  * @param width represents the width of the screenshot to take
  */
-ScreenshotDataModule::ScreenshotDataModule(int height, int width, bool mobile) {
+ScreenshotDataModule::ScreenshotDataModule(int height, int width, int ONPAINT_TIMEOUT, int ELAPSED_TIME_ONPAINT_TIMEOUT, double CHANGE_THRESHOLD, int LAST_SCREENSHOTS, bool mobile) {
     this->height = height;
     this->width = width;
     this->mobile = mobile;
+    this->ONPAINT_TIMEOUT = ONPAINT_TIMEOUT;
+    this->ELAPSED_TIME_ONPAINT_TIMEOUT = ELAPSED_TIME_ONPAINT_TIMEOUT;
+    this->CHANGE_THRESHOLD = CHANGE_THRESHOLD;
+    this->LAST_SCREENSHOTS = LAST_SCREENSHOTS;
 }
 
 /**
@@ -54,7 +58,7 @@ DataBase *ScreenshotDataModule::process(CefMainArgs* mainArgs, std::string url) 
     *quitMessageLoop = false;
 
     // no mutex needed since MessageLoops is only exited, when painting is over
-    CefRefPtr<ScreenshotHandler> screenshotHandler(new ScreenshotHandler(quitMessageLoop, 10, 0.025, height, width));
+    CefRefPtr<ScreenshotHandler> screenshotHandler(new ScreenshotHandler(quitMessageLoop, LAST_SCREENSHOTS, CHANGE_THRESHOLD, height, width));
     CefRefPtr<ScreenshotClient> screenshotClient(new ScreenshotClient(screenshotHandler));
 
     CefWindowInfo cefWindowInfo;
@@ -67,7 +71,15 @@ DataBase *ScreenshotDataModule::process(CefMainArgs* mainArgs, std::string url) 
 
     // Thread to timeout ScreenshotHandler::onPaint(), if detecting mechanisms fail
     std::thread timeout([&]() {
-        std::this_thread::sleep_for(std::chrono::seconds(ONPAINT_TIMEOUT));
+        int secondsSteps = 0;
+
+        while(secondsSteps < ONPAINT_TIMEOUT){
+            if(*quitMessageLoop)
+                return;
+
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            ++secondsSteps;
+        }
 
         if (screenshotHandler->hasPainted()) {
             logger->info("ScreenshotDataModule timed out! Returning current screenshot result!");
@@ -75,9 +87,6 @@ DataBase *ScreenshotDataModule::process(CefMainArgs* mainArgs, std::string url) 
             logger->error("ScreenshotDataModule has failed to take a screenshot!");
             throw "ScreenshotDataModule has failed to take a screenshot!";
         }
-
-        if(*quitMessageLoop)
-            return;
 
         screenshotHandler->getQuitMessageLoopMutex().lock();
         *quitMessageLoop = true;
@@ -89,10 +98,10 @@ DataBase *ScreenshotDataModule::process(CefMainArgs* mainArgs, std::string url) 
 
         while (!screenshotHandler->hasPainted());
 
-        while (screenshotHandler->getTimeSinceLastPaint() < ELAPSED_TIME_ONPAINT_TIMEOUT);
-
-        if(*quitMessageLoop)
-            return;
+        while (screenshotHandler->getTimeSinceLastPaint() < ELAPSED_TIME_ONPAINT_TIMEOUT){
+            if(*quitMessageLoop)
+                return;
+        }
 
         logger->info(std::to_string(ELAPSED_TIME_ONPAINT_TIMEOUT) +
                      "ms has passed since last OnPaint()! Taking screenshot!");

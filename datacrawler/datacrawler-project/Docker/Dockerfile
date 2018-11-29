@@ -10,17 +10,20 @@ RUN apt-get update && apt-get install -y \
   libxtst-dev \
   libgl1-mesa-dev \
   libatk-bridge2.0-0 \
-  xvfb
+  libtbb-dev \
+  xvfb \
+  tzdata && \
+    rm /etc/localtime && \
+    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
+    dpkg-reconfigure -f noninteractive tzdata && \
+    apt-get clean
 
 COPY datacrawler/ /opt/apt/datacrawler/
 COPY run_datacrawler.sh /opt/apt/
+RUN mkdir /opt/apt/output
 
 RUN chmod +x /opt/apt/run_datacrawler.sh
 RUN chmod +x /opt/apt/datacrawler/datacrawler
 
-# To analyse given domain, set URL env as follows:
-# 	docker run -e URL=<url> URL_RANK=<rank> OUTPUT_PATH=<output path for results> 
-# 	DATAMODULE=<name of datamodule to run>
-# 	--mount source=datacrawler-test,target=/data
-
 ENTRYPOINT ["/bin/bash", "/opt/apt/run_datacrawler.sh"]
+

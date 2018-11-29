@@ -46,7 +46,7 @@ ScreenshotHandler::ScreenshotHandler(bool * quitMessageLoop, int countLastL1Norm
  * @return This will return true.
  */
 bool ScreenshotHandler::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect) {
-    rect = CefRect(0, 0, renderHeight, renderWidth);
+    rect = CefRect(0, 0, renderWidth, renderHeight);
     return true;
 }
 
@@ -71,9 +71,12 @@ void ScreenshotHandler::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType 
     timeOnPaintInvoke = std::chrono::steady_clock::now();
 
     // hide vertical and horizontal scrollbars
-    CefRefPtr<CefFrame> mainFrame = browser.get()->GetMainFrame();
-    mainFrame->ExecuteJavaScript("document.documentElement.style.overflow = 'hidden'; document.body.scroll = \"no\";",
+    // we are doing it here, since the website has been loaded already
+    if(initialInvoke) {
+        CefRefPtr<CefFrame> mainFrame = browser.get()->GetMainFrame();
+        mainFrame->ExecuteJavaScript("document.documentElement.style.overflow = 'hidden'; document.body.scroll = \"no\";",
                                  mainFrame->GetURL(), 0);
+    }
 
     mHasPainted = true;
 
@@ -130,8 +133,8 @@ void ScreenshotHandler::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType 
  *         a_i,j = 0, if there was no change.
  */
 unsigned char *
-ScreenshotHandler::calculateChangeMatrix(unsigned char *firstMatrix, unsigned char *secMatrix, int32_t numCol,
-                                         int32_t numRow) {
+ScreenshotHandler::calculateChangeMatrix(unsigned char *firstMatrix, unsigned char *secMatrix, int32_t numRow,
+                                         int32_t numCol) {
     auto *changeMatrix = new unsigned char[numCol * numRow]{0};
 
     for (int32_t i = 0, k = 0; i < numRow * numCol * 4; i += 4, k++) {

@@ -20,15 +20,17 @@
 #include "Screenshot.h"
 #include "ScreenshotData.h"
 
-#define ONPAINT_TIMEOUT 10
-#define ELAPSED_TIME_ONPAINT_TIMEOUT 2500
-
 class ScreenshotDataModule : public DataModuleBase, public CefBaseRefCounted {
 private:
     IMPLEMENT_REFCOUNTING(ScreenshotDataModule);
     int height;
     int width;
     bool mobile;
+    int ONPAINT_TIMEOUT;
+    int ELAPSED_TIME_ONPAINT_TIMEOUT;
+    int LAST_SCREENSHOTS;
+    double CHANGE_THRESHOLD;
+
     CefRefPtr<ScreenshotHandler> screenshotHandler;
     CefRefPtr<ScreenshotClient> screenshotClient;
     CefRefPtr<CefBrowser> browser;
@@ -37,7 +39,7 @@ public:
     DataBase* process(CefMainArgs*, std::string) OVERRIDE;
 
     ScreenshotDataModule();
-    ScreenshotDataModule(int, int, bool);
+    ScreenshotDataModule(int, int, int, int, double, int, bool);
     ~ScreenshotDataModule();
 };
 

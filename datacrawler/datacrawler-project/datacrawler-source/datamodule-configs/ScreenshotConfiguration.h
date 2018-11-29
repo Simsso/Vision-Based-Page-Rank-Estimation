@@ -9,12 +9,16 @@ private:
     int height;
     int width;
     bool mobile;
+    int ONPAINT_TIMEOUT;
+    int ELAPSED_TIME_ONPAINT_TIMEOUT;
+    int LAST_SCREENSHOTS;
+    double CHANGE_THRESHOLD;
 
 public:
     DataModuleBase* createInstance();
 
     ScreenshotConfiguration();
-    ScreenshotConfiguration(int, int, bool);
+    ScreenshotConfiguration(int, int, int, int, double, int, bool);
     ~ScreenshotConfiguration();
 
 };

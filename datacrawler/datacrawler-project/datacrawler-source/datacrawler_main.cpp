@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
                 std::vector<int> params;
                 params.push_back(cv::IMWRITE_PNG_COMPRESSION);
                 params.push_back(9);
-                cv::Mat newImg = cv::Mat(img->getHeight(), img->getWidth(), CV_8UC4, img->getScreenshot());
+                cv::Mat newImg = cv::Mat(img->getHeight(),img->getWidth(), CV_8UC4, img->getScreenshot());
 
                 std::string fullPath;
                 fullPath.append(outputPath);
