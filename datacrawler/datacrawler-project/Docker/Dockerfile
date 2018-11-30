@@ -18,8 +18,14 @@ RUN apt-get update && apt-get install -y \
     dpkg-reconfigure -f noninteractive tzdata && \
     apt-get clean
 
+RUN pip install redis 
+
 COPY datacrawler/ /opt/apt/datacrawler/
+
+COPY rediswq.py /opt/apt/
+COPY worker.py  /opt/apt/
 COPY run_datacrawler.sh /opt/apt/
+
 RUN mkdir /opt/apt/output
 
 RUN chmod +x /opt/apt/run_datacrawler.sh
