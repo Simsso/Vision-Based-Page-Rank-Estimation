@@ -1,0 +1,9 @@
+version: "latest"
+urlRank: 1
+url: google.com
+datamodule: SCREENSHOT_MODULE
+outputPath: /opt/apt/output
+onPaintTimeout: 25
+elapsedTimeOnPaintTimeout: 17500
+changeThreshold: 0.005
+lastScreenshots: 20

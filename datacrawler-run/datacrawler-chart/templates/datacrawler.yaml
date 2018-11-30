@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: datacrawler-deployment
+spec:
+  selector:
+    matchLabels:
+      app: datacrawler
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: datacrawler
+    spec:
+      containers:
+      - name: datacrawler
+        image: gcr.io/nips-2018-102018/datacrawler:{{ .Values.version | replace "\"" "" }}
+        resources:
+          requests:
+            cpu: 500m
+            memory: 400Mi
+        volumeMounts:
+        - name: datacrawler-output
+          mountPath: {{ .Values.outputPath }}
+      restartPolicy: Never
+      env:
+      - name: URL_RANK
+        value: {{ .Values.urlRank }}
+      - name: URL
+        value: {{ .Values.url }}
+      - name: DATAMODULE
+        value: {{ .Values.datamodule }}
+      - name: OUTPUT_PATH
+        value: {{ .Values.outputPath }}
+      - name: ONPAINT_TIMEOUT
+        value: {{ .Values.onPaintTimeout }}
+      - name: ELAPSED_TIME_ONPAINT_TIMEOUT
+        value: {{ .Values.elapsedTimeOnPaintTimeout }}
+      - name: CHANGE_THRESHOLD
+        value: {{ .Values.changeThreshold }}
+      - name: LAST_SCREENSHOTS
+        value: {{ .Values.lastScreenshots }}

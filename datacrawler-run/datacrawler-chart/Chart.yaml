@@ -1,0 +1,8 @@
+name: datacrawler-chart
+description: Datacrawler for Page Rank Estimation Deep Graph Networks
+version: 1.0.0
+keywords:
+  - web
+home: https://github.com/doktorgibson/Samed_Guener_Portfolio
+maintainers:
+  - name: doktorgibson
