@@ -3,4 +3,4 @@
 Xvfb :99 &
 export DISPLAY=:99
 
-python worker.py
+python /opt/apt/worker.py

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: datacrawler-redis-filler
+  labels:
+    app: datacrawler-redis-filler
+spec:
+  containers:
+    - name: datacrawler-redis-filler
+      image: gcr.io/nips-2018-102018/datacrawler-redis-filler:latest
+  restartPolicy: Never

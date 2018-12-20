@@ -3,14 +3,11 @@ kind: Job
 metadata:
   name: datacrawler-job
 spec:
-  selector:
-    matchLabels:
-      app: datacrawler
-  parallelism: 10
+  parallelism: 38
   template:
     metadata:
       labels:
-        app: datacrawler
+        name: datacrawler
     spec:
       containers:
       - name: datacrawler
@@ -18,19 +15,23 @@ spec:
         resources:
           requests:
             cpu: 500m
-            memory: 400Mi
+            memory: 500Mi
         volumeMounts:
         - name: datacrawler-output
           mountPath: /opt/apt/output
-      restartPolicy: Never
-      env:
-      - name: OUTPUT_PATH
-        value: "/opt/apt/output"
-      - name: ONPAINT_TIMEOUT
-        value: 25
-      - name: ELAPSED_TIME_ONPAINT_TIMEOUT
-        value: 17500
-      - name: CHANGE_THRESHOLD
-        value: 0.005
-      - name: LAST_SCREENSHOTS
-        value: 20
+        env:
+        - name: OUTPUT_PATH
+          value: "/opt/apt/output"
+        - name: ONPAINT_TIMEOUT
+          value: "25"
+        - name: ELAPSED_TIME_ONPAINT_TIMEOUT
+          value: "17500"
+        - name: CHANGE_THRESHOLD
+          value: "0.005"
+        - name: LAST_SCREENSHOTS
+          value: "20"
+      restartPolicy: OnFailure
+      volumes:
+      - name: datacrawler-output
+        persistentVolumeClaim:
+           claimName: datacrawler-output-claim

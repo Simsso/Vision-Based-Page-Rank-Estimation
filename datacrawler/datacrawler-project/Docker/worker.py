@@ -16,9 +16,14 @@ while not q.empty():
     data = itemstr.split(",")
     os.environ["URL_RANK"] = data[0]
     os.environ["URL"] = data[1]
-    os.environ["DATAMODULE"] = data[2]
+    os.environ["DATAMODULE"] = data[3]
+    os.environ["OUTPUT_PATH"] = "/opt/apt/output"
+    os.environ["ONPAINT_TIMEOUT"] = "25"
+    os.environ["ELAPSED_TIME_ONPAINT_TIMEOUT"] = "17500"
+    os.environ["CHANGE_THRESHOLD"] = "0.005"
+    os.environ["LAST_SCREENSHOTS"] = "20"
 
-    subprocess.call("datacrawler", shell=True)
+    subprocess.call(["/opt/apt/datacrawler/datacrawler", "--no-sandbox", "--headless", "--disable-gpu","--disk-cache-dir=/dev/null", "--disk-cache-size=1"])
 
     q.complete(item)
   else:
