@@ -1,4 +1,6 @@
 """
+Deprecated because the split now happens within PyTorch.
+
 This script pre-processes raw data of dataset v1, i.e. a folder
 of screenshots where each file is called xxx.png where xxx is its
 ranking (integer).
