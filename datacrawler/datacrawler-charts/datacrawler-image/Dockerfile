@@ -21,7 +21,7 @@ RUN apt-get update && apt-get install -y \
 RUN apt-get install -y  python-pip
 RUN pip install redis 
 
-COPY datacrawler/ /opt/apt/datacrawler/
+COPY datacrawler-bin/ /opt/apt/datacrawler/
 
 COPY rediswq.py /opt/apt/
 COPY worker.py  /opt/apt/

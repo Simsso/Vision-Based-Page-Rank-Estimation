@@ -2,3 +2,5 @@
 datacrawler/datacrawler-project/Docker/datacrawler/
 
 datacrawler-run/\.idea/
+
+\.DS_Store
