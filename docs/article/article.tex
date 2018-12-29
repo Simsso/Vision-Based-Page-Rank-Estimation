@@ -16,16 +16,43 @@ General description, open problems, motivation, goals of this work, contribution
 Methods, literature, related work (perhaps as a separate subsection)
 Description of GCP, K8s, infrastructure background
 
+\subsection{Ground Truth}
+\subsubsection{Open Page Rank}
+\label{OpenPageRank}
+
 \section{Method}
 Our contributions, novel aspects, great detail
 
 \section{Datasets}
-Description of the dataset versions, where to get them, and an exact specification.
+In our approach we propose a supervised machine learning algorithm to estimate the page rank using deep graph networks. For this purpose we require labelled data to develop, train and validate our model. 
+
+In general the process of gathering, augmenting and labelling of data can take an immense amount of time and slow down the development of machine learning model. Therefore we decided to iteratively develop and align our dataset to the current need of research and progress of development. For each upcoming iteration we specified the requirements for the data set. Following from this each iteration resulted in an own data set version.
+
+The following sections will profoundly specify each dataset version as required during the development of our approach.
+
+\subsection{Dataset Version 1}
+The dataset version consists of 100000 samples in total, each corresponding to one domain. The ground truth for this dataset version is \textit{Open Page Rank} and is described in \ref{OpenPageRank}.
+
+Every sample $k$ is a tuple consisting of three values and corresponds to one Domain $D$ from the ground truth:
+
+\begin{center}
+ $ k \in (I_D, R_D, U_D)$
+\begin{itemize}
+	\item[$I_D$]: The screenshot of the domain $D$ in image format PNG and in the resolution 1920x1080.
+	\item[$R_D$] $\in [1, 100000]$ : The global rank of the domain $D$, according to Open PageRank (\ref{OpenPageRank}). 
+	\item[$U_D$]: The URL of the domain $D$ mapped by the Open PageRank list. Example: \textit{github.com}
+\end{itemize}
+
+\end{center}
+
+\subsection{Dataset Version 2}
+- Picture of an example graph
 
 \section{Implementation Details}
 Technical aspects of our methods, things we have tried that might have failed, code snippets
 Technical description of the dataset creation process
-
+\subsection{Datacrawler}
+\subsection{Page Rank Estimator}
 \section{Results}
 Presentation of our results, no opinion
 
