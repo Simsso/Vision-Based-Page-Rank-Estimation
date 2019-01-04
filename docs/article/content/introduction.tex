@@ -1,15 +1,21 @@
 \section{Introduction}
 
-Recent advances intro sentence
+The world wide web has evolved to become a common source of information and entertainment for people from all around the globe. The number of active websites exceeds 100 million by far. People commonly access these websites through the internet using a webbrowser on their computer or hand-held devices and consume the content in visual or visual and audio format.
 
-The ranking of webpages, current ranking methodologies
+Some website attrackt more visitors than others. The Alexa page ranking lists !!! as the top five most visited website. Ordering website by their popularity can be done in different ways: One might think of the total number of links pointing to a website, the visitor count, visitor count combined with the average time people spend, and other measures.
 
-Leading to the open problem
+New websites will initially be assigned to a low rank, until their popularity grows and the statistic reflects that. An experienced user, however, might be able to have a rough feeling for whether a website has potential to become popular or not, solely based on its content and look. To the best of our knowledge, there is a shortcoming in tools, which estimate the expected popularity of a website, thereby replicating the behavioral patterns of a human observer.
 
-How we try to solve it, considering the graph structure, visual information, i.e. what humans browsing do.
+In this work we try to model a pagerank estimator using methods of computer vision. More specifically, we train a graph network with convolutional building blocks to \textit{look} at several pages of a domain and output its expected popularity.
 
-Goals of this work
+The world wide web has been designed with hyperlinks. They allow users to navigate between web pages. A website typically consists of several web pages, which (often, but not necessarily) point to each other with hyperlinks. Such a website can be interpreted as a graph, where nodes correspond to web pages and edges to hyperlinks connecting two of them. We try to exploit the information contained in the graph structure by applying graph networks to the ranking problem.
 
-contributions
+Our main contributions are:
+\begin{itemize}
+\item Creation and release of a pagerank dataset with two versions: (v1) A single screenshot for each of the top 100k websites and (v2) 100k graphs, where each graph represents one of the websites with screenshots and meta data.
+\item Application of graph networks to the problem of pagerank prediction.
+\end{itemize}
 
-structure
+This work is a student research project of two students of Applied Computer Science, carried out at Coorporative State University Baden-Württemberg, Karlsruhe.
+
+The remainder of this document is structured as follows: !!!
