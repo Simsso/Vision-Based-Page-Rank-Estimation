@@ -1,14 +1,16 @@
 \section{Introduction}
 
-The world wide web has evolved to become a common source of information and entertainment for people from all around the globe. The number of active websites exceeds 100 million by far. People commonly access these websites through the internet using a webbrowser on their computer or hand-held devices and consume the content in visual or visual and audio format.
+The world wide web has evolved to become a common source of information and entertainment for people from all around the globe. The number of active websites exceeds 100 million by far. People commonly access these websites through the internet using a webbrowser on their computer or hand-held devices and consume the content in graphical or !!! (sound) format.
 
-Some website attrackt more visitors than others. The Alexa page ranking lists !!! as the top five most visited website. Ordering website by their popularity can be done in different ways: One might think of the total number of links pointing to a website, the visitor count, visitor count combined with the average time people spend, and other measures.
+Some website attrackt more visitors than others. As of !!!, the Alexa page ranking lists !!! as the top five most visited website. Ordering websites by their popularity can be done in different ways: One might think of the total number of links pointing to a website, the visitor count, visitor count combined with the average time people spend, and other measures.
 
-New websites will initially be assigned to a low rank, until their popularity grows and the statistic reflects that. An experienced user, however, might be able to have a rough feeling for whether a website has potential to become popular or not, solely based on its content and look. To the best of our knowledge, there is a shortcoming in tools, which estimate the expected popularity of a website, thereby replicating the behavioral patterns of a human observer.
+Newly published websites will initially be assigned a low rank, until their popularity grows and the statistic reflects that. An experienced user, however, might be able to have a rough feeling for whether a website they see has potential to become popular or not, solely based on its content and look. To the best of our knowledge, there is a shortcoming in tools, which estimate the expected popularity of a website, thereby replicating the behavioral patterns of a human observer.
 
-In this work we try to model a pagerank estimator using methods of computer vision. More specifically, we train a graph network with convolutional building blocks to \textit{look} at several pages of a domain and output its expected popularity.
+In this work we model a pagerank estimator using methods of computer vision. More specifically, we train a graph network with convolutional building blocks to \textit{look} at screenshots of web pages of a domain and output the expected popularity.
 
 The world wide web has been designed with hyperlinks. They allow users to navigate between web pages. A website typically consists of several web pages, which (often, but not necessarily) point to each other with hyperlinks. Such a website can be interpreted as a graph, where nodes correspond to web pages and edges to hyperlinks connecting two of them. We try to exploit the information contained in the graph structure by applying graph networks to the ranking problem.
+
+Traversing the web page graph of the internet or a single website is referred to as crawling. In order to create a screenshot dataset that contains the meta information we want, we have developed a webcrawler. It is documented in this article.
 
 Our main contributions are:
 \begin{itemize}
@@ -16,6 +18,6 @@ Our main contributions are:
 \item Application of graph networks to the problem of pagerank prediction.
 \end{itemize}
 
-This work is a student research project of two students of Applied Computer Science, carried out at Coorporative State University Baden-Württemberg, Karlsruhe.
+This work is a student research project of two students of Applied Computer Science, carried out at Coorporative State University Baden-Wuerttemberg, Karlsruhe.
 
 The remainder of this document is structured as follows: !!!
