@@ -6,8 +6,8 @@
 \author{Timo Denk, Samed Güner}
 \date{June 2019}
 
-% citing
-\usepackage[backend=bibtex,style=alphabetic]{biblatex}
+% Citing
+\usepackage[backend=bibtex,style=numeric]{biblatex}
 \addbibresource{bibliography.bib}
 
 \begin{document}
@@ -22,8 +22,12 @@ Methods, literature, related work (perhaps as a separate subsection)
 Description of GCP, K8s, infrastructure background
 
 \subsection{Ground Truth}
-\subsubsection{Open Page Rank}
+\subsubsection{Open PageRank}
 \label{OpenPageRank}
+\textit{Open PageRank} is an initiative, which has the goal to enable webmasters to check the pagerank for their domains and easily compare with other domains. The initiative was constituted after Google had shut down the \textit{PageRank}-toolbar and left a void in the industry. The Open PageRank initiative provides completely free and available data that was built on top of \textit{Common Crawl}, which provides high quality crawl data of webpages since 2013. \cite{OpenPageRank} \cite{CommonCrawl}
+
+Open PageRank uses the number of backlinks of a domain found in \textit{Common Crawl} to calculate the pagerank. The more the number of links different domains use to refer to the given domain, the better is the pagerank of the given domain in Open PageRank.
+
 
 \section{Method}
 Our contributions, novel aspects, great detail
