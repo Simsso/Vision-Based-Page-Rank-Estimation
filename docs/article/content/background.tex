@@ -9,14 +9,14 @@ Learning to rank in general, which loss functions exist, how can ranking happen 
 
 \subsection{Graph Networks}
 The most basic type of neural network, consisting solely of fully connected layers, converts a vector of fixed size into another vector of fixed size.
-In contast, convolutional neural networks can convert variably-sized input into variably-sized output. In image classification or segmentation tasks, the inputs are often scaled to a fixed size and the convolutional layers serve as feature extractors for a fully-connected classification head.
+In contast, convolutional neural networks (CNNs) can convert variably-sized input into variably-sized output. In image classification or segmentation tasks, the inputs are often scaled to a fixed size and the convolutional layers serve as feature extractors for a fully-connected classification head.
 Recurrent neural networks can convert a sequence of vectors into another sequence.
 
 While some of those neural network types \textit{can} handle variably-sized inputs, they do not deal with sets very well: Consider for instance an (unordered) set of images and the task to assign a single label to the entire set. All architectures from above could be applied to that task by simply concatenating all the images into one large vector. However, they would implicitly try to assign a semantic meaning to the ordering in which the samples are being presented to them. One could augment the dataset by shuffling the samples of a set befor concatenating them but that does not solve the underlying problem.
 
 Graph networks are designed to handle graphs and sets naturally. They can deal with any size of graph and do not regard the ordering of nodes.
 
-!!! definition of graph networks
+!!! definition of graph networks, note on notation, we use deep mind's notation throughout our document
 
 !!! list some applications
 
@@ -24,4 +24,12 @@ Graph networks are designed to handle graphs and sets naturally. They can deal w
 
 
 \subsection{Screenshot Processing}
-Screenshot processing, CNN architecture
+
+Screenshot definition
+CNNs are a common choice for image processing !!! cite a couple of papers. Original CNN paper LeCun !!!. There is little work on the application of CNNs on screenshots, which can either be attributed to them handling screenshots just as fine as natural images or few applications.
+
+!!! cite Beltramelli has applied a xxx layer CNN to screenshots in order to extract xxx. Describe the paper real quick
+
+Describe the architecture and state that we are using a similar one.
+
+We choose to use CNNs as feature extractors for the website screenshots.
