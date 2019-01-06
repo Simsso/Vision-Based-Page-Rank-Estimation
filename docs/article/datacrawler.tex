@@ -1,6 +1,6 @@
 \section{Datacrawler}
 \label{Datacrawler}
-The datacrawler represents a very important part and has a critical role in the success of our research since data is the foundation of our research. The main purpose of the datacrawler is simply to collect data and enrich existing data. Specifically, the datacrawler is used to deliver the required dataset versions as described in \label{dataset} \improve{[IMPROVE] Add reference to dataset}.
+The datacrawler represents a very important part and has a critical role in the success of our research. The main purpose of the datacrawler is simply to collect data and enrich existing data. Specifically, the datacrawler is used to deliver the required dataset versions as described in \label{dataset} \improve{[IMPROVE] Add reference to dataset}, which later being used to research, develop and train our model.
 
 The input of the datacrawler is simply a domain, which is initially provided by the chosen ground truth in the dataset specification. The output varies depending on the dataset versions. For example, dataset version 1 (specified in \label{datasetversion1}) \improve{[IMPROVE] Add reference to dataset version 1} requires a screenshot per given domain.
 
@@ -8,11 +8,15 @@ The following sections will profoundly describe the initial conceptual requireme
 
 \subsection{Requirements}
 \label{datacrawler_requirements}
-- initial requirements are dataset version specification
-- high flexibility: access to dom, header, request
-- rendering of the given website
-- flexibility regarding to be analysed attributes (screenshot, loadingtime, ..)
-- low analysis time, scalability
+In general all dataset version specifications (\ref{datasetversion1}, \ref{datasetversion2}) can be seen as requirements for the datacrawler. While specification generally describes how the given dataset version should look like, it also implicitly defines required functionality for the datacrawler. Specification such as screenshot of the given website implicitly require that the datacrawler has to be able to 1) render and 2) take a screenshot of the website.
+
+One of the major requirements for the datacrawler was to find a convenient way to emulate a browser. This requirement raised from the fact that the main goal of our research was to evaluate a given website and calculate a rank depending on the user experience of the user during his visit of the website. This requirement is furthermore underlined by the fact that any other approaches to calculate attributes of a domain, such as the download size or loading time, would ultimately lead to distortion of the data. Another fact is that for attributes such as screenshot the given website has to be interpreted and rendered on the screen with the highest possible compatibility. The browser was primarily designed for this purpose.
+
+The accessibility to \textit{low-level} information of a website represents another important requirement and is raised from the emulation of a browser. This means that the datacrawler had to have the possibility to access information such as the \textit{HTTP-Request} (\ref{datacrawler_mobilescreenshot_datamodule}) or \textit{Document Object Model} (\ref{datacrawler_url_datamodule}) to be able to calculate specific attributes. So being able to read and manipulate internal data structures or even to inject own Javascript (\ref{datacrawler_screenshot_datamodule}, \ref{datacrawler_mobilescreenshot_datamodule})  represents another inevitable requirement for the datacrawler.
+
+Another requirement was the flexibility regarding to be calculated attributes. In this case flexibility means that each attribute should be calculated independently from each other generating high flexibility in choosing which attributes should be calculated. This flexibility raised from the iterative process of dataset specification: It might happen that dataset version $i$ requires some certain attributes whereas dataset version $i+1$ does not. This flexibility was required and led to a sophisticated architecture such as the \textit{DataModule-System} (\ref{datacrawler_datamodulesystem}), which makes it possible to directly feed the dataset specification into the datacrawler.
+
+Lastly scalability and efficiency in terms of time represented two major requirements for the datacrawler. Considering the huge amount of domains to be analysed, the datacrawler had to be horizontal scalable to allow the analysis of multiple domains at once, and efficient in terms analysis time and start-up time. An inefficient and not scalable datacrawler would lead to 1) multiple days of required analysis time and 2) high infrastructure costs.
 
 \subsection{Chromium Embedded Framework}
 \label{datacrawler_framework_language}
@@ -28,6 +32,9 @@ The following sections will profoundly describe the initial conceptual requireme
 
 \subsubsection{MobileScreenshot-Datamodule}
 \label{datacrawler_mobilescreenshot_datamodule}
+
+\subsubsection{URL-Datamodule}
+\label{datacrawler_url_datamodule}
 
 \improve{[IMPROVE] Add documentation for new datamodules}
 
