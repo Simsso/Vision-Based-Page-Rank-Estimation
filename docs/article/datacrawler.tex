@@ -4,10 +4,15 @@ The datacrawler represents a very important part and has a critical role in the 
 
 The input of the datacrawler is simply a domain, which is initially provided by the chosen ground truth in the dataset specification. The output varies depending on the dataset versions. For example, dataset version 1 (specified in \label{datasetversion1}) \improve{[IMPROVE] Add reference to dataset version 1} requires a screenshot per given domain.
 
-The following sections will profoundly describe the initial conceptual requirements for datacrawler (\ref{datacrawler_requirements}), the decisions taken towards the frameworks and programming language (\ref{datacrawler_framework_language}) and the current architecture of the datacrawler (\ref{datacrawler_architecture}). Within that the custom plugin-system with so called \textit{DataModules} are introduced (\ref{datacrawler_datamodulesystem}), all developed and consumed DataModules (\ref{datacrawler_screenshot_datamodule}, \ref{datacrawler_mobilescreenshot_datamodule} \improve{[IMPROVE] Add missing refs to new datamodules}) and their interplay as a whole unit is profoundly described (\ref{datacrawler_workflow}). \info{[INFO] You might add a section with "Calculating the Graph" or "Outputing the dataset"} In the last section we will discuss how we used state-of-the-art technologies and scaled the datacrawler to dramatically reduce the analysis time (\ref{datacrawler_scale}).
+The following sections will profoundly describe the initial conceptual requirements for datacrawler (\ref{datacrawler_requirements}), the decisions taken towards chosen the frameworks and programming language (\ref{datacrawler_framework_language}) and the current architecture of the datacrawler (\ref{datacrawler_architecture}). Within that the custom plugin-system with so called \textit{DataModules} are introduced (\ref{datacrawler_datamodulesystem}), all developed and consumed DataModules (\ref{datacrawler_screenshot_datamodule}, \ref{datacrawler_mobilescreenshot_datamodule} \improve{[IMPROVE] Add missing refs to new datamodules}) and their interplay as a whole unit is profoundly described (\ref{datacrawler_workflow}). \info{[INFO] You might add a section with "Calculating the Graph" or "Outputing the dataset"} In the last section we will discuss how we used state-of-the-art technologies and designed an architecture to scale the datacrawler to dramatically reduce the analysis time (\ref{datacrawler_scale}).
 
 \subsection{Requirements}
 \label{datacrawler_requirements}
+- initial requirements are dataset version specification
+- high flexibility: access to dom, header, request
+- rendering of the given website
+- flexibility regarding to be analysed attributes (screenshot, loadingtime, ..)
+- low analysis time, scalability
 
 \subsection{Chromium Embedded Framework}
 \label{datacrawler_framework_language}
