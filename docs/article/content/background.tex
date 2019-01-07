@@ -12,9 +12,9 @@ The most basic type of neural network, consisting solely of fully connected laye
 In contast, convolutional neural networks (CNNs) can convert variably-sized input into variably-sized output. In image classification or segmentation tasks, the inputs are often scaled to a fixed size and the convolutional layers serve as feature extractors for a fully-connected classification head.
 Recurrent neural networks can convert a sequence of vectors into another sequence.
 
-While some of those neural network types \textit{can} handle variably-sized inputs, they do not deal with sets very well: Consider for instance an (unordered) set of images and the task to assign a single label to the entire set. All architectures from above could be applied to that task by simply concatenating all the images into one large vector. However, they would implicitly try to assign a semantic meaning to the ordering in which the samples are being presented to them. One could augment the dataset by shuffling the samples of a set befor concatenating them but that does not solve the underlying problem.
+While some of those neural network types \textit{can} handle variably-sized inputs, they do not deal with sets very well: Consider for instance an (unordered) set of images and the task to assign a single label to the entire set. All architectures from above could be applied to that task by simply concatenating all the images into one large vector. However, they would implicitly try to assign a semantic meaning to the ordering in which the samples are being presented to them. One could augment the dataset by shuffling the samples of a set before concatenating them but that does not solve the underlying problem.
 
-Graph networks are designed to handle graphs and sets naturally. They can deal with any size of graph and do not regard the ordering of nodes. !!! cite Deep Mind have brought several different types of graph networks under a common hood. We follow their notation and will replicate the relevant parts in the following paragraphs. That is the formal definition of a graph and of graph networks.
+Graph networks are designed to handle graphs and sets naturally. They can deal with any size of graph and do not regard the ordering of nodes. \cite{deepmind:graphnets} have brought several different types of graph networks under a common hood. We follow their notation and will replicate the relevant parts in the following paragraphs. That is the formal definition of a graph and of graph networks.
 
 !!! A graph $G$ ...
 
@@ -22,9 +22,9 @@ Graph networks are designed to handle graphs and sets naturally. They can deal w
 
 !!! list some applications
 
-Graph networks can be trained with stochastic gradient descent (SGD). !!! cite "Learning a SAT-solver from single-bit supervision" train a graph network on a boolean satisfiability task (SAT-solver) with a single bit of supervision, namely whether or not the statement is satisfiable. They thereby show that graph networks can be successfully trained on NP-complete tasks with very little supervision, namely just a single bit.
+Graph networks can be trained with stochastic gradient descent (SGD). \cite{selsam:satsolver} train a graph network on a boolean satisfiability task (SAT-solver) with a single bit of supervision, namely whether or not the statement is satisfiable. They thereby show that graph networks can be successfully trained on NP-complete tasks with very little supervision, namely just a single bit.
 
-They extract the fixed-size information (true or false) from the graph network by computing the mean of all nodes. This fits into !!! cite Deep Mind's graph networks framework, since the output bit can be interpreted as a global state.
+They extract the fixed-size information (true or false) from the graph network by computing the mean of all nodes. This fits into \cite{deepmind:graphnets} Deep Mind's graph networks framework, since the output bit can be interpreted as a global state.
 
 !!! look into where set2vec fits into this section
 
@@ -34,10 +34,10 @@ They extract the fixed-size information (true or false) from the graph network b
 Screenshot definition
 CNNs are a common choice for image processing !!! cite a couple of papers. Original CNN paper LeCun !!!. There is little work on the application of CNNs on screenshots, which can either be attributed to them handling screenshots just as fine as natural images or few applications.
 
-The closest to us is the work of !!! cite Beltramelli, who feeds screenshots into a CNN in order to extract structual information from them. He tries to convert screenshots of a user interface into code that describes that exact layout. In his setup, a CNN is combined with an LSTM: The former is responsible for the feature extraction whereas the latter converts the extracted features into a sequence layout descriptions.
+The closest to us is the work of \cite{beltramelli:pix2code}, who feeds screenshots into a CNN in order to extract structual information from them. He tries to convert screenshots of a user interface into code that describes that exact layout. In his setup, a CNN is combined with an LSTM: The former is responsible for the feature extraction whereas the latter converts the extracted features into a sequence layout descriptions.
 
 More specifically, he does not perform any pre-processing and feeds images of size $256\times 256$ into the model. The model consists of three convolutional blocks, each of which contains two convolutional layers with kernels of size $3\times 3$ and stride 1, followed by $2\times 2$ max-pooling and dropout with a probability of $p=0.25$. The third convolutional block is followed by two fully connected layers with $1024$ units each. Both regularized with $p=0.3$ dropout. The filter count for the convolutions is $32$, $64$, and $128$ for the three blocks respectively. 
 
-We choose to use CNNs as feature extractors for the website screenshots as well. Our baseline architecture is a slightly adjusted version of !!! cite Beltramelli, with more agressive pooling to make it work for screenshots with larger resolution.
+We choose to use CNNs as feature extractors for the website screenshots as well. Our baseline architecture is a slightly adjusted version of \cite{beltramelli:pix2code}, with more agressive pooling to make it work for screenshots with larger resolution.
 
 !!! name the other website ranking paper from 2006 somewhere
