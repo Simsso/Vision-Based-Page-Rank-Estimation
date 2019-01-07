@@ -34,8 +34,10 @@ They extract the fixed-size information (true or false) from the graph network b
 Screenshot definition
 CNNs are a common choice for image processing !!! cite a couple of papers. Original CNN paper LeCun !!!. There is little work on the application of CNNs on screenshots, which can either be attributed to them handling screenshots just as fine as natural images or few applications.
 
-!!! cite Beltramelli has applied a xxx layer CNN to screenshots in order to extract xxx. Describe the paper real quick
+The closest to us is the work of !!! cite Beltramelli, who feeds screenshots into a CNN in order to extract structual information from them. He tries to convert screenshots of a user interface into code that describes that exact layout. In his setup, a CNN is combined with an LSTM: The former is responsible for the feature extraction whereas the latter converts the extracted features into a sequence layout descriptions.
 
-Describe the architecture and state that we are using a similar one.
+More specifically, he does not perform any pre-processing and feeds images of size $256\times 256$ into the model. The model consists of three convolutional blocks, each of which contains two convolutional layers with kernels of size $3\times 3$ and stride 1, followed by $2\times 2$ max-pooling and dropout with a probability of $p=0.25$. The third convolutional block is followed by two fully connected layers with $1024$ units each. Both regularized with $p=0.3$ dropout. The filter count for the convolutions is $32$, $64$, and $128$ for the three blocks respectively. 
 
-We choose to use CNNs as feature extractors for the website screenshots.
+We choose to use CNNs as feature extractors for the website screenshots as well. Our baseline architecture is a slightly adjusted version of !!! cite Beltramelli, with more agressive pooling to make it work for screenshots with larger resolution.
+
+!!! name the other website ranking paper from 2006 somewhere
