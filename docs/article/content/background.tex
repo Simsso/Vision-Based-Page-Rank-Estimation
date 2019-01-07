@@ -22,12 +22,12 @@ While some of those neural network types \textit{can} handle variably-sized inpu
 Graph networks are designed to handle graphs and sets naturally. They can deal with any size of graph and do not regard the ordering of nodes. \cite{deepmind:graphnets} have brought several different types of graph networks under a common hood. We follow their notation and will replicate the relevant parts in the following paragraphs. That is the formal definition of a directed, attributed multi-graph with a global attribute, and of graph networks.
 
 Let a graph $G$ be a 3-tuple $G=\left(\bm{u},\mathbb{V},\mathbb{E}\right)$, where $\bm{u}$ is a vector of global attributes.
-$\mathbb{V}=\left\{\bm{v}_i\mid i\in\left[1,N^{(v)}\right]\right\}$ is a set of $N^{(v)}$ nodes (also referred to as vertices) consisting solely of an attribute vector.
-$\mathbb{E}=\left\{\left(\bm{e}_k,r_k,s_k\right)\mid k\in\left[1,N^{(e)}\right]\right\}$ is a set of $N^{(e)}$ edges, each of which connects a sender node $\bm{v}_{s_k}$ to a receiver node $\bm{v}_{r_k}$, and contains an attribute vector $\bm{e}_k$.
+$\mathbb{V}=\left\{\bm{v}_i\right\}_{i=1}^{N^{(v)}}$ is a set of $N^{(v)}$ nodes (also referred to as vertices) consisting solely of an attribute vector.
+$\mathbb{E}=\left\{\left(\bm{e}_k,r_k,s_k\right)\right\}_{k=1}^{N^{(e)}}$ is a set of $N^{(e)}$ edges, each of which connects a sender node $\bm{v}_{s_k}$ to a receiver node $\bm{v}_{r_k}$, and contains an attribute vector $\bm{e}_k$.
 
-The attribute vectors ($\bm{v}_i$ and $\bm{e}_k$) can contain any kind of information. In fact they could even be another graph themselves.
+The attribute vectors ($\bm{u}$, $\bm{v}_i$, and $\bm{e}_k$) can contain any kind of information. In fact they could even be another graph themselves.
 
-Graph networks (GN) contain at least one GN block. !!!
+Graph networks (GN) are neural networks that contain at least one GN block. !!!
 
 !!! list some applications
 
