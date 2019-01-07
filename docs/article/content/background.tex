@@ -1,13 +1,18 @@
 \section{Background}
+\label{sec:background}
 
 Methods, literature, related work (perhaps as a separate subsection)
 
 Description of GCP, K8s, infrastructure background
 
 \subsection{Learning to Rank}
+\label{sec:learningtorank}
+
 Learning to rank in general, which loss functions exist, how can ranking happen anyways?
 
 \subsection{Graph Networks}
+\label{sec:graphnetworks}
+
 The most basic type of neural network, consisting solely of fully connected layers, converts a vector of fixed size into another vector of fixed size.
 In contast, convolutional neural networks (CNNs) can convert variably-sized input into variably-sized output. In image classification or segmentation tasks, the inputs are often scaled to a fixed size and the convolutional layers serve as feature extractors for a fully-connected classification head.
 Recurrent neural networks can convert a sequence of vectors into another sequence.
@@ -34,6 +39,7 @@ They extract the fixed-size information (true or false) from the graph network b
 
 
 \subsection{Screenshot Processing}
+\label{sec:screenshotprocessing}
 
 Screenshot definition
 Convolutional neural networks (CNNs) were originally inspired by the visual cortex of humans, see \cite{lecun:lenet}, and had their most notable breakthrough with the success of AlexNet (\cite{krizhevsky:imagenet}) in the domain of image classification. The convolutional layers are sliding kernels over two dimensions of the input while looking at all channels simultaneously. This concept allows for two-dimensional translation invariant feature extraction and has proven to be both effective and efficient. There is little work on the application of CNNs on screenshots, which can either be attributed to them handling screenshots just as fine as natural images or few applications.
