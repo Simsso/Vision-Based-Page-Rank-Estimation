@@ -1,39 +1,40 @@
 
 \section{Datasets}
-In our approach we propose a supervised machine learning algorithm to estimate the page rank using deep graph networks. For this purpose we require labelled data to develop, train and validate our model. 
 
-In general the process of gathering, augmenting and labelling of data can take an immense amount of time and slow down the development of machine learning model. Therefore we decided to iteratively develop and align our dataset to the current need of research and progress of development. For each upcoming iteration we specified the requirements for the data set. Following from this each iteration resulted in an own data set version.
+In our approach we propose a supervised machine learning algorithm to estimate the page rank using deep graph networks. For this purpose we require labeled data to develop, train, and validate our model.
 
-The following sections will profoundly specify each dataset version as required during the development of our approach.
+In general the process of gathering, augmenting, and labeling data can take an immense amount of time and can slow down the development of machine learning models. Therefore, we decided to iteratively develop and align our dataset to the current need of research and progress of development. For each upcoming iteration we specified the requirements for the dataset. Following from this, each iteration resulted in a corresponding dataset version.
+
+The following sections will profoundly specify each dataset version as required during the development phase.
 
 \subsection{Dataset Version 1}
 \label{DatasetVersion1}
-The dataset version 1 consists of 100000 samples in total. The ground truth for this dataset version is \textit{OpenPage Rank}, which is described in \ref{OpenPageRank}.
+The dataset version 1 consists of 100,000 samples in total. The ground truth for this dataset version is OpenPage Rank, which is described in section \ref{OpenPageRank}.
 
-Every sample $k$ is a tuple consisting of three values and corresponds to one Domain $D$ from the ground truth:
+Every sample $k$ is a tuple consisting of three values and corresponds to one domain $D$ from the ground truth:
 
 \begin{center}
- $ k \in (I_D, R_D, U_D)$
+ $ k = (I_D, R_D, U_D)$
 \begin{itemize}
-	\item[$I_D$]: The screenshot of the domain $D$ in image format PNG and in the resolution 1920x1080.
-	\item[$R_D$] $\in [1, 100000]$ : The global rank of the domain $D$, according to Open PageRank (\ref{OpenPageRank}). 
-	\item[$U_D$]: The URL of the domain $D$ mapped by the Open PageRank list. Example: \textit{github.com}
+	\item[$I_D$] The screenshot of the domain $D$ in image format PNG and in the resolution $1920\times1080$.
+	\item[$R_D$] The global rank of the domain $D$, according to Open PageRank, within $[1, 100000]$. 
+	\item[$U_D$] The URL of the domain $D$ mapped by the Open PageRank list. For example a string like \texttt{github.com}.
 \end{itemize}
 \end{center}
 
 \subsection{Dataset Version 2}
 \label{DatasetVersion2}
-The dataset version 2 consists of 100000 samples in total and the ground truth is \textit{Open PageRank} as described in dataset version 1.
+The dataset version 2 consists of 100,000 samples in total and the ground truth is \textit{Open PageRank} as described in dataset version 1.
 
-Every sample $k$ is mapped to a domain $D$ from the ground truth and represents a tuple consisting of four values:
+Every sample $k$ is mapped to a domain $D$ by the ground truth and can be expressed as a tuple consisting of four values:
 
 \begin{center}
-$k \in (U_D,R_D,H_D,G_D)$
+$k = (U_D,R_D,H_D,G_D)$
 \begin{itemize}
-	 \item[$U_D$]: The URL of the domain $D$ mapped by the Open PageRank list.
-	\item[$R_D$] $\in [1, 100000]$ : The global rank of the domain $D$ according to Open PageRank (\ref{OpenPageRank}). 
-    \item[$H_D$] $\in \{true, false\}$: Indicator for whether the website uses the protocol HTTPS.
-    \item[$G_D$] $= (V_D, A_D)$: The directed graph of the domain $D$ characterized by a set of vertices $V_D$ and arrows $A_D$.
+	\item[$U_D$] The URL of the domain $D$ mapped by the Open PageRank list.
+	\item[$R_D$] The global rank of the domain $D$, according to Open PageRank, within $[1, 100000]$. 
+    \item[$H_D$] Indicator for whether or not the website uses the protocol HTTPS, the value is $\in\left\{\text{true}, \text{false}\right\}$.
+    \item[$G_D$] The directed graph of the domain $D$ characterized by a set of vertices $V_D$ and arrows $A_D$: $G_D= (V_D, A_D)$.
 \end{itemize}
 \end{center}
 
