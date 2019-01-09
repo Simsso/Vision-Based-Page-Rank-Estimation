@@ -11,14 +11,14 @@ The following sections will profoundly specify each dataset version as required 
 \label{DatasetVersion1}
 The dataset version 1 consists of 100,000 samples in total. The ground truth for this dataset version is OpenPage Rank, which is described in section \ref{OpenPageRank}.
 
-Every sample $k$ is a tuple consisting of three values and corresponds to one domain $D$ from the ground truth:
+Every sample $X$ is corresponds to a domain $D$ contained in the ground truth. We denote the $r$th sample as $X^{(r)}$. It can be expressed as a tuple consisting of four values:
 
 \begin{center}
- $ k = (I_D, R_D, U_D)$
+ $X^{(r)} = (\tensorsym{I}, r, u)$
 \begin{itemize}
-	\item[$I_D$] The screenshot of the domain $D$ in image format PNG and in the resolution $1920\times1080$.
-	\item[$R_D$] The global rank of the domain $D$, according to Open PageRank, within $[1, 100000]$. 
-	\item[$U_D$] The URL of the domain $D$ mapped by the Open PageRank list. For example a string like \texttt{github.com}.
+	\item[$\tensorsym{I}$] The screenshot of the domain $D$ in image format PNG and in the resolution $1920\times1080$. The image tensor has four channels, $\tensorsym{I}$ is therefore $\in\mathbb{R}^{1920\times1080\times4}$.
+	\item[$r$] The global rank of the domain $D$, according to Open PageRank, within $[1, 100000]$. 
+	\item[$u$] The URL of the domain $D$ mapped by the Open PageRank list. For example a string like \texttt{github.com}.
 \end{itemize}
 \end{center}
 
@@ -26,43 +26,43 @@ Every sample $k$ is a tuple consisting of three values and corresponds to one do
 \label{DatasetVersion2}
 The dataset version 2 consists of 100,000 samples in total and the ground truth is \textit{Open PageRank} as described in dataset version 1.
 
-Every sample $k$ is mapped to a domain $D$ by the ground truth and can be expressed as a tuple consisting of four values:
+Every sample $X$ is corresponds to a domain $D$ contained in the ground truth. We denote the $r$th sample as $X^{(r)}$. It can be expressed as a tuple consisting of four values:
 
 \begin{center}
-$k = (U_D,R_D,H_D,G_D)$
+$X = (G,u,r,h)$
 \begin{itemize}
-	\item[$U_D$] The URL of the domain $D$ mapped by the Open PageRank list.
-	\item[$R_D$] The global rank of the domain $D$, according to Open PageRank, within $[1, 100000]$. 
-    \item[$H_D$] Indicator for whether or not the website uses the protocol HTTPS, the value is $\in\left\{\text{true}, \text{false}\right\}$.
-    \item[$G_D$] The directed graph of the domain $D$ characterized by a set of vertices $V_D$ and arrows $A_D$: $G_D= (V_D, A_D)$.
+    \item[$G$] The directed graph of the domain $D$ characterized by a set of nodes $\mathbb{V}$ and edges $\mathbb{E}$: $G= \left(\mathbb{V}, \mathbb{A}\right)$.
+	\item[$u$] The URL of the domain $D$ mapped by the Open PageRank list.
+	\item[$r$] The global rank of the domain $D$, according to Open PageRank, within $[1, 100000]$. 
+    \item[$h$] Indicator for whether or not the website uses the protocol HTTPS, the value is $\in\left\{\text{true}, \text{false}\right\}$.
 \end{itemize}
 \end{center}
 
 \subsubsection{The Directed Graph}
-The directed graph provides a topological view on the given website by representing all associated webpages within the same domain as vertices and connections as arrows as in figure \ref{fig:PartialDirectedGraph_timodenk.com} exemplary illustrated. During the crawling process as described in \ref{Datacrawler} vertices and arrows of the graph are created and enriched with local information about the visited webpages.
+The directed graph provides a topological view on the given website by representing all associated web pages within the same domain as vertices and connections as arrows as in figure \ref{fig:PartialDirectedGraph_timodenk.com} exemplary illustrated. During the crawling process as described in \ref{Datacrawler} vertices and arrows of the graph are created and enriched with local information about the visited web pages.
 
-The directed graph $G_D$ is characterized by a set of vertices $V_D$ and arrows $A_D$. Each vertices $v \in V_D$ represents a webpage $p$ of the given domain $D$ and is characterized by the following tuple:
+The directed graph $G$ is characterized by a set of nodes $\mathbb{V}$ and edges $\mathbb{E}$. Each node $v \in \mathbb{V}$ represents a web page of the given domain associated with the graph. A node is characterized by the following tuple:
 
 \begin{center}
-	$v \in (U_p, I_p, M_p,T_p, L_p, S_p)$
+$v = (u, \tensorsym{I}, \tensorsym{M},t, l, s)$
 \begin{itemize}
-	\item[$ U_p$] : The exact URL of the webpage $p$. Example: \textit{https://github.com/help}
-	\item[$I_p$] : The screenshot of webpage $p$ in image format PNG and in the resolution 1920x1080.
-	\item[$M_p$] The screenshot of webpage $p$ in image format PNG and in mobile resolution TODO ZxY.
-	\item[$T_p$] : The title of webpage $p$ as can be seen in the tabs bar of a common browser.
-	\item[$L_p$] : The time it takes to download all data of webpage $p$ from the web server in milliseconds.
-	\item[$S_p$] : Number of kilobytes downloaded in total for webpage $p$.
+	\item[$u$] The exact URL of the web page. Example: \textit{https://github.com/help}
+	\item[$\tensorsym{I}$] The screenshot of web page in image format PNG and in the resolution 1920x1080.
+	\item[$\tensorsym{M}$] The screenshot of web page in image format PNG and in mobile resolution TODO ZxY.
+	\item[$t$] The title of web page as can be seen in the tabs bar of a common browser.
+	\item[$l$] The time it takes to download all data of web page from the web server in milliseconds.
+	\item[$s$] Number of kilobytes downloaded in total for web page (size).
 \end{itemize}
 \end{center}
 
-Each arrow represents a possible navigation from webpage $p$ to $q$ in the graph $G_D$. It can be understood as a hyperlink or button found on webpage $p$ (source), which leads to webpage $q$ (target) in the same domain $G_D$. 
+Each edge represents a possible navigation from web page $v_1$ to $v_2$ in the graph $G$. It can be understood as a hyperlink or button found on web page $v_1$ (source), which points to $v_2$ (target) in the same domain. 
 
 \begin{center}
-	$a \in (U_p, U_q, L_{p,q})$
+	$v \in (v_1, v_2, t)$
 	\begin{itemize}
-		\item[$U_p$] : The source URL of the webpage $p$
-		\item[$U_q$] : The target URL of the webpage $q$ the arrow directs to.
-		\item[$L_{p,q}$] : If existent, the text that links from source to target webpage. 
+		\item[$v_1$] The source node (web page).
+		\item[$v_2$] The target node that $v_1$ points to.
+		\item[$t$] If existent, the text that links from source to target web page.
 	\end{itemize}
 \end{center}
 
@@ -113,6 +113,6 @@ Each arrow represents a possible navigation from webpage $p$ to $q$ in the graph
 \draw[-latex] (timodenk.one west) to [bend right=30](imprint.one north);
 \end{tikzpicture}
 }
-\caption{Illustrates partial directed graph of domain \textit{timodenk.com} with three webpages, corresponding arrows and vertices}
+\caption{Illustrates partial directed graph of domain \textit{timodenk.com} with three web pages, corresponding arrows and vertices}
 \label{fig:PartialDirectedGraph_timodenk.com}
 \end{figure}
