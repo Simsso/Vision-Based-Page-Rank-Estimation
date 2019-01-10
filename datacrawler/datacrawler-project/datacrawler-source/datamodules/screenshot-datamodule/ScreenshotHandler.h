@@ -37,7 +37,7 @@ private:
     std::chrono::steady_clock::time_point timeOnPaintInvoke;
 
 public:
-    bool GetViewRect(CefRefPtr<CefBrowser> , CefRect &) OVERRIDE;
+    void GetViewRect(CefRefPtr<CefBrowser> , CefRect &) OVERRIDE;
     void OnPaint(CefRefPtr<CefBrowser>, PaintElementType, const RectList &, const void*, int, int) OVERRIDE;
 
     unsigned char* calculateChangeMatrix(unsigned char*, unsigned char*, int32_t, int32_t);

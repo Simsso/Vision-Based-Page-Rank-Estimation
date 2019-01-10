@@ -45,9 +45,8 @@ ScreenshotHandler::ScreenshotHandler(bool * quitMessageLoop, int countLastL1Norm
  * @param rect represents the CefRect-instance of the given CefBrowser-instance
  * @return This will return true.
  */
-bool ScreenshotHandler::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect) {
+void ScreenshotHandler::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect) {
     rect = CefRect(0, 0, renderWidth, renderHeight);
-    return true;
 }
 
 /**
