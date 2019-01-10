@@ -47,7 +47,7 @@ set(CEFSIMPLE_SRCS
         datamodules/screenshot-datamodule/ScreenshotData.cpp
         datamodules/screenshot-datamodule/ScreenshotData.h
         datamodules/screenshot-datamodule/Screenshot.cpp
-        datamodules/screenshot-datamodule/Screenshot.h)
+        datamodules/screenshot-datamodule/Screenshot.h datamodules/screenshot-datamodule/ScreenshotRequestHandler.cpp datamodules/screenshot-datamodule/ScreenshotRequestHandler.h)
 
 APPEND_PLATFORM_SOURCES(CEFSIMPLE_HELPER_SRCS)
 source_group(cefsimple FILES ${CEFSIMPLE_HELPER_SRCS})

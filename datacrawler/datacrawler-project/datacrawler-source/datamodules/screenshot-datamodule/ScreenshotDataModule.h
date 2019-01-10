@@ -16,6 +16,7 @@
 
 #include "../DataModuleBase.h"
 #include "ScreenshotHandler.h"
+#include "ScreenshotRequestHandler.h"
 #include "ScreenshotClient.h"
 #include "Screenshot.h"
 #include "ScreenshotData.h"

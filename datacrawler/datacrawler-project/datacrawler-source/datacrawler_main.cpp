@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
 
     if(DEVELOPMENT){
         setenv("LOG_LEVEL", "LOG_ALL", true);
-        setenv("URL","http://timodenk.com", true);
+        setenv("URL","http://youtube.com", true);
         setenv("DATAMODULE", "SCREENSHOT_MODULE", true);
         setenv("URL_RANK", "1", true);
         setenv("OUTPUT_PATH", "/home/doktorgibson/Desktop/", true);
