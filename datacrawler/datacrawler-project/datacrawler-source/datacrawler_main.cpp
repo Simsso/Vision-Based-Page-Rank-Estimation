@@ -2,13 +2,29 @@
 
 #define DATASET_VERSION_1
 
+#define DEVELOPMENT true
+
 Logger *Logger::instance = 0;
 
 #ifdef DATASET_VERSION_1
 
 #include "opencv2/opencv.hpp"
+#include "stdlib.h"
 
 int main(int argc, char *argv[]) {
+
+    if(DEVELOPMENT){
+        setenv("LOG_LEVEL", "LOG_ALL", true);
+        setenv("URL","http://timodenk.com", true);
+        setenv("DATAMODULE", "SCREENSHOT_MODULE", true);
+        setenv("URL_RANK", "1", true);
+        setenv("OUTPUT_PATH", "/home/doktorgibson/Desktop/", true);
+        setenv("ONPAINT_TIMEOUT", "25", true);
+        setenv("ELAPSED_TIME_ONPAINT_TIMEOUT", "17500", true);
+        setenv("CHANGE_THRESHOLD", "0.005", true);
+        setenv("LAST_SCREENSHOTS", "20", true);
+    }
+
     Logger *logger = Logger::getInstance();
 
     char *url = std::getenv("URL");

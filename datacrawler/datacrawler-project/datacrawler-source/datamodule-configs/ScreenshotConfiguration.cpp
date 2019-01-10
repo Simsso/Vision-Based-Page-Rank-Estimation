@@ -14,6 +14,7 @@ ScreenshotConfiguration::ScreenshotConfiguration(){
     mobile = false;
 }
 
+// TODO refactor parameter
 /**
  * ScreenshotConfiguration - Constructor to configure the ScreenshotDataModule
  * @param width specifies the width of the screenshot to be taken

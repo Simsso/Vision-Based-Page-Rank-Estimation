@@ -15,8 +15,7 @@ DatacrawlerConfiguration::~DatacrawlerConfiguration() {
 DatacrawlerConfiguration::DatacrawlerConfiguration() {
     logger = Logger::getInstance();
 
-    // TODO Figure out how to pass complex datasctructures (derived objects) through IPC to allow multiple datamodules in one process
-    // TODO Refactor this !!
+    // TODO Refactor, add default values if not available
     char *datamoduleName = std::getenv("DATAMODULE");
 
     if(datamoduleName == NULL) {
