@@ -28,7 +28,7 @@ public:
     NodeElement* process(string);
     void init();
 
-    Datacrawler(CefMainArgs*);
+    Datacrawler();
     ~Datacrawler();
 };
 

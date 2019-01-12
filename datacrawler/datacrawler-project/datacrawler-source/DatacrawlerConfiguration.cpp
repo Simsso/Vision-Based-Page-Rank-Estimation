@@ -27,11 +27,24 @@ DatacrawlerConfiguration::DatacrawlerConfiguration() {
                 auto datamoduleConfig = datamoduleEntry.value();
 
                 if (datamoduleConfig["DATAMODULE"] == "SCREENSHOT_MODULE") {
+                    if (datamoduleConfig["DISABLED"].is_null() || datamoduleConfig["DISABLED"].get<bool>())
+                        continue;
+
                     configurations[SCREENSHOT_MODULE] = generateScreenshotDatamoduleConfig(
                             datamoduleConfig["ATTRIBUTES"], false);
+
                 } else if (datamoduleConfig["DATAMODULE"] == "SCREENSHOT_MOBILE_MODULE") {
+                    if (datamoduleConfig["DISABLED"].is_null() || datamoduleConfig["DISABLED"].get<bool>())
+                        continue;
+
                     configurations[SCREENSHOT_MOBILE_MODULE] = generateScreenshotDatamoduleConfig(
                             datamoduleConfig["ATTRIBUTES"], true);
+
+                } else if (datamoduleConfig["DATAMODULE"] == "URL_MODULE"){
+                    if (datamoduleConfig["DISABLED"].is_null() || datamoduleConfig["DISABLED"].get<bool>())
+                        continue;
+
+                    configurations[URL_MODULE] = generateUrlDataModuleConfig(datamoduleConfig["ATTRIBUTES"]);
                 }
             }
 
@@ -53,9 +66,9 @@ ScreenshotConfiguration *DatacrawlerConfiguration::generateScreenshotDatamoduleC
     bool parseError = false;
 
     if(mobile)
-        logger->info("<ScreenshotMobile-Datamodule> ..");
+        logger->info("<ScreenshotMobile-Datamodule> configuration");
     else
-        logger->info("<Screenshot-Datamodule> ..");
+        logger->info("<Screenshot-Datamodule> configuration");
 
     if (attributes["ELAPSED_TIME_ONPAINT_TIMEOUT"].is_null() &&
         !attributes["ELAPSED_TIME_ONPAINT_TIMEOUT"].is_number()) {
@@ -105,6 +118,14 @@ ScreenshotConfiguration *DatacrawlerConfiguration::generateScreenshotDatamoduleC
 
     return new ScreenshotConfiguration(height, width, onPaintTimeout, elapsedTimeOnPaintTimeout, changeThreshold,
                                        lastScreenshots, mobile);
+}
+
+UrlConfiguration *DatacrawlerConfiguration::generateUrlDataModuleConfig(json &attributes) {
+    logger->info("<URL-Datamodule> configuration");
+
+    logger->info(".. loaded !");
+
+    return new UrlConfiguration();
 }
 
 /**

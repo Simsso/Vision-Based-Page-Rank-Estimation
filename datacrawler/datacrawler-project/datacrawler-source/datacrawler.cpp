@@ -3,12 +3,15 @@
 /**
  * Datacrawler
  */
-Datacrawler::Datacrawler(CefMainArgs *mainArgs) {
+Datacrawler::Datacrawler() {
     logger = Logger::getInstance();
-    this->mainArgs = mainArgs;
 }
 
-Datacrawler::~Datacrawler() {}
+Datacrawler::~Datacrawler() {
+    for (auto x: dataModules) {
+        delete x;
+    }
+}
 
 /**
  * init - Loads all user-defined DataModules and prepares Datacrawler to crawl given url
@@ -18,17 +21,17 @@ void Datacrawler::init() {
 
     if (datacrawlerConfiguration.getConfiguration(SCREENSHOT_MODULE) != nullptr) {
         dataModules.push_front(datacrawlerConfiguration.getConfiguration(SCREENSHOT_MODULE)->createInstance());
-        logger->info("Using ScreenshotDataModule ..");
+        logger->info("Using Screenshot-DataModule ..");
     }
 
     if (datacrawlerConfiguration.getConfiguration(SCREENSHOT_MOBILE_MODULE) != nullptr) {
         dataModules.push_front(datacrawlerConfiguration.getConfiguration(SCREENSHOT_MOBILE_MODULE)->createInstance());
-        logger->info("Using ScreenshotDataModule with mobile enabled ..");
+        logger->info("Using ScreenshotMobile-DataModule ..");
     }
 
     if (datacrawlerConfiguration.getConfiguration(URL_MODULE) != nullptr) {
         dataModules.push_front(datacrawlerConfiguration.getConfiguration(URL_MODULE)->createInstance());
-        logger->info("Using URLDataModule ..");
+        logger->info("Using URL-Module ..");
     }
 
     logger->info("Initialising Datacrawler finished!");
@@ -46,7 +49,7 @@ NodeElement *Datacrawler::process(string url) {
     NodeElement *newNode = new NodeElement();
 
     for (auto x: dataModules) {
-       newNode->addData(x->process(mainArgs, url));
+       newNode->addData(x->process(url));
     }
 
     logger->info("<" + url + "> processed!");

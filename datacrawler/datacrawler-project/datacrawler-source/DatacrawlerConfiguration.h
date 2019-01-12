@@ -7,6 +7,7 @@
 #include "datamodule-configs/ScreenshotConfiguration.h"
 #include "util/json.hpp"
 #include "fstream"
+#include "datamodule-configs/UrlConfiguration.h"
 
 using namespace std;
 using namespace nlohmann;
@@ -18,6 +19,7 @@ private:
     Logger* logger;
 
     ScreenshotConfiguration* generateScreenshotDatamoduleConfig(json&, bool);
+    UrlConfiguration* generateUrlDataModuleConfig(json&);
 
 public:
     DataModuleBaseConfiguration* getConfiguration(DataModulesEnum);

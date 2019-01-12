@@ -2,6 +2,7 @@
   "DATAMODULES": [
     {
       "DATAMODULE": "SCREENSHOT_MODULE",
+      "DISABLED": true,
       "ATTRIBUTES":
         {
           "ONPAINT_TIMEOUT": 25,
@@ -14,6 +15,7 @@
     },
     {
       "DATAMODULE": "SCREENSHOT_MOBILE_MODULE",
+      "DISABLED": true,
       "ATTRIBUTES":
         {
           "ONPAINT_TIMEOUT": 25,
@@ -23,6 +25,14 @@
           "HEIGHT": 1080,
           "WIDTH": 1920
         }
+    },
+    {
+      "DATAMODULE": "URL_MODULE",
+      "DISABLED": false,
+      "ATTRIBUTES":
+      {
+
+      }
     }
   ]
 }

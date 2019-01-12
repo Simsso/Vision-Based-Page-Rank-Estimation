@@ -27,18 +27,13 @@ private:
     int height;
     int width;
     bool mobile;
-    int ONPAINT_TIMEOUT;
-    int ELAPSED_TIME_ONPAINT_TIMEOUT;
-    int LAST_SCREENSHOTS;
-    double CHANGE_THRESHOLD;
-
-    CefRefPtr<ScreenshotHandler> screenshotHandler;
-    CefRefPtr<ScreenshotClient> screenshotClient;
-    CefRefPtr<ScreenshotRequestHandler> screenshotRequestHandler;
-    CefRefPtr<CefBrowser> browser;
+    int onPaintTimeout;
+    int elapsedTimeOnPaintTimeout;
+    int lastScreenshots;
+    double changeThreshold;
 
 public:
-    DataBase* process(CefMainArgs*, std::string) OVERRIDE;
+    DataBase* process(std::string) OVERRIDE;
 
     ScreenshotDataModule();
     ScreenshotDataModule(int, int, int, int, double, int, bool);
