@@ -13,7 +13,7 @@
         }
     },
     {
-      "DATAMODULE": "SCREENSHOTMOBILE_MODULE",
+      "DATAMODULE": "SCREENSHOT_MOBILE_MODULE",
       "ATTRIBUTES":
         {
           "ONPAINT_TIMEOUT": 25,

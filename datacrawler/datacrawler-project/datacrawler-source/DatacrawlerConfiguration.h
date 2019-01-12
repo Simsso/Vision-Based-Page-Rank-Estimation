@@ -17,8 +17,8 @@ private:
     map<DataModulesEnum, DataModuleBaseConfiguration*> configurations;
     Logger* logger;
 
-    ScreenshotConfiguration* generateScreenshotDatamoduleConfig(json&);
-    ScreenshotConfiguration* genereateScreenshotMobileDatamoduleConfig(json&);
+    ScreenshotConfiguration* generateScreenshotDatamoduleConfig(json&, bool);
+
 public:
     DataModuleBaseConfiguration* getConfiguration(DataModulesEnum);
 

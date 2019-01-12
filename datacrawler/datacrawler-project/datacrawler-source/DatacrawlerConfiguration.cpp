@@ -10,7 +10,7 @@ DatacrawlerConfiguration::~DatacrawlerConfiguration() {
 }
 
 /**
- * DatacrawlerConfiguration - Loads all user-defined configurations for the graph to be generated
+ * DatacrawlerConfiguration - Loads all user-defined configurations for the graph to be generated from a json-file
  */
 DatacrawlerConfiguration::DatacrawlerConfiguration() {
     logger = Logger::getInstance();
@@ -20,7 +20,7 @@ DatacrawlerConfiguration::DatacrawlerConfiguration() {
     if (file) {
         json config;
         file >> config;
-        //configurations[SCREENSHOT_MODULE] = new ScreenshotConfiguration(400, 400, ONPAINT_TIMEOUT, ELAPSED_TIME_ONPAINT_TIMEOUT, CHANGE_THRESHOLD, LAST_SCREENSHOTS, true);
+
         if (!config["DATAMODULES"].is_null()) {
 
             for (auto &datamoduleEntry : config["DATAMODULES"].items()) {
@@ -28,10 +28,11 @@ DatacrawlerConfiguration::DatacrawlerConfiguration() {
 
                 if (datamoduleConfig["DATAMODULE"] == "SCREENSHOT_MODULE") {
                     configurations[SCREENSHOT_MODULE] = generateScreenshotDatamoduleConfig(
-                            datamoduleConfig["ATTRIBUTES"]);
+                            datamoduleConfig["ATTRIBUTES"], false);
+                } else if (datamoduleConfig["DATAMODULE"] == "SCREENSHOT_MOBILE_MODULE") {
+                    configurations[SCREENSHOT_MOBILE_MODULE] = generateScreenshotDatamoduleConfig(
+                            datamoduleConfig["ATTRIBUTES"], true);
                 }
-                // else if (datamoduleConfig["DATAMODULE"] == "SCREENSHOT_MOBILE_MODULE")
-                //    configurations[SCREENSHOT_MODULE] = generateScreenshotDatamoduleConfig(datamoduleConfig["ATTRIBUTES"]);
             }
 
         } else {
@@ -42,43 +43,54 @@ DatacrawlerConfiguration::DatacrawlerConfiguration() {
     }
 }
 
-ScreenshotConfiguration *DatacrawlerConfiguration::generateScreenshotDatamoduleConfig(json &attributes) {
+/**
+ * generateScreenshotDatamoduleConfig
+ * @param attributes represents a key-value storage for json-attributes retrieved for the Datamodule
+ * @param mobile switches user-agent in Screenshot-Datamodule to mobile device if true. Otherwise default user-agent.
+ * @return ScreenshotConfiguration*, which represents the configuration of the ScreenshotDatamodule
+ */
+ScreenshotConfiguration *DatacrawlerConfiguration::generateScreenshotDatamoduleConfig(json &attributes, bool mobile) {
     bool parseError = false;
+
+    if(mobile)
+        logger->info("<ScreenshotMobile-Datamodule> ..");
+    else
+        logger->info("<Screenshot-Datamodule> ..");
 
     if (attributes["ELAPSED_TIME_ONPAINT_TIMEOUT"].is_null() &&
         !attributes["ELAPSED_TIME_ONPAINT_TIMEOUT"].is_number()) {
         logger->error(
-                "Missing/Wrong value for 'ELAPSED_TIME_ONPAINT_TIMEOUT' in config for ScreenshotDatamodule!");
+                "Missing/Wrong value for 'ELAPSED_TIME_ONPAINT_TIMEOUT' in config!");
         parseError = true;
     }
 
     if (attributes["ONPAINT_TIMEOUT"].is_null() && !attributes["ONPAINT_TIMEOUT"].is_number()) {
-        logger->error("Missing/Wrong value for 'ONPAINT_TIMEOUT' in config for ScreenshotDatamodule!");
+        logger->error("Missing/Wrong value for 'ONPAINT_TIMEOUT' in config!");
         parseError = true;
     }
 
     if (attributes["CHANGE_THRESHOLD"].is_null() && !attributes["CHANGE_THRESHOLD"].is_number()) {
-        logger->error("Missing/Wrong value for 'CHANGE_THRESHOLD' in config for ScreenshotDatamodule!");
+        logger->error("Missing/Wrong value for 'CHANGE_THRESHOLD' in config!");
         parseError = true;
     }
 
     if (attributes["LAST_SCREENSHOTS"].is_null() && !attributes["LAST_SCREENSHOTS"].is_number()) {
-        logger->error("Missing/Wrong value for 'LAST_SCREENSHOTS' in config for ScreenshotDatamodule!");
+        logger->error("Missing/Wrong value for 'LAST_SCREENSHOTS' in config!");
         parseError = true;
     }
 
     if (attributes["HEIGHT"].is_null() && !attributes["HEIGHT"].is_number()) {
-        logger->error("Missing/Wrong value for 'HEIGHT' in config for ScreenshotDatamodule!");
+        logger->error("Missing/Wrong value for 'HEIGHT' in config!");
         parseError = true;
     }
 
     if (attributes["WIDTH"].is_null() && !attributes["WIDTH"].is_number()) {
-        logger->error("Missing/Wrong value for 'WIDTH' in config for ScreenshotDatamodule!");
+        logger->error("Missing/Wrong value for 'WIDTH' in config!");
         parseError = true;
     }
 
     if (parseError) {
-        logger->error("ScreenshotDatamodule has configuration errors! Excluded!");
+        logger->error("Datamodule has configuration errors! Excluded!");
         return nullptr;
     }
 
@@ -89,9 +101,12 @@ ScreenshotConfiguration *DatacrawlerConfiguration::generateScreenshotDatamoduleC
     int height = attributes["HEIGHT"].get<int>();
     int width = attributes["WIDTH"].get<int>();
 
+    logger->info(".. loaded !");
+
     return new ScreenshotConfiguration(height, width, onPaintTimeout, elapsedTimeOnPaintTimeout, changeThreshold,
-                                       lastScreenshots, false);
+                                       lastScreenshots, mobile);
 }
+
 /**
  * getConfiguration
  * @param selectedConfig represents the name of the DataModule for whom configuration shall be loaded
