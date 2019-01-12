@@ -22,7 +22,7 @@ class ScreenshotFeatureExtractor(nn.Module):
         self.conv3a = nn.Conv2d(64, 128, kernel_size=(3, 3))
         self.conv3b = nn.Conv2d(128, 128, kernel_size=(3, 3))
 
-        self.dense1 = nn.Linear(128*10*5, 1024)
+        self.dense1 = nn.Linear(128*5*5, 1024)
         self.dense2 = nn.Linear(1024, 1024)
 
     def forward(self, x):
@@ -58,7 +58,3 @@ class ScreenshotFeatureExtractor(nn.Module):
         for s in size:
             num_features *= s
         return num_features
-
-
-net = ScreenshotFeatureExtractor()
-print(net(torch.randn(1, 3, 1920, 1080)))
