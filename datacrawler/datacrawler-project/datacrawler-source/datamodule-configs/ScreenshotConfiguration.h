@@ -9,10 +9,10 @@ private:
     int height;
     int width;
     bool mobile;
-    int ONPAINT_TIMEOUT;
-    int ELAPSED_TIME_ONPAINT_TIMEOUT;
-    int LAST_SCREENSHOTS;
-    double CHANGE_THRESHOLD;
+    int onPaintTimeout;
+    int elapsedTimeOnPaintTimeout;
+    int lastScreenshots;
+    double changeThreshold;
 
 public:
     DataModuleBase* createInstance();

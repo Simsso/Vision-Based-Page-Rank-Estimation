@@ -34,6 +34,7 @@ private:
 
     CefRefPtr<ScreenshotHandler> screenshotHandler;
     CefRefPtr<ScreenshotClient> screenshotClient;
+    CefRefPtr<ScreenshotRequestHandler> screenshotRequestHandler;
     CefRefPtr<CefBrowser> browser;
 
 public:

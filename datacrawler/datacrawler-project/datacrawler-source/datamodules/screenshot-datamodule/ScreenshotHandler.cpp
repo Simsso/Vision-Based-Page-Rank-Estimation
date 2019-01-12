@@ -85,8 +85,6 @@ void ScreenshotHandler::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType 
         unsigned char *changeMatrix = calculateChangeMatrix(lastScreenshot, (unsigned char*) buffer, renderHeight, renderWidth);
         int32_t l1Norm = calculateL1Norm(changeMatrix, renderWidth, renderHeight);
 
-        logger->info("Current L1-Norm: " + std::to_string(l1Norm));
-
         sumL1Norm += l1Norm;
         int64_t averageL1Norm = sumL1Norm / numInvokations;
         insertL1Norm(l1Norm);

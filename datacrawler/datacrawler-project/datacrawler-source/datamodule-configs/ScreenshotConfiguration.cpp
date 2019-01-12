@@ -20,14 +20,14 @@ ScreenshotConfiguration::ScreenshotConfiguration(){
  * @param width specifies the width of the screenshot to be taken
  * @param height specifies the height of the screenshot to be taken
  */
-ScreenshotConfiguration::ScreenshotConfiguration(int height, int width, int ONPAINT_TIMEOUT, int ELAPSED_TIME_ONPAINT_TIMEOUT, double CHANGE_THRESHOLD, int LAST_SCREENSHOTS, bool mobile) {
+ScreenshotConfiguration::ScreenshotConfiguration(int height, int width, int onPaintTimeout, int elapsedTimeOnPaintTimeout, double changeThreshold, int lastScreenshots, bool mobile) {
     this->width  = width;
     this->height = height;
     this->mobile = mobile;
-    this->ONPAINT_TIMEOUT = ONPAINT_TIMEOUT;
-    this->LAST_SCREENSHOTS = LAST_SCREENSHOTS;
-    this->CHANGE_THRESHOLD = CHANGE_THRESHOLD;
-    this->ELAPSED_TIME_ONPAINT_TIMEOUT = ELAPSED_TIME_ONPAINT_TIMEOUT;
+    this->onPaintTimeout = onPaintTimeout;
+    this->lastScreenshots = lastScreenshots;
+    this->changeThreshold = changeThreshold;
+    this->elapsedTimeOnPaintTimeout = elapsedTimeOnPaintTimeout;
 }
 
 /**
@@ -35,6 +35,6 @@ ScreenshotConfiguration::ScreenshotConfiguration(int height, int width, int ONPA
  * @return instance of the ScreenshotDataModule
  */
 DataModuleBase* ScreenshotConfiguration::createInstance() {
-    return new ScreenshotDataModule(height, width, ONPAINT_TIMEOUT, ELAPSED_TIME_ONPAINT_TIMEOUT, CHANGE_THRESHOLD, LAST_SCREENSHOTS, mobile);
+    return new ScreenshotDataModule(height, width, onPaintTimeout, elapsedTimeOnPaintTimeout, changeThreshold, lastScreenshots, mobile);
 }
 

@@ -1,0 +1,28 @@
+{
+  "DATAMODULES": [
+    {
+      "DATAMODULE": "SCREENSHOT_MODULE",
+      "ATTRIBUTES":
+        {
+          "ONPAINT_TIMEOUT": 25,
+          "ELAPSED_TIME_ONPAINT_TIMEOUT": 17500,
+          "CHANGE_THRESHOLD": 0.005,
+          "LAST_SCREENSHOTS": 20,
+          "HEIGHT": 1080,
+          "WIDTH": 1920
+        }
+    },
+    {
+      "DATAMODULE": "SCREENSHOTMOBILE_MODULE",
+      "ATTRIBUTES":
+        {
+          "ONPAINT_TIMEOUT": 25,
+          "ELAPSED_TIME_ONPAINT_TIMEOUT": 17500,
+          "CHANGE_THRESHOLD": 0.005,
+          "LAST_SCREENSHOTS": 20,
+          "HEIGHT": 1080,
+          "WIDTH": 1920
+        }
+    }
+  ]
+}

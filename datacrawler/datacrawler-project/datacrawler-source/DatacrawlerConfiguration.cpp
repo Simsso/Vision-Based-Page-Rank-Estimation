@@ -15,80 +15,83 @@ DatacrawlerConfiguration::~DatacrawlerConfiguration() {
 DatacrawlerConfiguration::DatacrawlerConfiguration() {
     logger = Logger::getInstance();
 
-    // TODO Refactor, add default values if not available
-    char *datamoduleName = std::getenv("DATAMODULE");
+    ifstream file("datacrawler.config.json");
 
-    if(datamoduleName == NULL) {
-        logger->fatal("No datamodule has been detected! Please specify the environment variable <DATAMODULE>!");
-        logger->fatal("Exiting datacrawler!");
-        exit(1);
-    } else if (toStringDataModulesEnum(SCREENSHOT_MODULE).compare(datamoduleName) == 0) {
-        logger->info("SCREENSHOT_MODULE has been activated!");
+    if (file) {
+        json config;
+        file >> config;
+        //configurations[SCREENSHOT_MODULE] = new ScreenshotConfiguration(400, 400, ONPAINT_TIMEOUT, ELAPSED_TIME_ONPAINT_TIMEOUT, CHANGE_THRESHOLD, LAST_SCREENSHOTS, true);
+        if (!config["DATAMODULES"].is_null()) {
 
-        char * ONPAINT_TIMEOUT_ENV = std::getenv("ONPAINT_TIMEOUT");
-        if(ONPAINT_TIMEOUT_ENV == NULL){
-            logger->fatal("ONPAINT_TIMEOUT not specified! Exiting!");
-            exit(1);
+            for (auto &datamoduleEntry : config["DATAMODULES"].items()) {
+                auto datamoduleConfig = datamoduleEntry.value();
+
+                if (datamoduleConfig["DATAMODULE"] == "SCREENSHOT_MODULE") {
+                    configurations[SCREENSHOT_MODULE] = generateScreenshotDatamoduleConfig(
+                            datamoduleConfig["ATTRIBUTES"]);
+                }
+                // else if (datamoduleConfig["DATAMODULE"] == "SCREENSHOT_MOBILE_MODULE")
+                //    configurations[SCREENSHOT_MODULE] = generateScreenshotDatamoduleConfig(datamoduleConfig["ATTRIBUTES"]);
+            }
+
+        } else {
+            logger->error("Missing 'DATAMODULES' array in config!");
         }
-        long ONPAINT_TIMEOUT = atol(ONPAINT_TIMEOUT_ENV);
-
-        char * ELAPSED_TIME_ONPAINT_TIMEOUT_ENV = std::getenv("ELAPSED_TIME_ONPAINT_TIMEOUT");
-        if(ELAPSED_TIME_ONPAINT_TIMEOUT_ENV == NULL){
-            logger->fatal("ELAPSED_TIME_ONPAINT_TIMEOUT not specified! Exiting!");
-            exit(1);
-        }
-        long ELAPSED_TIME_ONPAINT_TIMEOUT = atol(ELAPSED_TIME_ONPAINT_TIMEOUT_ENV);
-
-        char * LAST_SCREENSHOTS_ENV = std::getenv("LAST_SCREENSHOTS");
-        if(LAST_SCREENSHOTS_ENV == NULL){
-            logger->fatal("LAST_SCREENSHOTS not specified! Exiting!");
-            exit(1);
-        }
-        long LAST_SCREENSHOTS = atol(LAST_SCREENSHOTS_ENV);
-
-        char * CHANGE_THRESHOLD_ENV = std::getenv("CHANGE_THRESHOLD");
-        if(CHANGE_THRESHOLD_ENV == NULL){
-            logger->fatal("CHANGE_THRESHOLD not specified! Exiting!");
-            exit(1);
-        }
-        double CHANGE_THRESHOLD = atof(CHANGE_THRESHOLD_ENV);
-
-        configurations[SCREENSHOT_MODULE] = new ScreenshotConfiguration(1080, 1920, ONPAINT_TIMEOUT, ELAPSED_TIME_ONPAINT_TIMEOUT, CHANGE_THRESHOLD, LAST_SCREENSHOTS, false);
-    } else if (toStringDataModulesEnum(SCREENSHOT_MOBILE_MODULE).compare(datamoduleName) == 0) {
-        logger->info("SCREENSHOT_MOBILE_MODULE has been activated!");
-
-        char * ONPAINT_TIMEOUT_ENV = std::getenv("ONPAINT_TIMEOUT");
-        if(ONPAINT_TIMEOUT_ENV == NULL){
-            logger->fatal("ONPAINT_TIMEOUT not specified! Exiting!");
-            exit(1);
-        }
-        long ONPAINT_TIMEOUT = atol(ONPAINT_TIMEOUT_ENV);
-
-        char * ELAPSED_TIME_ONPAINT_TIMEOUT_ENV = std::getenv("ELAPSED_TIME_ONPAINT_TIMEOUT");
-        if(ELAPSED_TIME_ONPAINT_TIMEOUT_ENV == NULL){
-            logger->fatal("ELAPSED_TIME_ONPAINT_TIMEOUT not specified! Exiting!");
-            exit(1);
-        }
-        long ELAPSED_TIME_ONPAINT_TIMEOUT = atol(ELAPSED_TIME_ONPAINT_TIMEOUT_ENV);
-
-        char * LAST_SCREENSHOTS_ENV = std::getenv("LAST_SCREENSHOTS");
-        if(LAST_SCREENSHOTS_ENV == NULL){
-            logger->fatal("LAST_SCREENSHOTS not specified! Exiting!");
-            exit(1);
-        }
-        long LAST_SCREENSHOTS = atol(LAST_SCREENSHOTS_ENV);
-
-        char * CHANGE_THRESHOLD_ENV = std::getenv("CHANGE_THRESHOLD");
-        if(CHANGE_THRESHOLD_ENV == NULL){
-            logger->fatal("CHANGE_THRESHOLD not specified! Exiting!");
-            exit(1);
-        }
-        double CHANGE_THRESHOLD = atof(CHANGE_THRESHOLD_ENV);
-
-        configurations[SCREENSHOT_MODULE] = new ScreenshotConfiguration(400, 400, ONPAINT_TIMEOUT, ELAPSED_TIME_ONPAINT_TIMEOUT, CHANGE_THRESHOLD, LAST_SCREENSHOTS, true);
+    } else {
+        logger->error("Config file could not be opened!");
     }
 }
 
+ScreenshotConfiguration *DatacrawlerConfiguration::generateScreenshotDatamoduleConfig(json &attributes) {
+    bool parseError = false;
+
+    if (attributes["ELAPSED_TIME_ONPAINT_TIMEOUT"].is_null() &&
+        !attributes["ELAPSED_TIME_ONPAINT_TIMEOUT"].is_number()) {
+        logger->error(
+                "Missing/Wrong value for 'ELAPSED_TIME_ONPAINT_TIMEOUT' in config for ScreenshotDatamodule!");
+        parseError = true;
+    }
+
+    if (attributes["ONPAINT_TIMEOUT"].is_null() && !attributes["ONPAINT_TIMEOUT"].is_number()) {
+        logger->error("Missing/Wrong value for 'ONPAINT_TIMEOUT' in config for ScreenshotDatamodule!");
+        parseError = true;
+    }
+
+    if (attributes["CHANGE_THRESHOLD"].is_null() && !attributes["CHANGE_THRESHOLD"].is_number()) {
+        logger->error("Missing/Wrong value for 'CHANGE_THRESHOLD' in config for ScreenshotDatamodule!");
+        parseError = true;
+    }
+
+    if (attributes["LAST_SCREENSHOTS"].is_null() && !attributes["LAST_SCREENSHOTS"].is_number()) {
+        logger->error("Missing/Wrong value for 'LAST_SCREENSHOTS' in config for ScreenshotDatamodule!");
+        parseError = true;
+    }
+
+    if (attributes["HEIGHT"].is_null() && !attributes["HEIGHT"].is_number()) {
+        logger->error("Missing/Wrong value for 'HEIGHT' in config for ScreenshotDatamodule!");
+        parseError = true;
+    }
+
+    if (attributes["WIDTH"].is_null() && !attributes["WIDTH"].is_number()) {
+        logger->error("Missing/Wrong value for 'WIDTH' in config for ScreenshotDatamodule!");
+        parseError = true;
+    }
+
+    if (parseError) {
+        logger->error("ScreenshotDatamodule has configuration errors! Excluded!");
+        return nullptr;
+    }
+
+    int elapsedTimeOnPaintTimeout = attributes["ELAPSED_TIME_ONPAINT_TIMEOUT"].get<int>();
+    int onPaintTimeout = attributes["ONPAINT_TIMEOUT"].get<int>();
+    double changeThreshold = attributes["CHANGE_THRESHOLD"].get<double>();
+    int lastScreenshots = attributes["LAST_SCREENSHOTS"].get<int>();
+    int height = attributes["HEIGHT"].get<int>();
+    int width = attributes["WIDTH"].get<int>();
+
+    return new ScreenshotConfiguration(height, width, onPaintTimeout, elapsedTimeOnPaintTimeout, changeThreshold,
+                                       lastScreenshots, false);
+}
 /**
  * getConfiguration
  * @param selectedConfig represents the name of the DataModule for whom configuration shall be loaded

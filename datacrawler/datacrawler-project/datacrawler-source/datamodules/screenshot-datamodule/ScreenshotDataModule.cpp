@@ -6,6 +6,7 @@
 ScreenshotDataModule::~ScreenshotDataModule() {
     delete screenshotHandler;
     delete screenshotClient;
+    delete screenshotRequestHandler;
 }
 
 /**
@@ -38,11 +39,6 @@ DataBase *ScreenshotDataModule::process(CefMainArgs* mainArgs, std::string url) 
 
     CefSettings cefSettings;
 
-    if(mobile){
-        logger->info("Switching to mobile agent!");
-        CefString(&cefSettings.user_agent) = "Mozilla/5.0 (iPhone; CPU iPhone OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5376e Safari/8536.25";
-    }
-
     CefInitialize(*mainArgs, cefSettings, NULL, NULL);
     logger->info("Initializing CEF finished .. !");
 
@@ -58,11 +54,13 @@ DataBase *ScreenshotDataModule::process(CefMainArgs* mainArgs, std::string url) 
     *quitMessageLoop = false;
 
     std::map<std::string, std::string> map;
-    map.insert(std::pair<std::string, std::string>("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5376e Safari/8536.25"));
 
-    CefRefPtr<ScreenshotRequestHandler> screenshotRequestHandler(new ScreenshotRequestHandler(map));
-    CefRefPtr<ScreenshotHandler> screenshotHandler(new ScreenshotHandler(quitMessageLoop, LAST_SCREENSHOTS, CHANGE_THRESHOLD, height, width));
-    CefRefPtr<ScreenshotClient> screenshotClient(new ScreenshotClient(screenshotHandler, screenshotRequestHandler));
+    if(mobile)
+        map.insert(std::pair<std::string, std::string>("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5376e Safari/8536.25"));
+
+    screenshotRequestHandler = new ScreenshotRequestHandler(map);
+    screenshotHandler = new ScreenshotHandler(quitMessageLoop, LAST_SCREENSHOTS, CHANGE_THRESHOLD, height, width);
+    screenshotClient = new ScreenshotClient(screenshotHandler, screenshotRequestHandler);
 
     CefWindowInfo cefWindowInfo;
     cefWindowInfo.SetAsWindowless(0);
