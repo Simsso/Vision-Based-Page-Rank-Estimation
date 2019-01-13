@@ -13,10 +13,12 @@ class UrlLoadHandler : public CefLoadHandler {
 private:
     IMPLEMENT_REFCOUNTING(UrlLoadHandler)
     Logger* logger;
+    string url;
 
 public:
     void OnLoadEnd(CefRefPtr<CefBrowser>, CefRefPtr<CefFrame>, int) OVERRIDE;
 
+    UrlLoadHandler(string);
     UrlLoadHandler();
     ~UrlLoadHandler() OVERRIDE;
 };

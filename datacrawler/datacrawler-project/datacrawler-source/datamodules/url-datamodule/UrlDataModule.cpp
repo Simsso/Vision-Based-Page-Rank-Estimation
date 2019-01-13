@@ -23,7 +23,7 @@ DataBase *UrlDataModule::process(std::string url) {
     *quitMessageLoop = false;
 
     CefRefPtr<UrlRenderHandler> urlRenderHandler(new UrlRenderHandler());
-    CefRefPtr<UrlLoadHandler> urlLoadHandler(new UrlLoadHandler());
+    CefRefPtr<UrlLoadHandler> urlLoadHandler(new UrlLoadHandler(url));
 
     CefRefPtr<UrlClient> urlClient(new UrlClient(urlLoadHandler, urlRenderHandler));
 

@@ -9,13 +9,23 @@
 #include <include/cef_dom.h>
 #include "../../util/Logger.h"
 
-class UrlDOMVisitor: public CefDOMVisitor {
+#include "iostream"
+#include <queue>
+
+using namespace std;
+
+class UrlDOMVisitor : public CefDOMVisitor {
 private:
-    IMPLEMENT_REFCOUNTING(UrlDOMVisitor)
-    Logger* logger;
+IMPLEMENT_REFCOUNTING(UrlDOMVisitor)
+    Logger *logger;
+    string url;
+
+    queue<CefRefPtr<CefDOMNode>> traverseDOMTree(CefRefPtr<CefDOMNode>);
+    void filterURL(queue<CefRefPtr<CefDOMNode>> &aQueue);
 
 public:
     void Visit(CefRefPtr<CefDOMDocument>) OVERRIDE;
+    void setUrl(string);
 
     UrlDOMVisitor();
     ~UrlDOMVisitor();

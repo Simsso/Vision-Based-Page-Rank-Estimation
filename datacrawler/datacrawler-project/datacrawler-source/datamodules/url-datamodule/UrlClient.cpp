@@ -24,13 +24,17 @@ CefRefPtr<CefRenderHandler> UrlClient::GetRenderHandler(){
     return urlRenderHandler;
 }
 
-
 bool UrlClient::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
                                                                CefProcessId source_process,
                                                                CefRefPtr<CefProcessMessage> message) {
 
     if(message.get()->GetName() == "GetAllUrl_finished") {
-        logger->info("URL-Datamdoudle received event from RenderProcessHandler! Parsing finished!");
+        logger->info("URL-Datamodule received event from RenderProcessHandler! Parsing finished!");
+        CefRefPtr<CefListValue> listValue = message.get()->GetArgumentList();
+        logger->info(listValue->GetString(0));
+
+        logger->info("Running URL-Datamodule .. finished !");
+        CefQuitMessageLoop();
     }
     return false;
 }

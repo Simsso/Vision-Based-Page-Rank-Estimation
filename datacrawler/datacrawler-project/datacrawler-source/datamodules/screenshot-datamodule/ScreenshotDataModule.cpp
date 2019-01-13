@@ -118,7 +118,7 @@ DataBase *ScreenshotDataModule::process(std::string url) {
     screenshotHandlerStopped.join();
     timeout.join();
 
-    logger->info("Running ScreenshotDataModule .. finished !");
+    logger->info("Running Screenshot-DataModule .. finished !");
 
     return screenshotData;
 }
