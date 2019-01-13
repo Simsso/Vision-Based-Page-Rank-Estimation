@@ -10,7 +10,7 @@ from rank_predictor.trainer.training_run import TrainingRun
 
 composed_transforms = Compose([
     ImageTransform(ToPILImage()),
-    ImageTransform(Resize((1920//2, 1080//2))),
+    ImageTransform(Resize((1920//4, 1080//4))),
     ImageTransform(ToTensor()),
     ImageTransform(Normalize((.5, .5, .5, .5), (.5, .5, .5, .5))),
 ])
@@ -20,7 +20,7 @@ pagerank_v1 = ScreenshotPagerankDatasetV1(
     root_dir=os.getenv('dataset_v1_path'), transform=composed_transforms)
 
 # dataset loader
-dataloader = DataLoader(pagerank_v1, batch_size=32, shuffle=True)
+dataloader = DataLoader(pagerank_v1, batch_size=4, shuffle=True)
 
 # model with weights
 net = ScreenshotFeatureExtractor()

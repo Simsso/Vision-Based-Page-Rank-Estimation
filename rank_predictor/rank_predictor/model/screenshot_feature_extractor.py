@@ -1,4 +1,5 @@
 from __future__ import print_function
+import rank_predictor.model.util as uf
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -22,8 +23,8 @@ class ScreenshotFeatureExtractor(nn.Module):
         self.conv3a = nn.Conv2d(64, 128, kernel_size=(3, 3))
         self.conv3b = nn.Conv2d(128, 128, kernel_size=(3, 3))
 
-        self.dense1 = nn.Linear(128*5*5, 1024)
-        self.dense2 = nn.Linear(1024, 1024)
+        self.dense1 = nn.Linear(256, 256)  # diverging from the paper here
+        self.dense2 = nn.Linear(256, 256)
 
     def forward(self, x):
         x = F.relu(self.conv1a(x))
@@ -42,19 +43,11 @@ class ScreenshotFeatureExtractor(nn.Module):
         x = F.avg_pool2d(x, (10, 10))  # originally not included
         x = F.dropout2d(x, p=.25)
 
-        x = x.view(-1, self._num_flat_features(x))
+        x = uf.flatten(x)
         x = F.relu(self.dense1(x))
         x = F.dropout(x, p=.3)
 
         x = F.relu(self.dense2(x))
         x = F.dropout(x, p=.3)
 
-        return x
-
-    @staticmethod
-    def _num_flat_features(x):
-        size = x.size()[1:]  # all dimensions except the batch dimension
-        num_features = 1
-        for s in size:
-            num_features *= s
-        return num_features
+        return uf.global_avg_pool(x)

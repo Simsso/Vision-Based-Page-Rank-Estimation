@@ -28,8 +28,9 @@ class TrainingRun:
         self.step_ctr += 1
         self.opt.zero_grad()
         model_out = self.net.forward(inputs)
-        loss = self.loss_fn(model_out, targets)
+        loss = self.loss_fn(model_out, targets.float() / 1e5)
         loss.backward()
+        self._log_loss(loss)
         self.opt.step()
         self.net.train()
 
