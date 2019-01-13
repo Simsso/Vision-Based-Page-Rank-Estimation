@@ -13,7 +13,7 @@ class ScreenshotFeatureExtractor(nn.Module):
     def __init__(self):
         super(ScreenshotFeatureExtractor, self).__init__()
 
-        self.conv1a = nn.Conv2d(3, 32, kernel_size=(3, 3))
+        self.conv1a = nn.Conv2d(4, 32, kernel_size=(3, 3))
         self.conv1b = nn.Conv2d(32, 32, kernel_size=(3, 3))
 
         self.conv2a = nn.Conv2d(32, 64, kernel_size=(3, 3))

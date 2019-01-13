@@ -1,15 +1,18 @@
-import matplotlib.pyplot as plt
-import numpy as np
 import os
 from rank_predictor.data.v1.pagerank_dataset import ScreenshotPagerankDatasetV1
 from rank_predictor.data.v1.transforms import ImageTransform
 from rank_predictor.model.screenshot_feature_extractor import ScreenshotFeatureExtractor
+from torch import nn, optim
 from torch.utils.data import DataLoader
 from torchvision.transforms import Normalize, Resize, ToTensor, Compose, ToPILImage
 
+from rank_predictor.trainer.training_run import TrainingRun
+
 composed_transforms = Compose([
     ImageTransform(ToPILImage()),
+    ImageTransform(Resize((1920//2, 1080//2))),
     ImageTransform(ToTensor()),
+    ImageTransform(Normalize((.5, .5, .5, .5), (.5, .5, .5, .5))),
 ])
 
 # dataset
@@ -19,15 +22,11 @@ pagerank_v1 = ScreenshotPagerankDatasetV1(
 # dataset loader
 dataloader = DataLoader(pagerank_v1, batch_size=32, shuffle=True)
 
+# model with weights
+net = ScreenshotFeatureExtractor()
 
-def imshow(img):
-    img = img / 2 + 0.5  # unnormalize
-    npimg = img.numpy()
-    plt.imshow(np.transpose(npimg, (1, 2, 0)))
-    plt.show()
+# optimizer
+opt = optim.Adam(net.parameters(), lr=3e-3)
 
-
-for batch in dataloader:
-    imgs = batch['img']
-    ranks = batch['rank']
-    imshow(imgs[0])
+training_run = TrainingRun(net, opt, nn.MSELoss(), dataloader)
+training_run(1)
