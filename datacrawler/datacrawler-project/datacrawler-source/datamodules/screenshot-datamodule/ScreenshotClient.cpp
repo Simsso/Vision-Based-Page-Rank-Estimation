@@ -1,5 +1,4 @@
 #include "ScreenshotClient.h"
-#include "ScreenshotRequestHandler.h"
 
 /**
  * ScreenshotClient

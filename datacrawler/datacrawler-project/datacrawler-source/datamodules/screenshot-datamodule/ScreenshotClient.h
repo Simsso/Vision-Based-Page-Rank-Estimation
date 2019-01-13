@@ -19,7 +19,6 @@ public:
     ScreenshotClient();
     ScreenshotClient(ScreenshotHandler*, ScreenshotRequestHandler*);
     ~ScreenshotClient();
-
 };
 
 

@@ -10,11 +10,12 @@
 #include <include/wrapper/cef_helpers.h>
 
 #include "../DataModuleBase.h"
+#include "UrlClient.h"
+
 
 class UrlDataModule: public DataModuleBase, public CefBaseRefCounted {
 private:
     IMPLEMENT_REFCOUNTING(UrlDataModule);
-
 
 public:
     DataBase* process(std::string) OVERRIDE;

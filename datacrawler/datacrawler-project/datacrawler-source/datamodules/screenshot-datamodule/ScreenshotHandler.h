@@ -2,7 +2,6 @@
 #define DATACRAWLER_PROJECT_SCREENSHOTHANDLER_H
 
 #include <include/cef_render_handler.h>
-#include <include/cef_app.h>
 
 #include "../../util/Logger.h"
 

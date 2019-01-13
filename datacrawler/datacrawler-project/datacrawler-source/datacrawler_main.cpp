@@ -4,27 +4,38 @@ Logger *Logger::instance = 0;
 
 #include "opencv2/opencv.hpp"
 #include "stdlib.h"
+#include "DatacrawlerApp.h"
 
 int main(int argc, char *argv[]) {
     setenv("LOG_LEVEL", "LOG_ALL", true);
     Logger *logger = Logger::getInstance();
 
     CefMainArgs mainArgs(argc, argv);
-    CefExecuteProcess(mainArgs, NULL, NULL);
+
+    CefRefPtr<DatacrawlerApp> datacrawlerApp(new DatacrawlerApp());
+
+    int exitCode = CefExecuteProcess(mainArgs, datacrawlerApp, NULL);
+    if (exitCode >= 0) {
+        // The sub-process terminated, exit now.
+        return exitCode;
+    }
 
     CefSettings cefSettings;
     cefSettings.windowless_rendering_enabled = true;
 
-    CefInitialize(mainArgs, cefSettings, NULL, NULL);
-    logger->info("Initializing CEF finished .. !");
+    if(CefInitialize(mainArgs, cefSettings, NULL, NULL))
+        logger->info("Initializing CEF finished .. !");
+    else {
+        logger->fatal("Initializing has failed!");
+    }
 
     Datacrawler datacrawler;
     datacrawler.init();
 
     string url = "http://google.com";
-    NodeElement * node = datacrawler.process(url);
+   /* NodeElement * node =*/ datacrawler.process(url);
 
-    string urlRank = "1";
+    /* string urlRank = "1";
     string outputPath = "/home/Desktop/";
 
     vector<DataBase*>* dataBase = node->getData();
@@ -58,7 +69,7 @@ int main(int argc, char *argv[]) {
             logger->info("No data has been produced!");
         }
     }
-
+ */
     logger->info("Datacrawler execution finished!");
     CefShutdown();
 }
