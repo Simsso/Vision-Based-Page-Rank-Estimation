@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
     Datacrawler datacrawler;
     datacrawler.init();
 
-    string url = "http://google.com";
+    string url = "sap.com";
    /* NodeElement * node =*/ datacrawler.process(url);
 
     /* string urlRank = "1";

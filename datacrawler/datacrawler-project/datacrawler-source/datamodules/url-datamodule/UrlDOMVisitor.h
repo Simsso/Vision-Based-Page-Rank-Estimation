@@ -11,14 +11,17 @@
 
 #include "iostream"
 #include <queue>
+#include <regex>
+#include "Url.h"
 
 using namespace std;
 
 class UrlDOMVisitor : public CefDOMVisitor {
 private:
-IMPLEMENT_REFCOUNTING(UrlDOMVisitor)
+    IMPLEMENT_REFCOUNTING(UrlDOMVisitor)
     Logger *logger;
     string url;
+    queue<Url*>* validUrl;
 
     queue<CefRefPtr<CefDOMNode>> traverseDOMTree(CefRefPtr<CefDOMNode>);
     void filterURL(queue<CefRefPtr<CefDOMNode>> &aQueue);
@@ -27,6 +30,7 @@ public:
     void Visit(CefRefPtr<CefDOMDocument>) OVERRIDE;
     void setUrl(string);
 
+    UrlDOMVisitor(queue<Url*>*);
     UrlDOMVisitor();
     ~UrlDOMVisitor();
 };
