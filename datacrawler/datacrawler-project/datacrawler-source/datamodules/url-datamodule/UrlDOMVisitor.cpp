@@ -18,8 +18,13 @@ UrlDOMVisitor::~UrlDOMVisitor() {}
 void UrlDOMVisitor::Visit(CefRefPtr<CefDOMDocument> domDocument) {
     logger->info("Parsing URLs !");
     logger->info("Base-URL is " + url);
-    logger->info("Crawling all URLs the DOM !");
-    filterURL(traverseDOMTree(domDocument.get()->GetBody()));
+    logger->info("Crawling all URLs of the DOM !");
+    calculatedUrl = domDocument.get()->GetBaseURL();
+    // TODO get only top-level domain of calculated URL
+    logger->info("Calculated Url is "+calculatedUrl);
+
+    queue<CefRefPtr<CefDOMNode>> aQueue = traverseDOMTree(domDocument.get()->GetBody());
+    filterURL(aQueue);
 }
 
 queue<CefRefPtr<CefDOMNode>> UrlDOMVisitor::traverseDOMTree(CefRefPtr<CefDOMNode> body) {
@@ -52,19 +57,26 @@ queue<CefRefPtr<CefDOMNode>> UrlDOMVisitor::traverseDOMTree(CefRefPtr<CefDOMNode
 }
 
 void UrlDOMVisitor::filterURL(queue<CefRefPtr<CefDOMNode>> &aQueue) {
-    regex httpRegex("http://" + url);
-    regex httpsRegex("https://" + url);
-    regex wwwRegex("http://www." + url);
-    regex wwwHttpsRegex("https://www." + url);
-    regex implicitProtocolRegex("//" + url);
+    logger->info("Gathering valid Urls !");
+    regex httpRegex("^http://" + url);
+    regex httpsRegex("^https://" + url);
+    regex wwwRegex("^http://www." + url);
+    regex wwwHttpsRegex("^https://www." + url);
+    regex implicitProtocolRegex("^//" + url);
     regex relativePathRegex("^/.*");
     regex anchorRegex("^#.*");
+    bool calculatedUrlHasHttps = false;
+
+    if(regex_search(calculatedUrl, httpsRegex))
+       calculatedUrlHasHttps = true;
 
     while (!aQueue.empty()) {
         string urlText = aQueue.front().get()->GetElementInnerText();
         string url = aQueue.front().get()->GetElementAttribute("href");
+        aQueue.pop();
 
-        if (regex_search(url, httpRegex)) {
+        logger->info(url);
+       if (regex_search(url, httpRegex)) {
             validUrl->push(new Url(urlText, url, false));
         } else if (regex_search(url, httpsRegex)) {
             validUrl->push(new Url(urlText, url, true));
@@ -73,13 +85,13 @@ void UrlDOMVisitor::filterURL(queue<CefRefPtr<CefDOMNode>> &aQueue) {
         } else if (regex_search(url, wwwRegex)) {
             validUrl->push(new Url(urlText, url, false));
         } else if (regex_search(url, implicitProtocolRegex)) {
-            validUrl->push(new Url(urlText, url));
+            validUrl->push(new Url(urlText, calculatedUrlHasHttps ? "https:" + url : "http:"+ url, calculatedUrlHasHttps));
         } else if (regex_search(url, relativePathRegex)) {
-            validUrl->push(new Url(urlText, url));
+           // TODO add trimmed calculated Url
+            validUrl->push(new Url(urlText, calculatedUrl+url, calculatedUrlHasHttps));
         } else if (regex_search(url, anchorRegex)) {
-            validUrl->push(new Url(urlText, url));
+            validUrl->push(new Url(urlText, url, calculatedUrlHasHttps));
         }
-        aQueue.pop();
     }
 }
 

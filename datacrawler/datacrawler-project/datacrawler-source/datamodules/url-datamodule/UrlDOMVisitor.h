@@ -21,10 +21,11 @@ private:
     IMPLEMENT_REFCOUNTING(UrlDOMVisitor)
     Logger *logger;
     string url;
+    string calculatedUrl;
     queue<Url*>* validUrl;
 
     queue<CefRefPtr<CefDOMNode>> traverseDOMTree(CefRefPtr<CefDOMNode>);
-    void filterURL(queue<CefRefPtr<CefDOMNode>> &aQueue);
+    void filterURL(queue<CefRefPtr<CefDOMNode>>&);
 
 public:
     void Visit(CefRefPtr<CefDOMDocument>) OVERRIDE;

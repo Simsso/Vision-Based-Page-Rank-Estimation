@@ -7,7 +7,7 @@
 Url::Url(std::string urlText, std::string url, bool isHttps){
     this->urlText = urlText;
     this->url = url;
-    this->isHttps = isHttps;
+    this->https = isHttps;
 }
 
 Url::~Url(){}
@@ -16,4 +16,4 @@ std::string Url::getUrlText() { return urlText;}
 
 std::string Url::getUrl(){ return url;}
 
-bool Url::isHttps() { return isHttps;}
+bool Url::isHttps() { return https;}

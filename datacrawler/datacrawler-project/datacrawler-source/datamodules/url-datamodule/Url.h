@@ -11,7 +11,7 @@ class Url {
 private:
     std::string urlText;
     std::string url;
-    bool isHttps;
+    bool https;
 
 public:
     std::string  getUrlText();

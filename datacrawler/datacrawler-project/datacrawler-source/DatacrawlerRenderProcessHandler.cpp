@@ -6,7 +6,7 @@
 
 DatacrawlerRenderProcessHandler::DatacrawlerRenderProcessHandler(){
     logger = Logger::getInstance();
-    urlDOMVisitor = new UrlDOMVisitor();
+    urlDOMVisitor = new UrlDOMVisitor(new queue<Url*>);
 }
 
 DatacrawlerRenderProcessHandler::~DatacrawlerRenderProcessHandler(){}
