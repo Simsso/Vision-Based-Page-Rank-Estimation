@@ -24,19 +24,17 @@ private:
     string url;
     string calculatedUrl;
     int numUrls;
-    vector<Url> validUrls;
-    map<string, Url> validUrlMap;
+    vector<pair<string,string>>& validUrls;
+    map<string, string> validUrlMap;
 
     queue<CefRefPtr<CefDOMNode>> traverseDOMTree(CefRefPtr<CefDOMNode>);
     void filterURL(queue<CefRefPtr<CefDOMNode>>&);
     void shuffleURLs();
-    void getUrls(int);
 
 public:
     void Visit(CefRefPtr<CefDOMDocument>) OVERRIDE;
 
-    UrlDOMVisitor(vector<Url>&, string, int);
-    UrlDOMVisitor();
+    UrlDOMVisitor(vector<pair<string,string>>&, string, int);
     ~UrlDOMVisitor();
 };
 

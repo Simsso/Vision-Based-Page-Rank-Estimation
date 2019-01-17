@@ -17,6 +17,7 @@ class UrlDataModule: public DataModuleBase, public CefBaseRefCounted {
 private:
     IMPLEMENT_REFCOUNTING(UrlDataModule);
     int numUrls;
+    vector<Url*>* urls;
 
 public:
     DataBase* process(std::string) OVERRIDE;

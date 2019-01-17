@@ -5,11 +5,8 @@
 #include <chrono>
 #include "UrlDOMVisitor.h"
 
-UrlDOMVisitor::UrlDOMVisitor(){}
-
-UrlDOMVisitor::UrlDOMVisitor(vector<Url>& urls, string url, int numUrls) {
+UrlDOMVisitor::UrlDOMVisitor(vector<pair<string,string>>& urls, string url, int numUrls) : validUrls(urls){
     logger = Logger::getInstance();
-    this->validUrls = urls;
     this->numUrls = numUrls;
     this->url = url;
 }
@@ -94,37 +91,31 @@ void UrlDOMVisitor::filterURL(queue<CefRefPtr<CefDOMNode>> &aQueue) {
         string url = aQueue.front().get()->GetElementAttribute("href");
         aQueue.pop();
 
+        // TODO optimise
        if (regex_search(url, httpRegex)) {
-            Url tmpUrl(urlText, url, false);
-            validUrlMap.insert(make_pair(url,tmpUrl));
+           validUrlMap.insert(make_pair(url, urlText));
 
         } else if (regex_search(url, httpsRegex)) {
-           Url tmpUrl(urlText, url, true);
-           validUrlMap.insert(make_pair(url,tmpUrl));
+           validUrlMap.insert(make_pair(url, urlText));
 
         } else if (regex_search(url, wwwHttpsRegex)) {
-           Url tmpUrl(urlText, url, true);
-           validUrlMap.insert(make_pair(url,tmpUrl));
+           validUrlMap.insert(make_pair(url, urlText));
 
-        } else if (regex_search(url, wwwRegex)) {
-           Url tmpUrl(urlText, url, false);
-           validUrlMap.insert(make_pair(url,tmpUrl));
+       } else if (regex_search(url, wwwRegex)) {
+           validUrlMap.insert(make_pair(url, urlText));
 
-        } else if (regex_search(url, implicitProtocolRegex)) {
+       } else if (regex_search(url, implicitProtocolRegex)) {
            string newCalculatedUrl = calculatedUrlHasHttps ? "https:" + url : "http:"+ url;
-           Url tmpUrl(urlText, newCalculatedUrl, calculatedUrlHasHttps);
-           validUrlMap.insert(make_pair(newCalculatedUrl,tmpUrl));
+           validUrlMap.insert(make_pair(newCalculatedUrl, urlText));
 
-        } else if (regex_search(url, relativePathRegex)) {
+       } else if (regex_search(url, relativePathRegex)) {
            string newCalculatedUrl = calculatedUrl+url;
-           Url tmpUrl(urlText, newCalculatedUrl, calculatedUrlHasHttps);
-           validUrlMap.insert(make_pair(newCalculatedUrl,tmpUrl));
+           validUrlMap.insert(make_pair(newCalculatedUrl, urlText));
 
-        } else if (regex_search(url, anchorRegex)) {
+       } else if (regex_search(url, anchorRegex)) {
            string newCalculatedUrl = calculatedUrl+'/'+url;
-           Url tmpUrl(urlText, newCalculatedUrl, calculatedUrlHasHttps);
-           validUrlMap.insert(make_pair(newCalculatedUrl,tmpUrl));
-        }
+           validUrlMap.insert(make_pair(newCalculatedUrl, urlText));
+       }
     }
 }
 
@@ -134,7 +125,7 @@ void UrlDOMVisitor::shuffleURLs(){
     unsigned seed = chrono::system_clock::now().time_since_epoch().count();
 
     for (auto x : validUrlMap)
-        validUrls.push_back(x.second);
+        validUrls.push_back(make_pair(x.first, x.second));
 
     shuffle(validUrls.begin(), validUrls.end(), default_random_engine(seed));
 }

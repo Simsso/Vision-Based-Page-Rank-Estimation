@@ -19,13 +19,14 @@ private:
     Logger* logger;
     CefRefPtr <CefLoadHandler> urlLoadHandler;
     CefRefPtr <CefRenderHandler> urlRenderHandler;
+    vector<Url*>* urls;
 
 public:
     CefRefPtr<CefLoadHandler> GetLoadHandler() OVERRIDE;
     CefRefPtr<CefRenderHandler> GetRenderHandler() OVERRIDE;
     bool OnProcessMessageReceived(CefRefPtr<CefBrowser>, CefProcessId, CefRefPtr<CefProcessMessage>) OVERRIDE;
 
-    UrlClient(UrlLoadHandler*, UrlRenderHandler*);
+    UrlClient(UrlLoadHandler*, UrlRenderHandler*, vector<Url*>*);
     UrlClient();
     ~UrlClient();
 };

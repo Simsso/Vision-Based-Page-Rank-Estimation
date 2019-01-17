@@ -25,7 +25,17 @@ bool DatacrawlerRenderProcessHandler::OnProcessMessageReceived(CefRefPtr<CefBrow
 
         // send message to browser of URL-Datamodule, that we are finished
         CefRefPtr<CefProcessMessage> processMessage = CefProcessMessage::Create("GetAllUrl_finished");
-        processMessage.get()->GetArgumentList()->SetString(0, "test");
+        CefRefPtr <CefListValue> listUrls = CefListValue::Create();
+        CefRefPtr <CefListValue> listUrlsText = CefListValue::Create();
+
+
+        for(unsigned long i = 0; i < urls.size(); i++){
+             listUrls.get()->SetString(i, urls.at(i).first);
+             listUrlsText.get()->SetString(i, urls.at(i).second);
+        }
+
+        processMessage.get()->GetArgumentList()->SetList(0, listUrls);
+        processMessage.get()->GetArgumentList()->SetList(1, listUrlsText);
         browser.get()->SendProcessMessage(PID_BROWSER, processMessage);
     }
     return false;

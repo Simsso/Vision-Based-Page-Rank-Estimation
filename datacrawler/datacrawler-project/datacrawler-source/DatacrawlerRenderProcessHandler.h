@@ -14,7 +14,7 @@ class DatacrawlerRenderProcessHandler: public CefRenderProcessHandler{
 private:
     IMPLEMENT_REFCOUNTING(DatacrawlerRenderProcessHandler)
     Logger* logger;
-    vector<Url> urls;
+    vector<pair<string, string>> urls;
 
 public:
     bool OnProcessMessageReceived(CefRefPtr<CefBrowser>, CefProcessId, CefRefPtr<CefProcessMessage>) OVERRIDE;

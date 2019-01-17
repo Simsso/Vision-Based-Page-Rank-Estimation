@@ -4,13 +4,19 @@
 
 #include "UrlDataModule.h"
 
-UrlDataModule::UrlDataModule() {}
+UrlDataModule::UrlDataModule() {
+    this->numUrls = 10;
+    this->urls = new vector<Url*>;
+}
 
 UrlDataModule::UrlDataModule(int numUrls) {
     this->numUrls = numUrls;
+    this->urls = new vector<Url*>;
 }
 
-UrlDataModule::~UrlDataModule() {}
+UrlDataModule::~UrlDataModule() {
+    delete urls;
+}
 
 DataBase *UrlDataModule::process(std::string url) {
     logger->info("Running URL-DataModule ..");
@@ -29,7 +35,7 @@ DataBase *UrlDataModule::process(std::string url) {
     CefRefPtr<UrlRenderHandler> urlRenderHandler(new UrlRenderHandler());
     CefRefPtr<UrlLoadHandler> urlLoadHandler(new UrlLoadHandler(url, numUrls));
 
-    CefRefPtr<UrlClient> urlClient(new UrlClient(urlLoadHandler, urlRenderHandler));
+    CefRefPtr<UrlClient> urlClient(new UrlClient(urlLoadHandler, urlRenderHandler, urls));
 
     CefWindowInfo cefWindowInfo;
     cefWindowInfo.SetAsWindowless(0);
@@ -41,5 +47,8 @@ DataBase *UrlDataModule::process(std::string url) {
 
     CefRunMessageLoop();
 
+    for(auto x: *urls){
+        logger->info("parsed: "+x->getUrl());
+    }
     return nullptr;
 }
