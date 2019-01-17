@@ -14,11 +14,12 @@ private:
     IMPLEMENT_REFCOUNTING(UrlLoadHandler)
     Logger* logger;
     string url;
+    int numUrls;
 
 public:
     void OnLoadEnd(CefRefPtr<CefBrowser>, CefRefPtr<CefFrame>, int) OVERRIDE;
 
-    UrlLoadHandler(string);
+    UrlLoadHandler(string, int);
     UrlLoadHandler();
     ~UrlLoadHandler() OVERRIDE;
 };

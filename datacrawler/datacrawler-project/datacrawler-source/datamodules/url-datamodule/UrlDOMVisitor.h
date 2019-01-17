@@ -12,6 +12,7 @@
 #include "iostream"
 #include <queue>
 #include <regex>
+#include <chrono>
 #include "Url.h"
 
 using namespace std;
@@ -22,16 +23,19 @@ private:
     Logger *logger;
     string url;
     string calculatedUrl;
-    queue<Url*>* validUrl;
+    int numUrls;
+    vector<Url> validUrls;
+    map<string, Url> validUrlMap;
 
     queue<CefRefPtr<CefDOMNode>> traverseDOMTree(CefRefPtr<CefDOMNode>);
     void filterURL(queue<CefRefPtr<CefDOMNode>>&);
+    void shuffleURLs();
+    void getUrls(int);
 
 public:
     void Visit(CefRefPtr<CefDOMDocument>) OVERRIDE;
-    void setUrl(string);
 
-    UrlDOMVisitor(queue<Url*>*);
+    UrlDOMVisitor(vector<Url>&, string, int);
     UrlDOMVisitor();
     ~UrlDOMVisitor();
 };

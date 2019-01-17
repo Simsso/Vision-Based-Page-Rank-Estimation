@@ -123,9 +123,25 @@ ScreenshotConfiguration *DatacrawlerConfiguration::generateScreenshotDatamoduleC
 UrlConfiguration *DatacrawlerConfiguration::generateUrlDataModuleConfig(json &attributes) {
     logger->info("<URL-Datamodule> configuration");
 
+    bool parseError = false;
+
+    if (attributes["NUM_URLS"].is_null() &&
+        !attributes["NUM_URLS"].is_number()) {
+        logger->error(
+                "Missing/Wrong value for 'NUM_URLS' in config!");
+        parseError = true;
+    }
+
+    if (parseError) {
+        logger->error("Datamodule has configuration errors! Excluded!");
+        return nullptr;
+    }
+
+    int numUrls = attributes["NUM_URLS"].get<int>();
+
     logger->info(".. loaded !");
 
-    return new UrlConfiguration();
+    return new UrlConfiguration(numUrls);
 }
 
 /**

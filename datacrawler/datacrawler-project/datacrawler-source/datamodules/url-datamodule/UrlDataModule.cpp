@@ -6,6 +6,10 @@
 
 UrlDataModule::UrlDataModule() {}
 
+UrlDataModule::UrlDataModule(int numUrls) {
+    this->numUrls = numUrls;
+}
+
 UrlDataModule::~UrlDataModule() {}
 
 DataBase *UrlDataModule::process(std::string url) {
@@ -23,7 +27,7 @@ DataBase *UrlDataModule::process(std::string url) {
     *quitMessageLoop = false;
 
     CefRefPtr<UrlRenderHandler> urlRenderHandler(new UrlRenderHandler());
-    CefRefPtr<UrlLoadHandler> urlLoadHandler(new UrlLoadHandler(url));
+    CefRefPtr<UrlLoadHandler> urlLoadHandler(new UrlLoadHandler(url, numUrls));
 
     CefRefPtr<UrlClient> urlClient(new UrlClient(urlLoadHandler, urlRenderHandler));
 

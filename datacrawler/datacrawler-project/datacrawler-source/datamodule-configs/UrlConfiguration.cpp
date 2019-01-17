@@ -5,8 +5,13 @@
 #include "UrlConfiguration.h"
 
 UrlConfiguration::UrlConfiguration(){};
+
+UrlConfiguration::UrlConfiguration(int numUrls){
+    this->numUrls = numUrls;
+}
+
 UrlConfiguration::~UrlConfiguration(){};
 
 DataModuleBase* UrlConfiguration::createInstance() {
-    return new UrlDataModule();
+    return new UrlDataModule(numUrls);
 }

@@ -2,32 +2,51 @@
 // Created by doktorgibson on 1/13/19.
 //
 
+#include <chrono>
 #include "UrlDOMVisitor.h"
 
-UrlDOMVisitor::UrlDOMVisitor() {
-    logger = Logger::getInstance();
-}
+UrlDOMVisitor::UrlDOMVisitor(){}
 
-UrlDOMVisitor::UrlDOMVisitor(queue<Url*>* queue) {
+UrlDOMVisitor::UrlDOMVisitor(vector<Url>& urls, string url, int numUrls) {
     logger = Logger::getInstance();
-    this->validUrl = queue;
+    this->validUrls = urls;
+    this->numUrls = numUrls;
+    this->url = url;
 }
 
 UrlDOMVisitor::~UrlDOMVisitor() {}
 
 void UrlDOMVisitor::Visit(CefRefPtr<CefDOMDocument> domDocument) {
     logger->info("Parsing URLs !");
-    logger->info("Base-URL is " + url);
+    logger->info("Initial URL (passed) is " + url);
     logger->info("Crawling all URLs of the DOM !");
+
     calculatedUrl = domDocument.get()->GetBaseURL();
-    // TODO get only top-level domain of calculated URL
-    logger->info("Calculated Url is "+calculatedUrl);
+
+    std::smatch match;
+    regex regex_baseUrl("^(https|http):\\/\\/[a-zA-Z-0-9.-]*");
+
+    if(!regex_search(calculatedUrl, match, regex_baseUrl))
+        return;
+
+    calculatedUrl = match[0];
+
+    logger->info("Current visited Url is "+calculatedUrl);
 
     queue<CefRefPtr<CefDOMNode>> aQueue = traverseDOMTree(domDocument.get()->GetBody());
     filterURL(aQueue);
+    shuffleURLs();
+
+    logger->info("Returning "+to_string(numUrls)+" URLs !");
+
+    int numRemove = abs(numUrls - (int)validUrls.size());
+    for(int i = 0; i < numRemove; i++)
+        validUrls.pop_back();
+
 }
 
 queue<CefRefPtr<CefDOMNode>> UrlDOMVisitor::traverseDOMTree(CefRefPtr<CefDOMNode> body) {
+    logger->info("Traversing DOM!");
 
     queue<CefRefPtr<CefDOMNode>> aQueue;
     queue<CefRefPtr<CefDOMNode>> nodeQueue;
@@ -75,26 +94,47 @@ void UrlDOMVisitor::filterURL(queue<CefRefPtr<CefDOMNode>> &aQueue) {
         string url = aQueue.front().get()->GetElementAttribute("href");
         aQueue.pop();
 
-        logger->info(url);
        if (regex_search(url, httpRegex)) {
-            validUrl->push(new Url(urlText, url, false));
+            Url tmpUrl(urlText, url, false);
+            validUrlMap.insert(make_pair(url,tmpUrl));
+
         } else if (regex_search(url, httpsRegex)) {
-            validUrl->push(new Url(urlText, url, true));
+           Url tmpUrl(urlText, url, true);
+           validUrlMap.insert(make_pair(url,tmpUrl));
+
         } else if (regex_search(url, wwwHttpsRegex)) {
-            validUrl->push(new Url(urlText, url, true));
+           Url tmpUrl(urlText, url, true);
+           validUrlMap.insert(make_pair(url,tmpUrl));
+
         } else if (regex_search(url, wwwRegex)) {
-            validUrl->push(new Url(urlText, url, false));
+           Url tmpUrl(urlText, url, false);
+           validUrlMap.insert(make_pair(url,tmpUrl));
+
         } else if (regex_search(url, implicitProtocolRegex)) {
-            validUrl->push(new Url(urlText, calculatedUrlHasHttps ? "https:" + url : "http:"+ url, calculatedUrlHasHttps));
+           string newCalculatedUrl = calculatedUrlHasHttps ? "https:" + url : "http:"+ url;
+           Url tmpUrl(urlText, newCalculatedUrl, calculatedUrlHasHttps);
+           validUrlMap.insert(make_pair(newCalculatedUrl,tmpUrl));
+
         } else if (regex_search(url, relativePathRegex)) {
-           // TODO add trimmed calculated Url
-            validUrl->push(new Url(urlText, calculatedUrl+url, calculatedUrlHasHttps));
+           string newCalculatedUrl = calculatedUrl+url;
+           Url tmpUrl(urlText, newCalculatedUrl, calculatedUrlHasHttps);
+           validUrlMap.insert(make_pair(newCalculatedUrl,tmpUrl));
+
         } else if (regex_search(url, anchorRegex)) {
-            validUrl->push(new Url(urlText, url, calculatedUrlHasHttps));
+           string newCalculatedUrl = calculatedUrl+'/'+url;
+           Url tmpUrl(urlText, newCalculatedUrl, calculatedUrlHasHttps);
+           validUrlMap.insert(make_pair(newCalculatedUrl,tmpUrl));
         }
     }
 }
 
-void UrlDOMVisitor::setUrl(string url) {
-    this->url = url;
+void UrlDOMVisitor::shuffleURLs(){
+    logger->info("Shuffling URLs!");
+
+    unsigned seed = chrono::system_clock::now().time_since_epoch().count();
+
+    for (auto x : validUrlMap)
+        validUrls.push_back(x.second);
+
+    shuffle(validUrls.begin(), validUrls.end(), default_random_engine(seed));
 }

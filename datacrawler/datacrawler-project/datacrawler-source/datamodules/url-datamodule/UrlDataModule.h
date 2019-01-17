@@ -16,11 +16,13 @@
 class UrlDataModule: public DataModuleBase, public CefBaseRefCounted {
 private:
     IMPLEMENT_REFCOUNTING(UrlDataModule);
+    int numUrls;
 
 public:
     DataBase* process(std::string) OVERRIDE;
 
     UrlDataModule();
+    UrlDataModule(int);
     ~UrlDataModule();
 };
 

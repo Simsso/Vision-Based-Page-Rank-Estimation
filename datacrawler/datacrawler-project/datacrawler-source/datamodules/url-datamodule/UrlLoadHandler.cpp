@@ -7,9 +7,10 @@ UrlLoadHandler::UrlLoadHandler() {
     logger = Logger::getInstance();
 }
 
-UrlLoadHandler::UrlLoadHandler(string url) {
+UrlLoadHandler::UrlLoadHandler(string url, int numUrls) {
     logger = Logger::getInstance();
     this->url = url;
+    this->numUrls = numUrls;
 }
 
 UrlLoadHandler::~UrlLoadHandler() {}
@@ -20,5 +21,6 @@ void UrlLoadHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame
     logger->info("Notifiying render process for URL crawl!");
     CefRefPtr<CefProcessMessage> processMessage = CefProcessMessage::Create("GetAllUrl");
     processMessage.get()->GetArgumentList().get()->SetString(0, url);
+    processMessage.get()->GetArgumentList().get()->SetInt(1, numUrls);
     browser.get()->SendProcessMessage(PID_RENDERER, processMessage);
 }
