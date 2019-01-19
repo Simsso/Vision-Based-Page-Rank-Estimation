@@ -20,13 +20,14 @@ private:
     CefRefPtr <CefLoadHandler> urlLoadHandler;
     CefRefPtr <CefRenderHandler> urlRenderHandler;
     vector<Url*>* urls;
+    string * baseUrl;
 
 public:
     CefRefPtr<CefLoadHandler> GetLoadHandler() OVERRIDE;
     CefRefPtr<CefRenderHandler> GetRenderHandler() OVERRIDE;
     bool OnProcessMessageReceived(CefRefPtr<CefBrowser>, CefProcessId, CefRefPtr<CefProcessMessage>) OVERRIDE;
 
-    UrlClient(UrlLoadHandler*, UrlRenderHandler*, vector<Url*>*);
+    UrlClient(UrlLoadHandler*, UrlRenderHandler*, vector<Url*>*, string*);
     UrlClient();
     ~UrlClient();
 };

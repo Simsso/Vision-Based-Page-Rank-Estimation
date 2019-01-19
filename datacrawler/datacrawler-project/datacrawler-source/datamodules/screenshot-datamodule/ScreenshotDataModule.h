@@ -19,7 +19,6 @@
 #include "ScreenshotRequestHandler.h"
 #include "ScreenshotClient.h"
 #include "Screenshot.h"
-#include "ScreenshotData.h"
 
 class ScreenshotDataModule : public DataModuleBase, public CefBaseRefCounted {
 private:
@@ -33,7 +32,7 @@ private:
     double changeThreshold;
 
 public:
-    DataBase* process(std::string) OVERRIDE;
+    DataBase * process(std::string) OVERRIDE;
 
     ScreenshotDataModule();
     ScreenshotDataModule(int, int, int, int, double, int, bool);

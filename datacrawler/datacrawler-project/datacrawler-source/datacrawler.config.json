@@ -1,4 +1,5 @@
 {
+  "NUM_NODES" : 10,
   "DATAMODULES": [
     {
       "DATAMODULE": "SCREENSHOT_MODULE",

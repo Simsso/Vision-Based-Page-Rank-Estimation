@@ -16,10 +16,14 @@ bool DatacrawlerRenderProcessHandler::OnProcessMessageReceived(CefRefPtr<CefBrow
                                       CefRefPtr<CefProcessMessage> message) {
     /* URL-Datamodule*/
     if(message.get()->GetName() == "GetAllUrl") {
-        CefRefPtr<UrlDOMVisitor> urlDOMVisitor(new UrlDOMVisitor(urls, message.get()->GetArgumentList().get()->GetString(0), 10));
         logger->info("RenderProcessHandler received event from URL-Datamodule!");
 
+        string url = message.get()->GetArgumentList().get()->GetString(0);
+        int numUrls = message.get()->GetArgumentList().get()->GetInt(1);
+
+        CefRefPtr<UrlDOMVisitor> urlDOMVisitor(new UrlDOMVisitor(urls, url, numUrls));
         CefRefPtr<CefFrame> mainFrame = browser.get()->GetMainFrame();
+
         // delegate parsing to UrlDomVisitor
         mainFrame.get()->VisitDOM(urlDOMVisitor);
 

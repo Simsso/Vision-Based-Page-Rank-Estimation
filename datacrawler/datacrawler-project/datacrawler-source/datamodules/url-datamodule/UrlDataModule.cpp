@@ -7,15 +7,18 @@
 UrlDataModule::UrlDataModule() {
     this->numUrls = 10;
     this->urls = new vector<Url*>;
+    this->baseUrl = new string();
 }
 
 UrlDataModule::UrlDataModule(int numUrls) {
     this->numUrls = numUrls;
     this->urls = new vector<Url*>;
+    this->baseUrl = new string();
 }
 
 UrlDataModule::~UrlDataModule() {
     delete urls;
+    delete baseUrl;
 }
 
 DataBase *UrlDataModule::process(std::string url) {
@@ -35,7 +38,7 @@ DataBase *UrlDataModule::process(std::string url) {
     CefRefPtr<UrlRenderHandler> urlRenderHandler(new UrlRenderHandler());
     CefRefPtr<UrlLoadHandler> urlLoadHandler(new UrlLoadHandler(url, numUrls));
 
-    CefRefPtr<UrlClient> urlClient(new UrlClient(urlLoadHandler, urlRenderHandler, urls));
+    CefRefPtr<UrlClient> urlClient(new UrlClient(urlLoadHandler, urlRenderHandler, urls, baseUrl));
 
     CefWindowInfo cefWindowInfo;
     cefWindowInfo.SetAsWindowless(0);
@@ -46,9 +49,11 @@ DataBase *UrlDataModule::process(std::string url) {
     CefBrowserHost::CreateBrowser(cefWindowInfo, urlClient.get(), url, browserSettings, NULL);
 
     CefRunMessageLoop();
+    UrlCollection * urlCollection = new UrlCollection(*baseUrl);
 
     for(auto x: *urls){
-        logger->info("parsed: "+x->getUrl());
+        urlCollection->addUrl(x);
     }
-    return nullptr;
+
+    return urlCollection;
 }

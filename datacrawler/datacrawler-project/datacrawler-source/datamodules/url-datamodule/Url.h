@@ -6,6 +6,7 @@
 #define DATACRAWLER_PROJECT_URL_H
 
 #include "iostream"
+#include "../DataBase.h"
 
 class Url {
 private:
@@ -14,8 +15,8 @@ private:
     bool https;
 
 public:
-    std::string  getUrlText();
-    std::string  getUrl();
+    std::string getUrlText();
+    std::string getUrl();
     bool isHttps();
 
     Url(std::string, std::string, bool);

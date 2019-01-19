@@ -10,22 +10,23 @@
 
 #include "DatacrawlerConfiguration.h"
 #include "datamodules/DataModuleBase.h"
-#include "datamodules/screenshot-datamodule/ScreenshotDataModule.h"
 #include "util/Logger.h"
 
 
 using namespace std;
 
 class Datacrawler {
-
 private:
    DatacrawlerConfiguration datacrawlerConfiguration;
+   int numNodes;
    list<DataModuleBase*> dataModules;
    Logger* logger;
-   CefMainArgs* mainArgs;
+   map<std::string, NodeElement*>* graph;
+
+   vector<pair<string, NodeElement*>>  buildNodes(NodeElement*);
 
 public:
-    NodeElement* process(string);
+    map<string,NodeElement*> * process(string);
     void init();
 
     Datacrawler();

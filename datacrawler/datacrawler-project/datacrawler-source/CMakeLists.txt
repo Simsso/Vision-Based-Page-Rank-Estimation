@@ -44,8 +44,6 @@ set(CEFSIMPLE_SRCS
         datamodules/screenshot-datamodule/ScreenshotHandler.h
         datamodules/DataBase.cpp
         datamodules/DataBase.h
-        datamodules/screenshot-datamodule/ScreenshotData.cpp
-        datamodules/screenshot-datamodule/ScreenshotData.h
         datamodules/screenshot-datamodule/Screenshot.cpp
         datamodules/screenshot-datamodule/Screenshot.h
         datamodules/screenshot-datamodule/ScreenshotRequestHandler.cpp
@@ -59,7 +57,17 @@ set(CEFSIMPLE_SRCS
         datamodules/url-datamodule/UrlLoadHandler.cpp
         datamodules/url-datamodule/UrlLoadHandler.h
         datamodules/url-datamodule/UrlRenderHandler.cpp
-        datamodules/url-datamodule/UrlRenderHandler.h datamodules/url-datamodule/UrlDOMVisitor.cpp datamodules/url-datamodule/UrlDOMVisitor.h DatacrawlerApp.cpp DatacrawlerApp.h DatacrawlerRenderProcessHandler.cpp DatacrawlerRenderProcessHandler.h datamodules/url-datamodule/Url.cpp datamodules/url-datamodule/Url.h)
+        datamodules/url-datamodule/UrlRenderHandler.h
+        datamodules/url-datamodule/UrlDOMVisitor.cpp
+        datamodules/url-datamodule/UrlDOMVisitor.h
+        DatacrawlerApp.cpp
+        DatacrawlerApp.h
+        DatacrawlerRenderProcessHandler.cpp
+        DatacrawlerRenderProcessHandler.h
+        datamodules/url-datamodule/Url.cpp
+        datamodules/url-datamodule/Url.h
+        datamodules/url-datamodule/UrlCollection.cpp
+        datamodules/url-datamodule/UrlCollection.h)
 
 APPEND_PLATFORM_SOURCES(CEFSIMPLE_HELPER_SRCS)
 source_group(cefsimple FILES ${CEFSIMPLE_HELPER_SRCS})

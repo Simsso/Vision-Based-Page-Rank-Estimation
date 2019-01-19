@@ -10,11 +10,12 @@ UrlClient::UrlClient() {
 
 UrlClient::~UrlClient() {}
 
-UrlClient::UrlClient(UrlLoadHandler* urlLoadHandler, UrlRenderHandler* urlRenderHandler, vector<Url*>* urls) {
+UrlClient::UrlClient(UrlLoadHandler* urlLoadHandler, UrlRenderHandler* urlRenderHandler, vector<Url*>* urls, string * baseUrl) {
     logger = Logger::getInstance();
     this->urlLoadHandler = urlLoadHandler;
     this->urlRenderHandler = urlRenderHandler;
     this->urls = urls;
+    this->baseUrl = baseUrl;
 }
 
 CefRefPtr<CefLoadHandler> UrlClient::GetLoadHandler() {
@@ -31,6 +32,8 @@ bool UrlClient::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 
     if(message.get()->GetName() == "GetAllUrl_finished") {
         logger->info("URL-Datamodule received event from RenderProcessHandler! Parsing finished!");
+        *baseUrl = browser.get()->GetMainFrame().get()->GetURL();
+
         CefRefPtr<CefListValue> listValue = message.get()->GetArgumentList();
         CefRefPtr <CefListValue> listUrls = listValue.get()->GetList(0);
         CefRefPtr <CefListValue> listText = listValue.get()->GetList(1);
@@ -47,13 +50,12 @@ bool UrlClient::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
                 calculatedUrlHasHttps = true;
             else
                 calculatedUrlHasHttps = false;
-
             Url * tmp = new Url(tmpText, tmpUrl, calculatedUrlHasHttps);
             urls->push_back(tmp);
         }
-
         logger->info("Running URL-Datamodule .. finished !");
         CefQuitMessageLoop();
     }
+
     return false;
 }

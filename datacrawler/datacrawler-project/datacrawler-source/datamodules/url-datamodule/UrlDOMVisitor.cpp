@@ -15,31 +15,39 @@ UrlDOMVisitor::~UrlDOMVisitor() {}
 
 void UrlDOMVisitor::Visit(CefRefPtr<CefDOMDocument> domDocument) {
     logger->info("Parsing URLs !");
-    logger->info("Initial URL (passed) is " + url);
+    logger->info("Passed URL is " + url);
     logger->info("Crawling all URLs of the DOM !");
 
-    calculatedUrl = domDocument.get()->GetBaseURL();
-
+    baseUrl = domDocument.get()->GetBaseURL();
     std::smatch match;
     regex regex_baseUrl("^(https|http):\\/\\/[a-zA-Z-0-9.-]*");
+    regex regex_domainName("[a-zA-Z-0-9.-]*$");
 
-    if(!regex_search(calculatedUrl, match, regex_baseUrl))
+    if(!regex_search(baseUrl, match, regex_baseUrl))
         return;
 
-    calculatedUrl = match[0];
+    baseUrl = match[0];
 
-    logger->info("Current visited Url is "+calculatedUrl);
+    if(!regex_search(baseUrl, match, regex_domainName))
+        return;
+
+    baseUrlDomainOnly = match[0];
+
+    logger->info("Current visited base-URL is "+baseUrl);
 
     queue<CefRefPtr<CefDOMNode>> aQueue = traverseDOMTree(domDocument.get()->GetBody());
     filterURL(aQueue);
     shuffleURLs();
 
-    logger->info("Returning "+to_string(numUrls)+" URLs !");
+    int numRemove = 0;
+    logger->info(to_string(numUrls));
+    if(numUrls <= (int)validUrls.size())
+        numRemove = abs(numUrls - (int)validUrls.size());
 
-    int numRemove = abs(numUrls - (int)validUrls.size());
     for(int i = 0; i < numRemove; i++)
         validUrls.pop_back();
 
+    logger->info("Returning "+to_string(validUrls.size())+" URLs !");
 }
 
 queue<CefRefPtr<CefDOMNode>> UrlDOMVisitor::traverseDOMTree(CefRefPtr<CefDOMNode> body) {
@@ -74,17 +82,17 @@ queue<CefRefPtr<CefDOMNode>> UrlDOMVisitor::traverseDOMTree(CefRefPtr<CefDOMNode
 
 void UrlDOMVisitor::filterURL(queue<CefRefPtr<CefDOMNode>> &aQueue) {
     logger->info("Gathering valid Urls !");
-    regex httpRegex("^http://" + url);
-    regex httpsRegex("^https://" + url);
-    regex wwwRegex("^http://www." + url);
-    regex wwwHttpsRegex("^https://www." + url);
-    regex implicitProtocolRegex("^//" + url);
+    regex httpRegex("^http://" + baseUrlDomainOnly);
+    regex httpsRegex("^https://" + baseUrlDomainOnly);
+    regex wwwRegex("^http://www." + baseUrlDomainOnly);
+    regex wwwHttpsRegex("^https://www." + baseUrlDomainOnly);
+    regex implicitProtocolRegex("^//" + baseUrlDomainOnly);
     regex relativePathRegex("^/.*");
     regex anchorRegex("^#.*");
-    bool calculatedUrlHasHttps = false;
+    bool baseUrlHasHttps = false;
 
-    if(regex_search(calculatedUrl, httpsRegex))
-       calculatedUrlHasHttps = true;
+    if(regex_search(baseUrl, httpsRegex))
+        baseUrlHasHttps = true;
 
     while (!aQueue.empty()) {
         string urlText = aQueue.front().get()->GetElementInnerText();
@@ -105,15 +113,15 @@ void UrlDOMVisitor::filterURL(queue<CefRefPtr<CefDOMNode>> &aQueue) {
            validUrlMap.insert(make_pair(url, urlText));
 
        } else if (regex_search(url, implicitProtocolRegex)) {
-           string newCalculatedUrl = calculatedUrlHasHttps ? "https:" + url : "http:"+ url;
+           string newCalculatedUrl = baseUrlHasHttps ? "https:" + url : "http:"+ url;
            validUrlMap.insert(make_pair(newCalculatedUrl, urlText));
 
        } else if (regex_search(url, relativePathRegex)) {
-           string newCalculatedUrl = calculatedUrl+url;
+           string newCalculatedUrl = baseUrl+url;
            validUrlMap.insert(make_pair(newCalculatedUrl, urlText));
 
        } else if (regex_search(url, anchorRegex)) {
-           string newCalculatedUrl = calculatedUrl+'/'+url;
+           string newCalculatedUrl = baseUrl+'/'+url;
            validUrlMap.insert(make_pair(newCalculatedUrl, urlText));
        }
     }

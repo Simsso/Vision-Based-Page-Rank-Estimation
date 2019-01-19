@@ -11,13 +11,15 @@
 
 #include "../DataModuleBase.h"
 #include "UrlClient.h"
+#include "UrlCollection.h"
 
 
 class UrlDataModule: public DataModuleBase, public CefBaseRefCounted {
 private:
     IMPLEMENT_REFCOUNTING(UrlDataModule);
     int numUrls;
-    vector<Url*>* urls;
+    vector<Url*> *urls;
+    string * baseUrl;
 
 public:
     DataBase* process(std::string) OVERRIDE;

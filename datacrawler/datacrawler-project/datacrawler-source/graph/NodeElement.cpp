@@ -7,15 +7,15 @@ NodeElement::~NodeElement() {
     for(DataBase* database: *data){
         delete database;
     }
-
     delete data;
 }
 
 /**
  * NodeElement
  */
-NodeElement::NodeElement(){
+NodeElement::NodeElement(bool isStartNode){
     data = new std::vector<DataBase*>;
+    this->isStartNode = isStartNode;
 }
 
 /**

@@ -21,6 +21,15 @@ DatacrawlerConfiguration::DatacrawlerConfiguration() {
         json config;
         file >> config;
 
+        if(config["NUM_NODES"].is_null() || !config["NUM_NODES"].is_number()){
+            logger->error("Missing/Wrong value for 'NUM_NODES' in config!");
+            logger->error("I will not load any specified Datamodules!");
+            numNodes = 0;
+            return;
+        } else {
+            numNodes = config["NUM_NODES"].get<int>();
+        }
+
         if (!config["DATAMODULES"].is_null()) {
 
             for (auto &datamoduleEntry : config["DATAMODULES"].items()) {
@@ -156,3 +165,5 @@ DataModuleBaseConfiguration *DatacrawlerConfiguration::getConfiguration(DataModu
         return nullptr;
     }
 }
+
+int DatacrawlerConfiguration::getNumNodes() { return numNodes;}

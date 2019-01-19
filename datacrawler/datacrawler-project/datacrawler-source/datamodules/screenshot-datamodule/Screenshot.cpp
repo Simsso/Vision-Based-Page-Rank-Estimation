@@ -13,10 +13,11 @@ Screenshot::~Screenshot() {
  * @param height of the screenshot
  * @param width of the screenshot
  */
-Screenshot::Screenshot(unsigned char * screenshot, int height, int width) {
+Screenshot::Screenshot(unsigned char * screenshot, int height, int width, bool mobile) {
     this->screenshot = screenshot;
     this->height = height;
     this->width = width;
+    this->mobile = mobile;
 }
 
 /**
@@ -29,3 +30,9 @@ int Screenshot::getHeight() { return height;}
 
 int Screenshot::getWidth() { return width;}
 
+bool Screenshot::isMobile(){ return mobile;}
+
+DataModulesEnum Screenshot::getDataModuleType() {
+    if(mobile) return SCREENSHOT_MOBILE_MODULE;
+    return SCREENSHOT_MODULE;
+}

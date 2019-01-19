@@ -2,18 +2,23 @@
 #define DATACRAWLER_PROJECT_SCREENSHOT_H
 
 
-class Screenshot {
+#include "../DataBase.h"
+
+class Screenshot : public DataBase {
 private:
     unsigned char* screenshot;
     int height;
     int width;
-public:
+    bool mobile;
 
+public:
+    DataModulesEnum getDataModuleType();
     unsigned char* getScreenshot();
     int getHeight();
     int getWidth();
+    bool isMobile();
 
-    Screenshot(unsigned char*, int, int);
+    Screenshot(unsigned char*, int, int, bool);
     ~Screenshot();
 };
 

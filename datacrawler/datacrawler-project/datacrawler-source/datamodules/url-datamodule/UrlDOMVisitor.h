@@ -22,7 +22,9 @@ private:
     IMPLEMENT_REFCOUNTING(UrlDOMVisitor)
     Logger *logger;
     string url;
-    string calculatedUrl;
+    string baseUrl;
+    string baseUrlDomainOnly;
+
     int numUrls;
     vector<pair<string,string>>& validUrls;
     map<string, string> validUrlMap;
