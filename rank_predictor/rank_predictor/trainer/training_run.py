@@ -8,20 +8,24 @@ class TrainingRun:
                  net: nn.Module,
                  opt: optim.Optimizer,
                  loss_fn,
-                 data: DataLoader) -> None:
+                 data: DataLoader,
+                 device) -> None:
         self.net = net
         self.opt = opt
         self.loss_fn = loss_fn
         self.data = data
         self.step_ctr = 0
+        self.device = device
 
         self.loss_log = []
+
+        self.net.to(device)
 
     def __call__(self, epochs: int) -> None:
         for epoch in range(epochs):
             for batch in self.data:
-                imgs = batch['img']
-                ranks = batch['rank']
+                imgs = batch['img'].to(self.device)
+                ranks = batch['rank'].to(self.device)
                 self._step(imgs, ranks)
 
     def _step(self, inputs: torch.Tensor, targets: torch.Tensor) -> None:
