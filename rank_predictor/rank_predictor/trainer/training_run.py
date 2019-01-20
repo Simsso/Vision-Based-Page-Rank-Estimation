@@ -32,7 +32,6 @@ class TrainingRun:
         loss.backward()
         self._log_loss(loss)
         self.opt.step()
-        self.net.train()
 
     def _log_loss(self, loss) -> None:
         self.loss_log.append(loss.item())
