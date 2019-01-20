@@ -3,4 +3,6 @@ matplotlib
 numpy
 pillow
 scikit-image
+tensorboardX
 torch
+tqdm
