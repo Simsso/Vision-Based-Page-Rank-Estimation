@@ -23,7 +23,7 @@ class ScreenshotFeatureExtractor(nn.Module):
         self.conv3b = nn.Conv2d(128, 128, kernel_size=(3, 3))
 
         self.dense1 = nn.Linear(1024, 256)  # diverging from the paper here
-        self.dense2 = nn.Linear(256, 256)
+        self.dense2 = nn.Linear(256, 3)
 
     def forward(self, x):
         x = F.relu(self.conv1a(x))
@@ -46,7 +46,7 @@ class ScreenshotFeatureExtractor(nn.Module):
         x = F.relu(self.dense1(x))
         x = F.dropout(x, p=.3, training=self.training)
 
-        x = F.relu(self.dense2(x))
-        x = F.dropout(x, p=.3, training=self.training)
+        x = self.dense2(x)
+        x = F.softmax(x, dim=1)
 
-        return uf.global_avg_pool(x)
+        return x

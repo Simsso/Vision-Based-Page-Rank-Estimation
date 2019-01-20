@@ -22,5 +22,11 @@ net.cuda()
 # optimizer
 opt = optim.Adam(net.parameters(), lr=1e-5)
 
-training_run = TrainingRun(net, opt, nn.MSELoss(), dataset_v1, batch_size=24, device=device)
+# loss
+train_label_weights = dataset_v1.train.get_label_weights()
+train_label_weights = torch.Tensor(train_label_weights).to(device)
+logging.info("Using label weights: {}".format(str(train_label_weights)))
+loss = nn.CrossEntropyLoss(train_label_weights)
+
+training_run = TrainingRun(net, opt, loss, dataset_v1, batch_size=24, device=device)
 training_run(1)
