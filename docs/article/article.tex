@@ -21,8 +21,18 @@
 \usepackage{bm}  % bold math
 \usepackage{isomath}
 
+% graphics
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.16}
+\usepgfplotslibrary{fillbetween}
+
+% box diagrams
+\usepackage{flowchart}
+\usetikzlibrary{arrows}
+
 % citing
-\usepackage[backend=bibtex,style=alphabetic]{biblatex}
+\usepackage[backend=biber,style=alphabetic]{biblatex}
 \addbibresource{bibliography.bib}
 
 \begin{document}
