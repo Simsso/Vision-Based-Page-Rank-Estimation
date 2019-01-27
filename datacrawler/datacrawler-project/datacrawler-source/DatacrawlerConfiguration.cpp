@@ -91,16 +91,6 @@ ScreenshotConfiguration *DatacrawlerConfiguration::generateScreenshotDatamoduleC
         parseError = true;
     }
 
-    if (attributes["CHANGE_THRESHOLD"].is_null() && !attributes["CHANGE_THRESHOLD"].is_number()) {
-        logger->error("Missing/Wrong value for 'CHANGE_THRESHOLD' in config!");
-        parseError = true;
-    }
-
-    if (attributes["LAST_SCREENSHOTS"].is_null() && !attributes["LAST_SCREENSHOTS"].is_number()) {
-        logger->error("Missing/Wrong value for 'LAST_SCREENSHOTS' in config!");
-        parseError = true;
-    }
-
     if (attributes["HEIGHT"].is_null() && !attributes["HEIGHT"].is_number()) {
         logger->error("Missing/Wrong value for 'HEIGHT' in config!");
         parseError = true;
@@ -118,15 +108,12 @@ ScreenshotConfiguration *DatacrawlerConfiguration::generateScreenshotDatamoduleC
 
     int elapsedTimeOnPaintTimeout = attributes["ELAPSED_TIME_ONPAINT_TIMEOUT"].get<int>();
     int onPaintTimeout = attributes["ONPAINT_TIMEOUT"].get<int>();
-    double changeThreshold = attributes["CHANGE_THRESHOLD"].get<double>();
-    int lastScreenshots = attributes["LAST_SCREENSHOTS"].get<int>();
     int height = attributes["HEIGHT"].get<int>();
     int width = attributes["WIDTH"].get<int>();
 
     logger->info(".. loaded !");
 
-    return new ScreenshotConfiguration(height, width, onPaintTimeout, elapsedTimeOnPaintTimeout, changeThreshold,
-                                       lastScreenshots, mobile);
+    return new ScreenshotConfiguration(height, width, onPaintTimeout, elapsedTimeOnPaintTimeout, mobile);
 }
 
 UrlConfiguration *DatacrawlerConfiguration::generateUrlDataModuleConfig(json &attributes) {

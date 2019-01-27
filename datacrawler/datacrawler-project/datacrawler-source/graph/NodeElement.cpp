@@ -15,7 +15,7 @@ NodeElement::~NodeElement() {
  */
 NodeElement::NodeElement(bool isStartNode){
     data = new std::vector<DataBase*>;
-    this->isStartNode = isStartNode;
+    startNode = isStartNode;
 }
 
 /**
@@ -31,3 +31,7 @@ void NodeElement::addData(DataBase * newData) {
  * @return A pointer on to a vector<DataBase*> having all DataBase-instances of this NodeElement
  */
 std::vector<DataBase*>* NodeElement::getData(){ return data;}
+
+bool NodeElement::isStartNode(){
+    return startNode;
+}

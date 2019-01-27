@@ -14,9 +14,10 @@ ScreenshotClient::~ScreenshotClient(){}
  * ScreenshotClient - Initializies the client with the custom CefRenderHandler implemented in ScreenshotHandler
  * @param screenshotHandler
  */
-ScreenshotClient::ScreenshotClient(ScreenshotHandler* screenshotHandler, ScreenshotRequestHandler* screenshotRequestHandler){
+ScreenshotClient::ScreenshotClient(ScreenshotHandler* screenshotHandler, ScreenshotRequestHandler* screenshotRequestHandler, ScreenshotLoadhandler * screenshotLoadhandler){
     this->screenshotHandler = screenshotHandler;
     this->screenshotRequestHandler = screenshotRequestHandler;
+    this->screenshotLoadhandler = screenshotLoadhandler;
 }
 
 /**
@@ -34,3 +35,5 @@ CefRefPtr<CefRenderHandler> ScreenshotClient::GetRenderHandler() {
 CefRefPtr<CefRequestHandler> ScreenshotClient::GetRequestHandler() {
     return screenshotRequestHandler;
 }
+
+CefRefPtr<CefLoadHandler> ScreenshotClient::GetLoadHandler() { return screenshotLoadhandler;}

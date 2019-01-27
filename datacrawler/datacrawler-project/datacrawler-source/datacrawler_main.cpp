@@ -2,8 +2,8 @@
 
 Logger *Logger::instance = 0;
 
-#include "opencv2/opencv.hpp"
 #include "stdlib.h"
+#include "GraphOutput.h"
 #include "DatacrawlerApp.h"
 
 int main(int argc, char *argv[]) {
@@ -31,45 +31,16 @@ int main(int argc, char *argv[]) {
 
     Datacrawler datacrawler;
     datacrawler.init();
+    map<string, NodeElement*> * graph;
+    GraphOutput* graphOutput;
 
-    string url = "timodenk.com";
-   /* NodeElement * node =*/ datacrawler.process(url);
+    graph = datacrawler.process("youtube.com");
+    graphOutput = new GraphOutput(graph, "2");
+    graphOutput->generateGraph();
 
-    /* string urlRank = "1";
-    string outputPath = "/home/Desktop/";
+    delete graph;
+    delete graphOutput;
 
-    vector<DataBase*>* dataBase = node->getData();
-
-    for(auto x: *dataBase){
-        DataModulesEnum dataModulesEnum = x->getDataModuleType();
-
-        if(dataModulesEnum == SCREENSHOT_MODULE || dataModulesEnum == SCREENSHOT_MOBILE_MODULE) {
-
-            auto screenshotList = (ScreenshotData*) x;
-
-            for(auto img: screenshotList->getScreenshots())
-            try {
-                std::vector<int> params;
-                params.push_back(cv::IMWRITE_PNG_COMPRESSION);
-                params.push_back(9);
-                cv::Mat newImg = cv::Mat(img->getHeight(),img->getWidth(), CV_8UC4, img->getScreenshot());
-
-                std::string fullPath;
-                fullPath.append(outputPath);
-                fullPath.append("/");
-                fullPath.append(urlRank);
-                fullPath.append(".png");
-                logger->info("We have screenshots! Saving to to: "+fullPath);
-                cv::imwrite(fullPath, newImg, params);
-
-            } catch(std::runtime_error& ex) {
-                fprintf(stderr, "Exception while converting taking picture of the website in PNG format: %s", ex.what());
-            }
-        } else {
-            logger->info("No data has been produced!");
-        }
-    }
- */
     logger->info("Datacrawler execution finished!");
     CefShutdown();
 }

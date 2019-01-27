@@ -15,10 +15,17 @@ private:
     Logger* logger;
     string url;
     int numUrls;
+    bool notified;
+    bool failed;
+    bool stoppedLoadingStartTime;
+    int httpStatusCode;
+    std::chrono::steady_clock::time_point loadingStartTime;
 
 public:
+    void OnLoadError( CefRefPtr< CefBrowser > browser, CefRefPtr< CefFrame > frame, CefLoadHandler::ErrorCode errorCode, const CefString& errorText, const CefString& failedUrl ) OVERRIDE;
     void OnLoadEnd(CefRefPtr<CefBrowser>, CefRefPtr<CefFrame>, int) OVERRIDE;
-
+    void OnLoadStart(CefRefPtr<CefBrowser> , CefRefPtr<CefFrame> , CefLoadHandler::TransitionType ) OVERRIDE;
+    void OnLoadingStateChange(CefRefPtr<CefBrowser>, bool, bool, bool) OVERRIDE;
     UrlLoadHandler(string, int);
     UrlLoadHandler();
     ~UrlLoadHandler() OVERRIDE;

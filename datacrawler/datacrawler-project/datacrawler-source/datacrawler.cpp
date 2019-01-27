@@ -48,8 +48,9 @@ map<string, NodeElement*>* Datacrawler::process(string url) {
     logger->info("Processing <" + url + ">");
     logger->info("Running DataModules!");
 
+    graph = new map<std::string, NodeElement*>;
     NodeElement * startNode = new NodeElement(true);
-    UrlCollection * startNodeUrlCollection;
+    UrlCollection * startNodeUrlCollection = nullptr;
 
     for (auto x: dataModules) {
         startNode->addData(x->process(url));
@@ -79,7 +80,6 @@ map<string, NodeElement*>* Datacrawler::process(string url) {
     nodes.push(make_pair(startNodeUrlCollection->getBaseUrl(), startNode));
     --numNodes;
 
-
     while(!nodes.empty()) {
         if(numNodes <= 0)
             break;
@@ -92,21 +92,7 @@ map<string, NodeElement*>* Datacrawler::process(string url) {
         }
         nodes.pop();
     }
-/*
-    for(auto node : *graph){
-        auto nodeData = node.second->getData();
-        logger->info("node: "+ node.first);
 
-        for(auto entry : *nodeData){
-            if(entry->getDataModuleType() != URL_MODULE)
-                continue;
-
-            vector<Url*> * urls = ((UrlCollection*)entry)->getUrls();
-            for(auto url : *urls)
-                logger->info("---> "+url->getUrl());
-        }
-    }
-    logger->info(" ");
     // delete arbitary edges
    for(auto node : *graph){
       auto nodeData = node.second->getData();
@@ -134,7 +120,7 @@ map<string, NodeElement*>* Datacrawler::process(string url) {
                 logger->info("---> "+url->getUrl());
         }
     }
-*/
+
     return graph;
 }
 
@@ -170,6 +156,5 @@ vector<pair<string, NodeElement*>> Datacrawler::buildNodes(NodeElement* startNod
         newNodes.push_back(make_pair(edgeUrl, newNode));
         --numNodes;
     }
-
     return newNodes;
 }

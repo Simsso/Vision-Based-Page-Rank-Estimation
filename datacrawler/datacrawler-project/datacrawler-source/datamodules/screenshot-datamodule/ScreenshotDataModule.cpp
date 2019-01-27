@@ -15,14 +15,12 @@ ScreenshotDataModule::ScreenshotDataModule() {}
  * @param height represents the height of the screenshot to take
  * @param width represents the width of the screenshot to take
  */
-ScreenshotDataModule::ScreenshotDataModule(int height, int width, int onPaintTimeout, int elapsedTimeOnPaintTimeout, double changeThreshold, int lastScreenshots, bool mobile) {
+ScreenshotDataModule::ScreenshotDataModule(int height, int width, int onPaintTimeout, int elapsedTimeOnPaintTimeout, bool mobile) {
     this->height = height;
     this->width = width;
     this->mobile = mobile;
     this->onPaintTimeout = onPaintTimeout;
     this->elapsedTimeOnPaintTimeout = elapsedTimeOnPaintTimeout;
-    this->changeThreshold = changeThreshold;
-    this->lastScreenshots = lastScreenshots;
 }
 
 /**
@@ -51,22 +49,48 @@ DataBase *ScreenshotDataModule::process(std::string url) {
     logger->info("Runnning in UI thread!");
 
     bool * quitMessageLoop = new bool;
+    bool * browserFinishedLoading = new bool;
+
+    *browserFinishedLoading = false;
     *quitMessageLoop = false;
 
+    CefRefPtr<ScreenshotLoadhandler> screenshotLoadhandler(new ScreenshotLoadhandler(browserFinishedLoading));
     CefRefPtr<ScreenshotRequestHandler> screenshotRequestHandler(new ScreenshotRequestHandler(map));
-    CefRefPtr<ScreenshotHandler> screenshotHandler(new ScreenshotHandler(quitMessageLoop, lastScreenshots, changeThreshold, height, width));
-    CefRefPtr<ScreenshotClient> screenshotClient(new ScreenshotClient(screenshotHandler, screenshotRequestHandler));
+    CefRefPtr<ScreenshotHandler> screenshotHandler(new ScreenshotHandler(height, width));
+    CefRefPtr<ScreenshotClient> screenshotClient(new ScreenshotClient(screenshotHandler, screenshotRequestHandler, screenshotLoadhandler));
 
     CefWindowInfo cefWindowInfo;
     cefWindowInfo.SetAsWindowless(0);
 
     CefBrowserSettings browserSettings;
-    browserSettings.windowless_frame_rate = 60;
+    browserSettings.windowless_frame_rate = 300;
 
-    CefBrowserHost::CreateBrowser(cefWindowInfo, screenshotClient.get(), url, browserSettings, NULL);
+    CefRefPtr <CefBrowser> browser = CefBrowserHost::CreateBrowserSync(cefWindowInfo, screenshotClient.get(), url, browserSettings, NULL);
 
-    // Thread to timeout ScreenshotHandler::onPaint(), if detecting mechanisms fail
     std::thread timeout([&]() {
+        int secondsSteps = 0;
+
+        while(secondsSteps < elapsedTimeOnPaintTimeout){
+           if(*quitMessageLoop)
+                return;
+
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            ++secondsSteps;
+        }
+
+        logger->info("ScreenshotDataModule timed out after "+std::to_string(elapsedTimeOnPaintTimeout)+" seconds! Returning current screenshot result!");
+
+        *quitMessageLoop = true;
+    });
+
+    std::thread screenshotHandlerStopped([&]() {
+
+        while(!*browserFinishedLoading){
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            if(*quitMessageLoop)
+                return;
+        }
+
         int secondsSteps = 0;
 
         while(secondsSteps < onPaintTimeout){
@@ -77,34 +101,9 @@ DataBase *ScreenshotDataModule::process(std::string url) {
             ++secondsSteps;
         }
 
-        if (screenshotHandler->hasPainted()) {
-            logger->info("ScreenshotDataModule timed out! Returning current screenshot result!");
-        } else {
-            logger->error("ScreenshotDataModule has failed to take a screenshot!");
-            throw "ScreenshotDataModule has failed to take a screenshot!";
-        }
+        logger->info("Waited "+std::to_string(onPaintTimeout)+" seconds for rendering ..");
 
-        screenshotHandler->getQuitMessageLoopMutex().lock();
         *quitMessageLoop = true;
-        screenshotHandler->getQuitMessageLoopMutex().unlock();
-    });
-
-    // Thread to check, whether ScreenshotHandler::onPaint() was called in the last elapsedTimeOnPaintTimeout
-    std::thread screenshotHandlerStopped([&]() {
-
-        while (!screenshotHandler->hasPainted());
-
-        while (screenshotHandler->getTimeSinceLastPaint() < elapsedTimeOnPaintTimeout){
-            if(*quitMessageLoop)
-                return;
-        }
-
-        logger->info(std::to_string(elapsedTimeOnPaintTimeout) +
-                     "ms has passed since last OnPaint()! Taking screenshot!");
-
-        screenshotHandler->getQuitMessageLoopMutex().lock();
-        *quitMessageLoop = true;
-        screenshotHandler->getQuitMessageLoopMutex().unlock();
     });
 
     while (!(*quitMessageLoop)){
@@ -118,6 +117,10 @@ DataBase *ScreenshotDataModule::process(std::string url) {
     timeout.join();
 
     logger->info("Running Screenshot-DataModule .. finished !");
+
+    delete quitMessageLoop;
+
+    browser->GetHost()->CloseBrowser(true);
 
     return screenshot;
 }

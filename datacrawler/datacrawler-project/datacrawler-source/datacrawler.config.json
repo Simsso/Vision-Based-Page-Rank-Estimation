@@ -1,14 +1,14 @@
 {
-  "NUM_NODES" : 10,
+  "NUM_NODES" : 5,
   "DATAMODULES": [
     {
       "DATAMODULE": "SCREENSHOT_MODULE",
-      "DISABLED": true,
+      "DISABLED": false,
       "ATTRIBUTES":
         {
-          "ONPAINT_TIMEOUT": 25,
-          "ELAPSED_TIME_ONPAINT_TIMEOUT": 17500,
-          "CHANGE_THRESHOLD": 0.005,
+          "ONPAINT_TIMEOUT": 10,
+          "ELAPSED_TIME_ONPAINT_TIMEOUT": 4000,
+          "CHANGE_THRESHOLD": 0.01,
           "LAST_SCREENSHOTS": 20,
           "HEIGHT": 1080,
           "WIDTH": 1920
@@ -16,15 +16,15 @@
     },
     {
       "DATAMODULE": "SCREENSHOT_MOBILE_MODULE",
-      "DISABLED": true,
+      "DISABLED": false,
       "ATTRIBUTES":
         {
-          "ONPAINT_TIMEOUT": 25,
-          "ELAPSED_TIME_ONPAINT_TIMEOUT": 17500,
-          "CHANGE_THRESHOLD": 0.005,
+          "ONPAINT_TIMEOUT": 10,
+          "ELAPSED_TIME_ONPAINT_TIMEOUT": 4000,
+          "CHANGE_THRESHOLD": 0.01,
           "LAST_SCREENSHOTS": 20,
-          "HEIGHT": 1080,
-          "WIDTH": 1920
+          "HEIGHT": 667,
+          "WIDTH": 375
         }
     },
     {
@@ -32,7 +32,7 @@
       "DISABLED": false,
       "ATTRIBUTES":
       {
-          "NUM_URLS" : 10
+          "NUM_URLS" : 5
       }
     }
   ]

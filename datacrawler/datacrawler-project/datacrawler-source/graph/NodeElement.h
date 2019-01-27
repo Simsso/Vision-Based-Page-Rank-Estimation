@@ -8,11 +8,12 @@ class NodeElement {
 
 private:
    std::vector<DataBase*>* data;
-   bool isStartNode;
+   bool startNode;
 
 public:
     void addData(DataBase*);
     std::vector<DataBase*> * getData();
+    bool isStartNode();
 
     NodeElement(bool);
     ~NodeElement();

@@ -10,12 +10,11 @@ UrlClient::UrlClient() {
 
 UrlClient::~UrlClient() {}
 
-UrlClient::UrlClient(UrlLoadHandler* urlLoadHandler, UrlRenderHandler* urlRenderHandler, vector<Url*>* urls, string * baseUrl) {
+UrlClient::UrlClient(UrlLoadHandler* urlLoadHandler, UrlRenderHandler* urlRenderHandler, UrlCollection* urlCollection) {
     logger = Logger::getInstance();
     this->urlLoadHandler = urlLoadHandler;
     this->urlRenderHandler = urlRenderHandler;
-    this->urls = urls;
-    this->baseUrl = baseUrl;
+    this->urlCollection = urlCollection;
 }
 
 CefRefPtr<CefLoadHandler> UrlClient::GetLoadHandler() {
@@ -32,7 +31,7 @@ bool UrlClient::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 
     if(message.get()->GetName() == "GetAllUrl_finished") {
         logger->info("URL-Datamodule received event from RenderProcessHandler! Parsing finished!");
-        *baseUrl = browser.get()->GetMainFrame().get()->GetURL();
+        string baseUrl = browser.get()->GetMainFrame().get()->GetURL();
 
         CefRefPtr<CefListValue> listValue = message.get()->GetArgumentList();
         CefRefPtr <CefListValue> listUrls = listValue.get()->GetList(0);
@@ -40,20 +39,33 @@ bool UrlClient::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 
         logger->info("Constructing Url-objects .. !");
         regex httpsRegex("^https://");
-        bool calculatedUrlHasHttps;
+
+        if(regex_search(baseUrl, httpsRegex))
+            urlCollection->setBaseUrlHttps(true);
+        else
+            urlCollection->setBaseUrlHttps(false);
+
+        urlCollection->setBaseUrl(baseUrl);
+
+        urlCollection->setHttpResponseCode(listValue.get()->GetInt(2));
+
+        urlCollection->setLoadingTime(listValue.get()->GetInt(3));
 
         for(size_t i=0; i < listUrls.get()->GetSize(); i++){
             string tmpUrl = listUrls.get()->GetString(i);
             string tmpText = listText.get()->GetString(i);
 
-            if(regex_search(tmpUrl, httpsRegex))
-                calculatedUrlHasHttps = true;
-            else
-                calculatedUrlHasHttps = false;
-            Url * tmp = new Url(tmpText, tmpUrl, calculatedUrlHasHttps);
-            urls->push_back(tmp);
+            Url * tmp = new Url(tmpText, tmpUrl);
+            urlCollection->getUrls()->push_back(tmp);
         }
         logger->info("Running URL-Datamodule .. finished !");
+
+        CefQuitMessageLoop();
+    } else if(message.get()->GetName() == "LoadingFailed") {
+        string clientErrorText = message->GetArgumentList()->GetString(0);
+        string baseUrl = message->GetArgumentList()->GetString(1);
+        urlCollection->setClientErrorText(clientErrorText);
+        urlCollection->setBaseUrl(baseUrl);
         CefQuitMessageLoop();
     }
 

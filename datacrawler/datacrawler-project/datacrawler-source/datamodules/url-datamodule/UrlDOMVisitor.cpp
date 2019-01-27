@@ -17,10 +17,10 @@ void UrlDOMVisitor::Visit(CefRefPtr<CefDOMDocument> domDocument) {
     logger->info("Parsing URLs !");
     logger->info("Passed URL is " + url);
     logger->info("Crawling all URLs of the DOM !");
-
     baseUrl = domDocument.get()->GetBaseURL();
     std::smatch match;
-    regex regex_baseUrl("^(https|http):\\/\\/[a-zA-Z-0-9.-]*");
+    std::smatch matchPassedUrl;
+    regex regex_baseUrl("^(https|http)://[a-zA-Z-0-9.-]*");
     regex regex_domainName("[a-zA-Z-0-9.-]*$");
 
     if(!regex_search(baseUrl, match, regex_baseUrl))
@@ -36,11 +36,11 @@ void UrlDOMVisitor::Visit(CefRefPtr<CefDOMDocument> domDocument) {
     logger->info("Current visited base-URL is "+baseUrl);
 
     queue<CefRefPtr<CefDOMNode>> aQueue = traverseDOMTree(domDocument.get()->GetBody());
+    logger->info(std::to_string(aQueue.size()));
     filterURL(aQueue);
     shuffleURLs();
 
     int numRemove = 0;
-    logger->info(to_string(numUrls));
     if(numUrls <= (int)validUrls.size())
         numRemove = abs(numUrls - (int)validUrls.size());
 
@@ -77,6 +77,7 @@ queue<CefRefPtr<CefDOMNode>> UrlDOMVisitor::traverseDOMTree(CefRefPtr<CefDOMNode
         }
         nodeQueue.pop();
     }
+
     return aQueue;
 }
 
@@ -87,7 +88,7 @@ void UrlDOMVisitor::filterURL(queue<CefRefPtr<CefDOMNode>> &aQueue) {
     regex wwwRegex("^http://www." + baseUrlDomainOnly);
     regex wwwHttpsRegex("^https://www." + baseUrlDomainOnly);
     regex implicitProtocolRegex("^//" + baseUrlDomainOnly);
-    regex relativePathRegex("^/.*");
+    regex relativePathRegex("^/[^/]");
     regex anchorRegex("^#.*");
     bool baseUrlHasHttps = false;
 
@@ -102,16 +103,12 @@ void UrlDOMVisitor::filterURL(queue<CefRefPtr<CefDOMNode>> &aQueue) {
         // TODO optimise
        if (regex_search(url, httpRegex)) {
            validUrlMap.insert(make_pair(url, urlText));
-
         } else if (regex_search(url, httpsRegex)) {
            validUrlMap.insert(make_pair(url, urlText));
-
         } else if (regex_search(url, wwwHttpsRegex)) {
            validUrlMap.insert(make_pair(url, urlText));
-
-       } else if (regex_search(url, wwwRegex)) {
+        } else if (regex_search(url, wwwRegex)) {
            validUrlMap.insert(make_pair(url, urlText));
-
        } else if (regex_search(url, implicitProtocolRegex)) {
            string newCalculatedUrl = baseUrlHasHttps ? "https:" + url : "http:"+ url;
            validUrlMap.insert(make_pair(newCalculatedUrl, urlText));

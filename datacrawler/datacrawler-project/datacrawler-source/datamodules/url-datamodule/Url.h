@@ -12,14 +12,12 @@ class Url {
 private:
     std::string urlText;
     std::string url;
-    bool https;
 
 public:
     std::string getUrlText();
     std::string getUrl();
-    bool isHttps();
 
-    Url(std::string, std::string, bool);
+    Url(std::string, std::string);
     ~Url();
 };
 

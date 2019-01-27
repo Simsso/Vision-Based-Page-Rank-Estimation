@@ -28,14 +28,12 @@ private:
     bool mobile;
     int onPaintTimeout;
     int elapsedTimeOnPaintTimeout;
-    int lastScreenshots;
-    double changeThreshold;
 
 public:
     DataBase * process(std::string) OVERRIDE;
 
     ScreenshotDataModule();
-    ScreenshotDataModule(int, int, int, int, double, int, bool);
+    ScreenshotDataModule(int, int, int, int, bool);
     ~ScreenshotDataModule();
 };
 

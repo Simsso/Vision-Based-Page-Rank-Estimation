@@ -11,14 +11,12 @@ private:
     bool mobile;
     int onPaintTimeout;
     int elapsedTimeOnPaintTimeout;
-    int lastScreenshots;
-    double changeThreshold;
 
 public:
     DataModuleBase* createInstance();
 
     ScreenshotConfiguration();
-    ScreenshotConfiguration(int, int, int, int, double, int, bool);
+    ScreenshotConfiguration(int, int, int, int, bool);
     ~ScreenshotConfiguration();
 
 };

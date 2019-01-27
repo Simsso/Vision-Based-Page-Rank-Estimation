@@ -11,6 +11,7 @@
 #include "UrlLoadHandler.h"
 #include "UrlRenderHandler.h"
 #include "../../util/Logger.h"
+#include "UrlCollection.h"
 
 class UrlClient: public CefClient {
 private:
@@ -19,15 +20,14 @@ private:
     Logger* logger;
     CefRefPtr <CefLoadHandler> urlLoadHandler;
     CefRefPtr <CefRenderHandler> urlRenderHandler;
-    vector<Url*>* urls;
-    string * baseUrl;
+    UrlCollection* urlCollection;
 
 public:
     CefRefPtr<CefLoadHandler> GetLoadHandler() OVERRIDE;
     CefRefPtr<CefRenderHandler> GetRenderHandler() OVERRIDE;
     bool OnProcessMessageReceived(CefRefPtr<CefBrowser>, CefProcessId, CefRefPtr<CefProcessMessage>) OVERRIDE;
 
-    UrlClient(UrlLoadHandler*, UrlRenderHandler*, vector<Url*>*, string*);
+    UrlClient(UrlLoadHandler*, UrlRenderHandler*, UrlCollection*);
     UrlClient();
     ~UrlClient();
 };
