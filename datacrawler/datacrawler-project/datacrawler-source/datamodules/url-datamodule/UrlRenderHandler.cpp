@@ -12,7 +12,7 @@ UrlRenderHandler::UrlRenderHandler() {
 UrlRenderHandler::~UrlRenderHandler(){}
 
 void UrlRenderHandler::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect) {
-    rect = CefRect(0, 0, 1000, 1000);
+    rect = CefRect(0, 0, 10, 10);
 }
 
 void UrlRenderHandler::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects,

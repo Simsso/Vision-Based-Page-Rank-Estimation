@@ -36,7 +36,6 @@ void UrlDOMVisitor::Visit(CefRefPtr<CefDOMDocument> domDocument) {
     logger->info("Current visited base-URL is "+baseUrl);
 
     queue<CefRefPtr<CefDOMNode>> aQueue = traverseDOMTree(domDocument.get()->GetBody());
-    logger->info(std::to_string(aQueue.size()));
     filterURL(aQueue);
     shuffleURLs();
 

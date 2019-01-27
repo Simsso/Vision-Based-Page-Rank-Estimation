@@ -21,11 +21,12 @@ void UrlLoadHandler::OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFra
                                  CefLoadHandler::ErrorCode errorCode, const CefString &errorText,
                                  const CefString &failedUrl) {
 
-    if(errorCode == -27) // Skip ERROR_BLOCKED_BY_RESPONSE
+    if(errorCode == -27 || errorCode == -3) // Skip ERROR_BLOCKED_BY_RESPONSE, ERR_ABORTED
         return;
 
     failed = true;
     logger->info("Failed to load!");
+    logger->info(errorText.ToString()+" "+to_string(errorCode));
     CefRefPtr<CefProcessMessage> processMessage = CefProcessMessage::Create("LoadingFailed");
     processMessage.get()->GetArgumentList().get()->SetString(0, errorText);
     processMessage.get()->GetArgumentList().get()->SetString(1, failedUrl);

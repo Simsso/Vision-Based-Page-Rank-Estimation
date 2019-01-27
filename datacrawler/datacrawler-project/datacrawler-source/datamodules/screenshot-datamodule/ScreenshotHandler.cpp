@@ -3,9 +3,7 @@
 /**
  * ~ScreenshotHandler
  */
-ScreenshotHandler::~ScreenshotHandler() {
-    delete lastScreenshot;
-}
+ScreenshotHandler::~ScreenshotHandler() {}
 
 /**
  *
@@ -16,7 +14,7 @@ ScreenshotHandler::ScreenshotHandler(int renderHeight, int renderWidth) {
     this->renderHeight = renderHeight;
     this->renderWidth = renderWidth;
 
-    lastScreenshot = nullptr;
+    lastScreenshot = new unsigned char[renderHeight * renderWidth * 4];
 }
 
 /**
@@ -35,7 +33,6 @@ void ScreenshotHandler::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect
 void ScreenshotHandler::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects,
                                 const void *buffer, int width, int height) {
 
-    lastScreenshot = new unsigned char[height * width * 4];
     memcpy(lastScreenshot, buffer, sizeof(unsigned char) * height * width * 4);
 }
 
@@ -45,16 +42,5 @@ void ScreenshotHandler::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType 
  * @return Screenshot in size 4 Bytes * width of screenshot * height screenshot
  */
 unsigned char* ScreenshotHandler::getScreenshot(){
-
-    if(lastScreenshot == nullptr)
-        throw "Fatal: The lastScreenshot is null! Stopping datacrawler!";
-
-    auto* screenshot = new unsigned char[renderHeight * renderWidth * 4];
-
-    // copying, since lastScreenshot will be cleaned after destructor call
-    for(int i = 0; i < renderHeight * renderWidth * 4; i++){
-        *(screenshot + i) = *(lastScreenshot + i);
-    }
-
-    return screenshot;
+    return lastScreenshot;
 }

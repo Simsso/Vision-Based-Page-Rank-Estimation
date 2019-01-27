@@ -27,21 +27,28 @@ DataBase *UrlDataModule::process(std::string url) {
     logger->info("Runnning in UI thread!");
 
     UrlCollection * urlCollection = new UrlCollection();
+    size_t * totalSize = new size_t;
+    *totalSize = 0;
 
+    CefRefPtr<UrlResponseFilter> urlResponseFilter(new UrlResponseFilter(totalSize));
+    CefRefPtr<UrlRequestHandler> urlRequestHandler(new UrlRequestHandler(urlResponseFilter));
     CefRefPtr<UrlRenderHandler> urlRenderHandler(new UrlRenderHandler());
     CefRefPtr<UrlLoadHandler> urlLoadHandler(new UrlLoadHandler(url, numUrls));
-    CefRefPtr<UrlClient> urlClient(new UrlClient(urlLoadHandler, urlRenderHandler, urlCollection));
+    CefRefPtr<UrlClient> urlClient(new UrlClient(urlLoadHandler, urlRenderHandler, urlCollection, urlRequestHandler));
 
     CefWindowInfo cefWindowInfo;
     cefWindowInfo.SetAsWindowless(0);
 
     CefBrowserSettings browserSettings;
-    browserSettings.windowless_frame_rate = 60;
+    browserSettings.windowless_frame_rate = 300;
 
     CefRefPtr<CefBrowser> browser = CefBrowserHost::CreateBrowserSync(cefWindowInfo, urlClient.get(), url, browserSettings, NULL);
 
     CefRunMessageLoop();
 
+    urlCollection->setSize(*totalSize / 1024);
+
     browser->GetHost()->CloseBrowser(true);
+    delete totalSize;
     return urlCollection;
 }

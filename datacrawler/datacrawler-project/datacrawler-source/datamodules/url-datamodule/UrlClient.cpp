@@ -10,11 +10,12 @@ UrlClient::UrlClient() {
 
 UrlClient::~UrlClient() {}
 
-UrlClient::UrlClient(UrlLoadHandler* urlLoadHandler, UrlRenderHandler* urlRenderHandler, UrlCollection* urlCollection) {
+UrlClient::UrlClient(UrlLoadHandler* urlLoadHandler, UrlRenderHandler* urlRenderHandler, UrlCollection* urlCollection, UrlRequestHandler* urlRequestHandler) {
     logger = Logger::getInstance();
     this->urlLoadHandler = urlLoadHandler;
     this->urlRenderHandler = urlRenderHandler;
     this->urlCollection = urlCollection;
+    this->urlRequestHandler = urlRequestHandler;
 }
 
 CefRefPtr<CefLoadHandler> UrlClient::GetLoadHandler() {
@@ -23,6 +24,10 @@ CefRefPtr<CefLoadHandler> UrlClient::GetLoadHandler() {
 
 CefRefPtr<CefRenderHandler> UrlClient::GetRenderHandler(){
     return urlRenderHandler;
+}
+
+CefRefPtr<CefRequestHandler> UrlClient::GetRequestHandler(){
+    return urlRequestHandler;
 }
 
 bool UrlClient::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
@@ -56,7 +61,7 @@ bool UrlClient::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
             string tmpText = listText.get()->GetString(i);
 
             Url * tmp = new Url(tmpText, tmpUrl);
-            urlCollection->getUrls()->push_back(tmp);
+            urlCollection->addUrl(tmp);
         }
         logger->info("Running URL-Datamodule .. finished !");
 

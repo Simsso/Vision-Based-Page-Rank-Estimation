@@ -18,26 +18,28 @@ private:
     int httpResponseCode;
     std::string clientErrorText;
     int loadingTime;
+    size_t size;
 public:
-    int getLoadingTime() const;
+    size_t getSize() const;
+    void setSize(size_t size);
 
+    int getLoadingTime() const;
     void setLoadingTime(int loadingTime);
 
-public:
     const std::string &getClientErrorText() const;
-
     void setClientErrorText(const std::string &clientErrorText);
 
-public:
     int getHttpResponseCode() const;
+
     void setHttpResponseCode(int httpResponseCode);
+    std::string getBaseUrl();
     void setBaseUrl(const std::string &baseUrl);
     void setBaseUrlHttps(bool baseUrlHttps);
 
     DataModulesEnum getDataModuleType();
     void addUrl(Url*);
     std::vector<Url*>* getUrls();
-    std::string getBaseUrl();
+
     bool isHttps();
 
     UrlCollection();

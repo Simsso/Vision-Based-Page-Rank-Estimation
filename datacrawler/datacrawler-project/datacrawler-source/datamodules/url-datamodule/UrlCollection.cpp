@@ -63,3 +63,11 @@ void UrlCollection::setLoadingTime(int loadingTime) {
     UrlCollection::loadingTime = loadingTime;
 }
 
+size_t UrlCollection::getSize() const {
+    return size;
+}
+
+void UrlCollection::setSize(size_t size) {
+    UrlCollection::size = size;
+}
+

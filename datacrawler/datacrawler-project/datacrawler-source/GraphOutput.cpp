@@ -89,6 +89,8 @@ void GraphOutput::generateGraph() {
                 else
                     nodeJson["client_status"] = clientErrorText;
 
+                    nodeJson["size"] = urlCollection->getSize();
+
                 for(auto url : *urlCollection->getUrls()){
                     nlohmann::json tmp;
                     tmp["url_text"] = url->getUrlText();
