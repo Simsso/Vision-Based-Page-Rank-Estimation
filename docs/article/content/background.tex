@@ -3,6 +3,8 @@
 
 Methods, literature, related work (perhaps as a separate subsection)
 
+!!! name the other website ranking paper from 2006 somewhere
+
 Description of GCP, K8s, infrastructure background
 
 \subsection{Learning to Rank}
@@ -108,13 +110,12 @@ They extract the fixed-size information (true or false) from the graph network b
 \subsection{Screenshot Processing}
 \label{sec:screenshotprocessing}
 
-Screenshot definition
-Convolutional neural networks (CNNs) were originally inspired by the visual cortex of humans, see \cite{lecun:lenet}, and had their most notable breakthrough with the success of AlexNet (\cite{krizhevsky:imagenet}) in the domain of image classification. The convolutional layers are sliding kernels over two dimensions of the input while looking at all channels simultaneously. This concept allows for two-dimensional translation invariant feature extraction and has proven to be both effective and efficient. There is little work on the application of CNNs on screenshots, which can either be attributed to them handling screenshots just as fine as natural images or few applications.
+Convolutional neural networks (CNNs) were originally inspired by the visual cortex of humans, see \cite{lecun:lenet}, and had their most notable breakthrough with the success of AlexNet (\cite{krizhevsky:imagenet}) in the domain of image classification. The convolutional layers are sliding multiple kernels over two dimensions of the input while looking at all channels simultaneously. This concept allows for two-dimensional translation invariant feature extraction and has proven to be both effective and efficient.
 
-The closest to us is the work of \cite{beltramelli:pix2code}, who feeds screenshots into a CNN in order to extract structual information from them. He tries to convert screenshots of a user interface into code that describes that exact layout. In his setup, a CNN is combined with an LSTM: The former is responsible for the feature extraction whereas the latter converts the extracted features into a sequence layout descriptions.
+Most commonly, CNNs are applied to natual images, for instance pictures of animals taken in nature or car traffic scenes from a driver's point of view. Screenshots, i.e. images that show the content of a monitor, differ from natural images: Often they do not contain smooth transitions, do not feature a large color variety, and contain many equally colored areas such as white background. CNNs have been shown to have an inductive bias towards natural images, see e.g. \cite{deepimageprior} who exploit this bias in denoising, super-resolution, and inpainting problems. The question arises whether CNNs are also applicable to screenshots, which have different characteristics. There is little work that uses CNNs for screenshots processing, which can either be attributed to them handling screenshots just as fine as natural images or few applications.
 
-More specifically, he does not perform any pre-processing and feeds images of size $256\times 256$ into the model. The model consists of three convolutional blocks, each of which contains two convolutional layers with kernels of size $3\times 3$ and stride 1, followed by $2\times 2$ max-pooling and dropout with a probability of $p=0.25$. The third convolutional block is followed by two fully connected layers with $1024$ units each. Both regularized with $p=0.3$ dropout. The filter count for the convolutions is $32$, $64$, and $128$ for the three blocks respectively. 
+The closest to us is the work of \cite{beltramelli:pix2code}, who feeds screenshots into a CNN in order to extract structual information from them. He tries to convert screenshots of a user interface into code that describes that exact layout. In his setup, a CNN is combined with an LSTM: The former is responsible for the feature extraction, whereas the latter converts the extracted features into a sequence of layout descriptions.
+
+More specifically, he does not perform any pre-processing and feeds images of size $256\times 256$ into the model. The model consists of three convolutional blocks, each of which contains two convolutional layers with kernels of size $3\times 3$ and stride 1, followed by $2\times 2$ max-pooling and dropout with a probability of $p=0.25$. The third convolutional block is followed by two fully connected layers with $1024$ units each. Both regularized with $p=0.3$ dropout. The filter count for the convolutions is $32$, $64$, and $128$ for the three blocks, respectively.
 
 We choose to use CNNs as feature extractors for the website screenshots as well. Our baseline architecture is a slightly adjusted version of \cite{beltramelli:pix2code}, with more agressive pooling to make it work for screenshots with larger resolution.
-
-!!! name the other website ranking paper from 2006 somewhere
