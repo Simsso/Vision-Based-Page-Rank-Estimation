@@ -101,7 +101,9 @@ The functions are being evaluated in a specific sequence, visualized in Figure \
 Graph networks in related forms have been applied to a variety of different problems from different domains:
 \begin{itemize}
     \item \textbf{Social sciences}. \cite{graphnetsreddit} apply graph networks to post data from the social network Reddit. Like we do, \cite{graphnetscitationgraph} use convolutional graph networks. They run experiments on citation networks and on a knowledge graph dataset.
-    \item 
+    \item \textbf{Physics}. \cite{graphnetsphysicsengine} and \cite{graphnetsphysics2} train graph networks that focus on the modelling of physical relationships between objects.
+    \item \textbf{Medicine}. \cite{graphnetsproteininterface} consider the prediction of interfaces between proteins, a challenging problem with important applications in drug discovery and design.
+    \item \textbf{Algorithms}. See e.g. \cite{selsam:satsolver} and \cite{dai:graphnetscombinatorialalgo}.
 \end{itemize}
 
 Graph networks can be trained with stochastic gradient descent (SGD). \cite{selsam:satsolver} train a graph network on a boolean satisfiability task (SAT-solver) with a single bit of supervision, namely whether or not the statement is satisfiable. They thereby show that graph networks can be successfully trained on NP-complete tasks with very little supervision, namely just a single bit.
