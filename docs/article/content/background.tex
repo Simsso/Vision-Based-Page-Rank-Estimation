@@ -106,11 +106,9 @@ Graph networks in related forms have been applied to a variety of different prob
     \item \textbf{Algorithms}. See e.g. \cite{selsam:satsolver} and \cite{dai:graphnetscombinatorialalgo}.
 \end{itemize}
 
-Graph networks can be trained with stochastic gradient descent (SGD). \cite{selsam:satsolver} train a graph network on a boolean satisfiability task (SAT-solver) with a single bit of supervision, namely whether or not the statement is satisfiable. They thereby show that graph networks can be successfully trained on NP-complete tasks with very little supervision, namely just a single bit.
+Graph networks can be trained with stochastic gradient descent (SGD), since they are fully differentiable, if aggregation and attribute update functions are differentiable. \cite{selsam:satsolver} train a graph network on a boolean satisfiability task (SAT-solver) with a single bit of supervision, namely whether or not the statement is satisfiable. They thereby show that graph networks can be successfully trained on NP-complete tasks with very little supervision, namely just a single bit.
 
-They extract the fixed-size information (true or false) from the graph network by computing the mean of all nodes. This fits into \cite{deepmind:graphnets} Deep Mind's graph networks framework, since the output bit can be interpreted as a global state.
-
-!!! look into where set2vec fits into this section
+They extract the fixed-size information (true or false) from the graph network by computing the mean of all nodes. This fits into \cite{deepmind:graphnets} Deep Mind's graph networks framework, since the output bit can be interpreted as a global state. Depending on the application, a model's output might be a graph itself, in such cases, the last layer can be a GN block. !!! extend with set2vec and explain the problem on a more general level
 
 
 \subsection{Screenshot Processing}
