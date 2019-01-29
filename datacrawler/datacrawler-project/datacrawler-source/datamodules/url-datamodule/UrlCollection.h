@@ -36,7 +36,7 @@ public:
     void setBaseUrl(const std::string &baseUrl);
     void setBaseUrlHttps(bool baseUrlHttps);
 
-    DataModulesEnum getDataModuleType();
+    virtual DataModulesEnum getDataModuleType();
     void addUrl(Url*);
     std::vector<Url*>* getUrls();
 

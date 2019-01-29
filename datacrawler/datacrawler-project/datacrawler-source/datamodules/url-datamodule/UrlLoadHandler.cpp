@@ -7,10 +7,9 @@ UrlLoadHandler::UrlLoadHandler() {
     logger = Logger::getInstance();
 }
 
-UrlLoadHandler::UrlLoadHandler(string url, int numUrls) {
+UrlLoadHandler::UrlLoadHandler(string url) {
     logger = Logger::getInstance();
     this->url = url;
-    this->numUrls = numUrls;
     notified = false;
     failed = false;
 }
@@ -53,12 +52,11 @@ void UrlLoadHandler::OnLoadingStateChange(CefRefPtr<CefBrowser> browser,
 
         CefRefPtr<CefProcessMessage> processMessage = CefProcessMessage::Create("GetAllUrl");
         processMessage.get()->GetArgumentList().get()->SetString(0, url);
-        processMessage.get()->GetArgumentList().get()->SetInt(1, numUrls);
-        processMessage.get()->GetArgumentList().get()->SetInt(2, httpStatusCode);
+        processMessage.get()->GetArgumentList().get()->SetInt(1, httpStatusCode);
 
         std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
         int loadingTime = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - loadingStartTime).count();
-        processMessage.get()->GetArgumentList().get()->SetInt(3, loadingTime);
+        processMessage.get()->GetArgumentList().get()->SetInt(2, loadingTime);
 
         logger->info("Loaded in "+to_string(loadingTime)+"ms");
 

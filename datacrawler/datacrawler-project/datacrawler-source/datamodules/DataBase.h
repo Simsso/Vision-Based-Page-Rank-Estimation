@@ -7,7 +7,7 @@
 class DataBase {
 
 public:
-    virtual DataModulesEnum getDataModuleType();
+    virtual DataModulesEnum getDataModuleType() = 0;
     virtual ~DataBase();
 };
 

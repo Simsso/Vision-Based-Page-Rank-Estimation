@@ -14,7 +14,6 @@ private:
     IMPLEMENT_REFCOUNTING(UrlLoadHandler)
     Logger* logger;
     string url;
-    int numUrls;
     bool notified;
     bool failed;
     bool stoppedLoadingStartTime;
@@ -26,7 +25,7 @@ public:
     void OnLoadEnd(CefRefPtr<CefBrowser>, CefRefPtr<CefFrame>, int) OVERRIDE;
     void OnLoadStart(CefRefPtr<CefBrowser> , CefRefPtr<CefFrame> , CefLoadHandler::TransitionType ) OVERRIDE;
     void OnLoadingStateChange(CefRefPtr<CefBrowser>, bool, bool, bool) OVERRIDE;
-    UrlLoadHandler(string, int);
+    UrlLoadHandler(string);
     UrlLoadHandler();
     ~UrlLoadHandler() OVERRIDE;
 };

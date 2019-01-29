@@ -3,37 +3,29 @@
   "DATAMODULES": [
     {
       "DATAMODULE": "SCREENSHOT_MODULE",
-      "DISABLED": false,
+      "DISABLED": true,
       "ATTRIBUTES":
-        {
-          "ONPAINT_TIMEOUT": 10,
-          "ELAPSED_TIME_ONPAINT_TIMEOUT": 4000,
-          "CHANGE_THRESHOLD": 0.01,
-          "LAST_SCREENSHOTS": 20,
-          "HEIGHT": 1080,
-          "WIDTH": 1920
-        }
+      {
+        "ONPAINT_TIMEOUT": 3,
+        "ELAPSED_TIME_ONPAINT_TIMEOUT": 25,
+        "HEIGHT": 1080,
+        "WIDTH": 1920
+      }
     },
     {
       "DATAMODULE": "SCREENSHOT_MOBILE_MODULE",
-      "DISABLED": false,
+      "DISABLED": true,
       "ATTRIBUTES":
-        {
-          "ONPAINT_TIMEOUT": 10,
-          "ELAPSED_TIME_ONPAINT_TIMEOUT": 4000,
-          "CHANGE_THRESHOLD": 0.01,
-          "LAST_SCREENSHOTS": 20,
-          "HEIGHT": 667,
-          "WIDTH": 375
-        }
+      {
+        "ONPAINT_TIMEOUT": 3,
+        "ELAPSED_TIME_ONPAINT_TIMEOUT": 25,
+        "HEIGHT": 667,
+        "WIDTH": 375
+      }
     },
     {
       "DATAMODULE": "URL_MODULE",
-      "DISABLED": false,
-      "ATTRIBUTES":
-      {
-          "NUM_URLS" : 5
-      }
+      "DISABLED": false
     }
   ]
 }

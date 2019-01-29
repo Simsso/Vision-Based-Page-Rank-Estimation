@@ -5,11 +5,6 @@
 #include "UrlDataModule.h"
 
 UrlDataModule::UrlDataModule() {
-    this->numUrls = 10;
-}
-
-UrlDataModule::UrlDataModule(int numUrls) {
-    this->numUrls = numUrls;
 }
 
 UrlDataModule::~UrlDataModule() {
@@ -26,14 +21,13 @@ DataBase *UrlDataModule::process(std::string url) {
 
     logger->info("Runnning in UI thread!");
 
-    UrlCollection * urlCollection = new UrlCollection();
-    size_t * totalSize = new size_t;
-    *totalSize = 0;
+    UrlCollection * urlCollection = new UrlCollection;
+    std::unique_ptr<size_t> totalSize(new size_t(0));
 
-    CefRefPtr<UrlResponseFilter> urlResponseFilter(new UrlResponseFilter(totalSize));
+    CefRefPtr<UrlResponseFilter> urlResponseFilter(new UrlResponseFilter(totalSize.get()));
     CefRefPtr<UrlRequestHandler> urlRequestHandler(new UrlRequestHandler(urlResponseFilter));
     CefRefPtr<UrlRenderHandler> urlRenderHandler(new UrlRenderHandler());
-    CefRefPtr<UrlLoadHandler> urlLoadHandler(new UrlLoadHandler(url, numUrls));
+    CefRefPtr<UrlLoadHandler> urlLoadHandler(new UrlLoadHandler(url));
     CefRefPtr<UrlClient> urlClient(new UrlClient(urlLoadHandler, urlRenderHandler, urlCollection, urlRequestHandler));
 
     CefWindowInfo cefWindowInfo;
@@ -49,6 +43,6 @@ DataBase *UrlDataModule::process(std::string url) {
     urlCollection->setSize(*totalSize / 1024);
 
     browser->GetHost()->CloseBrowser(true);
-    delete totalSize;
+
     return urlCollection;
 }

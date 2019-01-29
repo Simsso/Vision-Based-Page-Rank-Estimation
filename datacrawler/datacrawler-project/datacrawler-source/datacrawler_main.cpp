@@ -31,16 +31,25 @@ int main(int argc, char *argv[]) {
 
     Datacrawler datacrawler;
     datacrawler.init();
-    map<string, NodeElement*> * graph;
-    GraphOutput* graphOutput;
 
-    graph = datacrawler.process("youtube.com");
-    graphOutput = new GraphOutput(graph, "2");
-    graphOutput->generateGraph();
+    string domains[] { "https://www.google.com/calendar?tab=wc" , "facebook.com", "samedguener.com", "timodenk.com", "dhbw.de", "sap.com" };
 
-    delete graph;
-    delete graphOutput;
+    std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
 
+    for(auto x: domains){
+        map<string, NodeElement*> * graph;
+        GraphOutput* graphOutput;
+
+        graph = datacrawler.process(x);
+        graphOutput = new GraphOutput(graph, "1");
+        graphOutput->generateGraph();
+
+        delete graph;
+        delete graphOutput;
+    }
+
+    long delta = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - start).count();
+    logger->info("It took:"+ std::to_string(delta/6));
     logger->info("Datacrawler execution finished!");
     CefShutdown();
 }

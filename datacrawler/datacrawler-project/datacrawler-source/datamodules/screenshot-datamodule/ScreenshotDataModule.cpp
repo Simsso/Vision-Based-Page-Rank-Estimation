@@ -48,13 +48,10 @@ DataBase *ScreenshotDataModule::process(std::string url) {
 
     logger->info("Runnning in UI thread!");
 
-    bool * quitMessageLoop = new bool;
-    bool * browserFinishedLoading = new bool;
+    std::unique_ptr<bool> quitMessageLoop(new bool(false));
+    std::unique_ptr<bool> browserFinishedLoading(new bool(false));
 
-    *browserFinishedLoading = false;
-    *quitMessageLoop = false;
-
-    CefRefPtr<ScreenshotLoadhandler> screenshotLoadhandler(new ScreenshotLoadhandler(browserFinishedLoading));
+    CefRefPtr<ScreenshotLoadhandler> screenshotLoadhandler(new ScreenshotLoadhandler(browserFinishedLoading.get()));
     CefRefPtr<ScreenshotRequestHandler> screenshotRequestHandler(new ScreenshotRequestHandler(map));
     CefRefPtr<ScreenshotHandler> screenshotHandler(new ScreenshotHandler(height, width));
     CefRefPtr<ScreenshotClient> screenshotClient(new ScreenshotClient(screenshotHandler, screenshotRequestHandler, screenshotLoadhandler));
@@ -117,8 +114,6 @@ DataBase *ScreenshotDataModule::process(std::string url) {
     timeout.join();
 
     logger->info("Running Screenshot-DataModule .. finished !");
-
-    delete quitMessageLoop;
 
     browser->GetHost()->CloseBrowser(true);
 

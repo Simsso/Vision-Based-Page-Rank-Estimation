@@ -39,10 +39,14 @@ void GraphOutput::generateGraph() {
                 try {
                     std::vector<int> params;
                     params.push_back(CV_IMWRITE_JPEG_QUALITY);
-                    params.push_back(75);
+                    params.push_back(70);
 
                     cv::Mat newImg = cv::Mat(screenshot->getHeight(), screenshot->getWidth(), CV_8UC4, screenshot->getScreenshot());
-                    cv::resize(newImg, newImg,cv::Size(screenshot->getWidth()/4, screenshot->getHeight()/4), 0, 0, CV_INTER_LINEAR);
+                    if(entry->getDataModuleType() == SCREENSHOT_MODULE)
+                        cv::resize(newImg, newImg,cv::Size(screenshot->getWidth()/4, screenshot->getHeight()/4), 0, 0, CV_INTER_LINEAR);
+                    else
+                        cv::resize(newImg, newImg,cv::Size(screenshot->getWidth()/2, screenshot->getHeight()/2), 0, 0, CV_INTER_LINEAR);
+
 
                     std::string imgPath;
                     std::string fileName;

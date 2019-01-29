@@ -9,14 +9,10 @@
 #include "../datamodules/url-datamodule/UrlDataModule.h"
 
 class UrlConfiguration: public DataModuleBaseConfiguration {
-private:
-    int numUrls;
-
 public:
     DataModuleBase* createInstance();
 
     UrlConfiguration();
-    UrlConfiguration(int);
     ~UrlConfiguration();
 };
 

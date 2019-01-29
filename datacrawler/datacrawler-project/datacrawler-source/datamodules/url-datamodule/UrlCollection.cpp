@@ -13,7 +13,7 @@ UrlCollection::UrlCollection() {
 }
 
 UrlCollection::~UrlCollection() {
-    for(auto x: *urls){
+    for(Url* x: *urls){
         delete x;
     }
     delete urls;

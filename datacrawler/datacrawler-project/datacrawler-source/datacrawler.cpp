@@ -51,14 +51,15 @@ map<string, NodeElement*>* Datacrawler::process(string url) {
     graph = new map<std::string, NodeElement*>;
     NodeElement * startNode = new NodeElement(true);
     UrlCollection * startNodeUrlCollection = nullptr;
+    int tmpNumNodes = numNodes;
 
-    for (auto x: dataModules) {
+    for (DataModuleBase* x: dataModules) {
         startNode->addData(x->process(url));
     }
 
     logger->info("<" + url + "> processed!");
 
-    for (auto x: *startNode->getData()) {
+    for (DataBase* x: *startNode->getData()) {
         // get base url of starting node, which is different from domain name
         if (x->getDataModuleType() == URL_MODULE)
             startNodeUrlCollection = (UrlCollection*) x;
@@ -97,7 +98,7 @@ map<string, NodeElement*>* Datacrawler::process(string url) {
    for(auto node : *graph){
       auto nodeData = node.second->getData();
 
-      for(auto entry : *nodeData){
+      for(DataBase* entry : *nodeData){
           if(entry->getDataModuleType() != URL_MODULE)
               continue;
 
@@ -111,16 +112,16 @@ map<string, NodeElement*>* Datacrawler::process(string url) {
         auto nodeData = node.second->getData();
         logger->info("node: "+ node.first);
 
-        for(auto entry : *nodeData){
+        for(DataBase* entry : *nodeData){
             if(entry->getDataModuleType() != URL_MODULE)
                 continue;
 
             vector<Url*> * urls = ((UrlCollection*)entry)->getUrls();
-            for(auto url : *urls)
+            for(Url* url : *urls)
                 logger->info("---> "+url->getUrl());
         }
     }
-
+    numNodes = tmpNumNodes;
     return graph;
 }
 
@@ -129,12 +130,12 @@ vector<pair<string, NodeElement*>> Datacrawler::buildNodes(NodeElement* startNod
     NodeElement *newNode;
     vector<pair<string,NodeElement*>> newNodes;
 
-    for (auto x: *startNode->getData()) {
-        if (x->getDataModuleType() == URL_MODULE)
+    for (DataBase * x: *startNode->getData()) {
+       if (x->getDataModuleType() == URL_MODULE)
             urlCollection = (UrlCollection *) x;
     }
 
-    for (auto edge : *urlCollection->getUrls()) {
+    for (Url* edge : *urlCollection->getUrls()) {
         string edgeUrl = edge->getUrl();
 
         // check if exists in the graph
@@ -148,7 +149,7 @@ vector<pair<string, NodeElement*>> Datacrawler::buildNodes(NodeElement* startNod
         newNode = new NodeElement(false);
 
         // calculate new node
-        for (auto x: dataModules) {
+        for (DataModuleBase* x: dataModules) {
             newNode->addData(x->process(edgeUrl));
         }
 

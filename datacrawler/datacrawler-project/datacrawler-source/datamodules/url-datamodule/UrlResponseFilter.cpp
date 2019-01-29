@@ -24,25 +24,27 @@ CefResponseFilter::FilterStatus UrlResponseFilter::Filter(void* data_in,
 
     *totalSize += data_in_size;
 
-    if (data_in == null || dataIn.Length == 0)
-    {
-        dataInRead = 0;
-        dataOutWritten = 0;
+  if (data_in == NULL) {
+        data_in_read = 0;
+        data_out_written = 0;
 
-        return FilterStatus.Done;
-    }
-
-    if(data_out_size >= data_in_size){
-        memcpy(data_out, data_in, data_in_size);
-        data_in_read = data_in_size;
-        data_out_written = data_in_size;
         return RESPONSE_FILTER_DONE;
     }
 
+    //Calculate how much data we can read, in some instances dataIn.Length is
+    //greater than dataOut.Length
+    data_in_read = std::min(data_in_size, data_out_size);
+    data_out_written = data_in_read;
 
-    memcpy(data_out, data_in, data_out_size);
-    data_in_read = data_out_size;
-    data_out_written = data_out_size;
+    // write data out
+    memcpy(data_out, data_in, data_in_read);
 
-    return RESPONSE_FILTER_NEED_MORE_DATA;
+    //If we read less than the total amount avaliable then we need
+    //return FilterStatus.NeedMoreData so we can then write the rest
+    if (data_in_read < data_in_size)
+    {
+        return RESPONSE_FILTER_NEED_MORE_DATA;
+    }
+
+    return RESPONSE_FILTER_DONE;
 }

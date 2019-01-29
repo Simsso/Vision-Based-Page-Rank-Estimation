@@ -25,7 +25,6 @@ private:
     string baseUrl;
     string baseUrlDomainOnly;
 
-    int numUrls;
     vector<pair<string,string>>& validUrls;
     map<string, string> validUrlMap;
 
@@ -36,7 +35,7 @@ private:
 public:
     void Visit(CefRefPtr<CefDOMDocument>) OVERRIDE;
 
-    UrlDOMVisitor(vector<pair<string,string>>&, string, int);
+    UrlDOMVisitor(vector<pair<string,string>>&, string);
     ~UrlDOMVisitor();
 };
 

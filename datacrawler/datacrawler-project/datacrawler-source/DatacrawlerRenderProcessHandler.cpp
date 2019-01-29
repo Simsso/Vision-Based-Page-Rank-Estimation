@@ -2,6 +2,7 @@
 // Created by doktorgibson on 1/13/19.
 //
 
+#include <thread>
 #include "DatacrawlerRenderProcessHandler.h"
 
 DatacrawlerRenderProcessHandler::DatacrawlerRenderProcessHandler(){
@@ -18,13 +19,13 @@ bool DatacrawlerRenderProcessHandler::OnProcessMessageReceived(CefRefPtr<CefBrow
     if(message.get()->GetName() == "GetAllUrl") {
 
         logger->info("RenderProcessHandler received event from URL-Datamodule!");
+
         vector<pair<string, string>> urls;
         string url = message.get()->GetArgumentList().get()->GetString(0);
-        int numUrls = message.get()->GetArgumentList().get()->GetInt(1);
-        int httpResponseCode = message.get()->GetArgumentList().get()->GetInt(2);
-        int loadingTime = message.get()->GetArgumentList().get()->GetInt(3);
+        int httpResponseCode = message.get()->GetArgumentList().get()->GetInt(1);
+        int loadingTime = message.get()->GetArgumentList().get()->GetInt(2);
 
-        CefRefPtr<UrlDOMVisitor> urlDOMVisitor(new UrlDOMVisitor(urls, url, numUrls));
+        CefRefPtr<UrlDOMVisitor> urlDOMVisitor(new UrlDOMVisitor(urls, url));
         CefRefPtr<CefFrame> mainFrame = browser.get()->GetMainFrame();
 
         // delegate parsing to UrlDomVisitor

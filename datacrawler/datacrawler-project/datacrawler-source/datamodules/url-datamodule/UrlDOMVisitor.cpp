@@ -5,9 +5,8 @@
 #include <chrono>
 #include "UrlDOMVisitor.h"
 
-UrlDOMVisitor::UrlDOMVisitor(vector<pair<string,string>>& urls, string url, int numUrls) : validUrls(urls){
+UrlDOMVisitor::UrlDOMVisitor(vector<pair<string,string>>& urls, string url) : validUrls(urls){
     logger = Logger::getInstance();
-    this->numUrls = numUrls;
     this->url = url;
 }
 
@@ -23,7 +22,7 @@ void UrlDOMVisitor::Visit(CefRefPtr<CefDOMDocument> domDocument) {
     regex regex_baseUrl("^(https|http)://[a-zA-Z-0-9.-]*");
     regex regex_domainName("[a-zA-Z-0-9.-]*$");
 
-    if(!regex_search(baseUrl, match, regex_baseUrl))
+   if(!regex_search(baseUrl, match, regex_baseUrl))
         return;
 
     baseUrl = match[0];
@@ -38,13 +37,6 @@ void UrlDOMVisitor::Visit(CefRefPtr<CefDOMDocument> domDocument) {
     queue<CefRefPtr<CefDOMNode>> aQueue = traverseDOMTree(domDocument.get()->GetBody());
     filterURL(aQueue);
     shuffleURLs();
-
-    int numRemove = 0;
-    if(numUrls <= (int)validUrls.size())
-        numRemove = abs(numUrls - (int)validUrls.size());
-
-    for(int i = 0; i < numRemove; i++)
-        validUrls.pop_back();
 
     logger->info("Returning "+to_string(validUrls.size())+" URLs !");
 }
@@ -65,18 +57,26 @@ queue<CefRefPtr<CefDOMNode>> UrlDOMVisitor::traverseDOMTree(CefRefPtr<CefDOMNode
             CefRefPtr<CefDOMNode> tmp = currentNode.get()->GetFirstChild().get();
             nodeQueue.push(tmp);
 
+            if (tmp.get()->IsElement()) {
+                if (tmp.get()->GetElementTagName() == "A"){
+                    aQueue.push(tmp);
+                }
+            }
+
             while (tmp.get()->GetNextSibling().get() != NULL) {
                 tmp = tmp.get()->GetNextSibling().get();
                 nodeQueue.push(tmp);
 
-                if (tmp.get()->IsElement())
-                    if (tmp.get()->GetElementTagName() == "A")
+                if (tmp.get()->IsElement()) {
+                    if (tmp.get()->GetElementTagName() == "A"){
                         aQueue.push(tmp);
+                    }
+                }
             }
         }
         nodeQueue.pop();
     }
-
+    logger->info(to_string(aQueue.size()));
     return aQueue;
 }
 
@@ -128,8 +128,10 @@ void UrlDOMVisitor::shuffleURLs(){
 
     unsigned seed = chrono::system_clock::now().time_since_epoch().count();
 
-    for (auto x : validUrlMap)
+    for (auto x : validUrlMap){
         validUrls.push_back(make_pair(x.first, x.second));
+        logger->info(x.first);
+    }
 
     shuffle(validUrls.begin(), validUrls.end(), default_random_engine(seed));
 }
