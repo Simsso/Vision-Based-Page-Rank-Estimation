@@ -76,7 +76,6 @@ queue<CefRefPtr<CefDOMNode>> UrlDOMVisitor::traverseDOMTree(CefRefPtr<CefDOMNode
         }
         nodeQueue.pop();
     }
-    logger->info(to_string(aQueue.size()));
     return aQueue;
 }
 
@@ -130,7 +129,6 @@ void UrlDOMVisitor::shuffleURLs(){
 
     for (auto x : validUrlMap){
         validUrls.push_back(make_pair(x.first, x.second));
-        logger->info(x.first);
     }
 
     shuffle(validUrls.begin(), validUrls.end(), default_random_engine(seed));

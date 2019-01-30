@@ -10,12 +10,14 @@ UrlClient::UrlClient() {
 
 UrlClient::~UrlClient() {}
 
-UrlClient::UrlClient(UrlLoadHandler* urlLoadHandler, UrlRenderHandler* urlRenderHandler, UrlCollection* urlCollection, UrlRequestHandler* urlRequestHandler) {
+UrlClient::UrlClient(string url, UrlCollection* urlCollection, string& title, size_t& totalSize) {
     logger = Logger::getInstance();
-    this->urlLoadHandler = urlLoadHandler;
-    this->urlRenderHandler = urlRenderHandler;
+    urlDisplayHandler =new UrlDisplayHandler(title);
+    urlResponseFilter = new UrlResponseFilter(totalSize);
+    urlRequestHandler = new UrlRequestHandler(urlResponseFilter);
+    urlRenderHandler = new UrlRenderHandler();
+    urlLoadHandler = new UrlLoadHandler(url);
     this->urlCollection = urlCollection;
-    this->urlRequestHandler = urlRequestHandler;
 }
 
 CefRefPtr<CefLoadHandler> UrlClient::GetLoadHandler() {
@@ -28,6 +30,10 @@ CefRefPtr<CefRenderHandler> UrlClient::GetRenderHandler(){
 
 CefRefPtr<CefRequestHandler> UrlClient::GetRequestHandler(){
     return urlRequestHandler;
+}
+
+CefRefPtr<CefDisplayHandler> UrlClient::GetDisplayHandler(){
+    return urlDisplayHandler;
 }
 
 bool UrlClient::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
@@ -60,8 +66,7 @@ bool UrlClient::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
             string tmpUrl = listUrls.get()->GetString(i);
             string tmpText = listText.get()->GetString(i);
 
-            Url * tmp = new Url(tmpText, tmpUrl);
-            urlCollection->addUrl(tmp);
+            urlCollection->addUrl(tmpText, tmpUrl);
         }
         logger->info("Running URL-Datamodule .. finished !");
 

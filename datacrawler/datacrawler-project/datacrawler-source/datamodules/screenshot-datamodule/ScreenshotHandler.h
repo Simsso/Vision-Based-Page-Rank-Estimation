@@ -20,6 +20,8 @@ private:
     int renderHeight;
     int renderWidth;
     unsigned char* lastScreenshot;
+    bool * quitMessageLoop;
+
 
 public:
     void GetViewRect(CefRefPtr<CefBrowser> , CefRect &) OVERRIDE;
@@ -27,7 +29,7 @@ public:
 
     unsigned char* getScreenshot();
 
-    ScreenshotHandler(int, int);
+    ScreenshotHandler(int, int, bool*);
     ~ScreenshotHandler() OVERRIDE;
 };
 

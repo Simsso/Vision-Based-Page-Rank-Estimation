@@ -18,7 +18,7 @@ private:
 public:
     CefRefPtr<CefResponseFilter> GetResourceResponseFilter( CefRefPtr<CefBrowser>, CefRefPtr<CefFrame>, CefRefPtr<CefRequest>, CefRefPtr<CefResponse>) OVERRIDE;
 
-    UrlRequestHandler(UrlResponseFilter*);
+    UrlRequestHandler(CefResponseFilter*);
     ~UrlRequestHandler();
 };
 

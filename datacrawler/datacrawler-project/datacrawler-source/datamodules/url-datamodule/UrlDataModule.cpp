@@ -22,26 +22,23 @@ DataBase *UrlDataModule::process(std::string url) {
     logger->info("Runnning in UI thread!");
 
     UrlCollection * urlCollection = new UrlCollection;
-    std::unique_ptr<size_t> totalSize(new size_t(0));
+    size_t totalSize = 0;
+    string title = "";
 
-    CefRefPtr<UrlResponseFilter> urlResponseFilter(new UrlResponseFilter(totalSize.get()));
-    CefRefPtr<UrlRequestHandler> urlRequestHandler(new UrlRequestHandler(urlResponseFilter));
-    CefRefPtr<UrlRenderHandler> urlRenderHandler(new UrlRenderHandler());
-    CefRefPtr<UrlLoadHandler> urlLoadHandler(new UrlLoadHandler(url));
-    CefRefPtr<UrlClient> urlClient(new UrlClient(urlLoadHandler, urlRenderHandler, urlCollection, urlRequestHandler));
+    CefRefPtr<UrlClient> urlClient(new UrlClient(url, urlCollection, title, totalSize));
 
     CefWindowInfo cefWindowInfo;
     cefWindowInfo.SetAsWindowless(0);
 
     CefBrowserSettings browserSettings;
-    browserSettings.windowless_frame_rate = 300;
+    browserSettings.windowless_frame_rate = 1;
 
     CefRefPtr<CefBrowser> browser = CefBrowserHost::CreateBrowserSync(cefWindowInfo, urlClient.get(), url, browserSettings, NULL);
 
     CefRunMessageLoop();
 
-    urlCollection->setSize(*totalSize / 1024);
-
+    urlCollection->setSize(totalSize / 1024);
+    urlCollection->setTitle(title);
     browser->GetHost()->CloseBrowser(true);
 
     return urlCollection;

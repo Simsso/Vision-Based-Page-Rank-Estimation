@@ -59,9 +59,9 @@ map<string, NodeElement*>* Datacrawler::process(string url) {
 
     logger->info("<" + url + "> processed!");
 
-    for (DataBase* x: *startNode->getData()) {
+    for (DataBase* x: startNode->getData()) {
         // get base url of starting node, which is different from domain name
-        if (x->getDataModuleType() == URL_MODULE)
+        if (x->getDataModules() == URL_MODULE)
             startNodeUrlCollection = (UrlCollection*) x;
     }
 
@@ -98,31 +98,18 @@ map<string, NodeElement*>* Datacrawler::process(string url) {
    for(auto node : *graph){
       auto nodeData = node.second->getData();
 
-      for(DataBase* entry : *nodeData){
-          if(entry->getDataModuleType() != URL_MODULE)
+      for(DataBase* entry : nodeData){
+          if(entry->getDataModules() != URL_MODULE)
               continue;
-
-          vector<Url*> * urls = ((UrlCollection*)entry)->getUrls();
+          UrlCollection * urlCollection = (UrlCollection*)entry;
+          list<Url> * urls = urlCollection->getUrls();
           urls->erase(std::remove_if(urls->begin(), urls->end(),
-                                 [&](Url* url) { return (graph->find(url->getUrl()) == graph->end()); }), urls->end());
+                                 [&](Url url) { return (graph->find(url.getUrl()) == graph->end()); }), urls->end());
       }
    }
 
-    for(auto node : *graph){
-        auto nodeData = node.second->getData();
-        logger->info("node: "+ node.first);
-
-        for(DataBase* entry : *nodeData){
-            if(entry->getDataModuleType() != URL_MODULE)
-                continue;
-
-            vector<Url*> * urls = ((UrlCollection*)entry)->getUrls();
-            for(Url* url : *urls)
-                logger->info("---> "+url->getUrl());
-        }
-    }
-    numNodes = tmpNumNodes;
-    return graph;
+   numNodes = tmpNumNodes;
+   return graph;
 }
 
 vector<pair<string, NodeElement*>> Datacrawler::buildNodes(NodeElement* startNode) {
@@ -130,13 +117,14 @@ vector<pair<string, NodeElement*>> Datacrawler::buildNodes(NodeElement* startNod
     NodeElement *newNode;
     vector<pair<string,NodeElement*>> newNodes;
 
-    for (DataBase * x: *startNode->getData()) {
-       if (x->getDataModuleType() == URL_MODULE)
+    for (DataBase * x: startNode->getData()) {
+       if (x->getDataModules() == URL_MODULE)
             urlCollection = (UrlCollection *) x;
     }
 
-    for (Url* edge : *urlCollection->getUrls()) {
-        string edgeUrl = edge->getUrl();
+    list<Url>* urls = urlCollection->getUrls();
+    for (Url edge : *urls) {
+        string edgeUrl = edge.getUrl();
 
         // check if exists in the graph
         if(graph->find(edgeUrl) != graph->end())

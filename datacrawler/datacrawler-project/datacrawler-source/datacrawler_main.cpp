@@ -32,24 +32,28 @@ int main(int argc, char *argv[]) {
     Datacrawler datacrawler;
     datacrawler.init();
 
-    string domains[] { "https://www.google.com/calendar?tab=wc" , "facebook.com", "samedguener.com", "timodenk.com", "dhbw.de", "sap.com" };
+    string domains[] { /*"https://www.google.com/" , "facebook.com", "samedguener.com", "timodenk.com", "dhbw.de", "sap.com", "youtube.com", "nationalgeographic.com", */"twitter.com", "tagesschau.de", "cnn.com.tr", "yandex.com", "xnxx.com" };
 
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-
+    int i = 1;
     for(auto x: domains){
         map<string, NodeElement*> * graph;
         GraphOutput* graphOutput;
 
         graph = datacrawler.process(x);
-        graphOutput = new GraphOutput(graph, "1");
+        graphOutput = new GraphOutput(graph, to_string(i));
         graphOutput->generateGraph();
+
+        for(auto x: *graph)
+            delete x.second;
 
         delete graph;
         delete graphOutput;
+        ++i;
     }
 
     long delta = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - start).count();
-    logger->info("It took:"+ std::to_string(delta/6));
+    logger->info("It took:"+ std::to_string(delta/i));
     logger->info("Datacrawler execution finished!");
     CefShutdown();
 }

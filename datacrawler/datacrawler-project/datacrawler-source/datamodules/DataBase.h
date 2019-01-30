@@ -3,11 +3,15 @@
 
 
 #include "../DataModulesEnum.h"
+#include "url-datamodule/Url.h"
+#include <vector>
 
 class DataBase {
+protected:
+    DataModulesEnum dataModulesEnum;
 
 public:
-    virtual DataModulesEnum getDataModuleType() = 0;
+    virtual DataModulesEnum getDataModules() = 0;
     virtual ~DataBase();
 };
 

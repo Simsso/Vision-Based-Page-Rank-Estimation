@@ -26,15 +26,15 @@ void GraphOutput::generateGraph() {
 
     int nodeNum = 1;
     for(auto node : *graph){
-        auto nodeData = node.second->getData();
+        std::list<DataBase*> nodeData = node.second->getData();
 
         nlohmann::json nodeJson;
         nodeJson["id"] = nodeNum;
         nodeJson["startNode"] = node.second->isStartNode();
 
-        for(auto entry : *nodeData){
-            if(entry->getDataModuleType() == SCREENSHOT_MODULE || entry->getDataModuleType() == SCREENSHOT_MOBILE_MODULE){
-                auto screenshot = (Screenshot*) entry;
+        for(DataBase * entry : nodeData){
+            if(entry->getDataModules() == SCREENSHOT_MODULE || entry->getDataModules() == SCREENSHOT_MOBILE_MODULE){
+                Screenshot* screenshot = (Screenshot*) entry;
 
                 try {
                     std::vector<int> params;
@@ -42,7 +42,7 @@ void GraphOutput::generateGraph() {
                     params.push_back(70);
 
                     cv::Mat newImg = cv::Mat(screenshot->getHeight(), screenshot->getWidth(), CV_8UC4, screenshot->getScreenshot());
-                    if(entry->getDataModuleType() == SCREENSHOT_MODULE)
+                    if(entry->getDataModules() == SCREENSHOT_MODULE)
                         cv::resize(newImg, newImg,cv::Size(screenshot->getWidth()/4, screenshot->getHeight()/4), 0, 0, CV_INTER_LINEAR);
                     else
                         cv::resize(newImg, newImg,cv::Size(screenshot->getWidth()/2, screenshot->getHeight()/2), 0, 0, CV_INTER_LINEAR);
@@ -51,7 +51,7 @@ void GraphOutput::generateGraph() {
                     std::string imgPath;
                     std::string fileName;
 
-                    if(entry->getDataModuleType() == SCREENSHOT_MOBILE_MODULE) {
+                    if(entry->getDataModules() == SCREENSHOT_MOBILE_MODULE) {
                         fileName = std::to_string(nodeNum) + "_mobile.jpg";
                         nodeJson["mobile_screenshot_filename"] = fileName;
                     } else {
@@ -67,7 +67,7 @@ void GraphOutput::generateGraph() {
                 } catch(std::runtime_error& ex) {
                     fprintf(stderr, "Exception while converting taking picture of the website in JPG format: %s", ex.what());
                 }
-            } else if (entry->getDataModuleType() == URL_MODULE){
+            } else if (entry->getDataModules() == URL_MODULE){
                 UrlCollection* urlCollection = (UrlCollection*) entry;
 
                 nodeJson["base_url"] = urlCollection->getBaseUrl();
@@ -93,12 +93,13 @@ void GraphOutput::generateGraph() {
                 else
                     nodeJson["client_status"] = clientErrorText;
 
-                    nodeJson["size"] = urlCollection->getSize();
+                nodeJson["size"] = urlCollection->getSize();
+                nodeJson["title"] = urlCollection->getTitle();
 
-                for(auto url : *urlCollection->getUrls()){
+                for(Url url : *urlCollection->getUrls()){
                     nlohmann::json tmp;
-                    tmp["url_text"] = url->getUrlText();
-                    tmp["url"] = url->getUrl();
+                    tmp["url_text"] = url.getUrlText();
+                    tmp["url"] = url.getUrl();
                     nodeJson["urls"].push_back(tmp);
                 }
 

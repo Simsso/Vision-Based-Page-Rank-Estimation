@@ -5,41 +5,40 @@
 #include "UrlCollection.h"
 
 UrlCollection::UrlCollection() {
-    this->urls = new std::vector<Url*>;
+    this->urls = new std::list<Url>;
     this->httpResponseCode = -1;
     this->baseUrlHttps = false;
     this->clientErrorText = "null";
     this->loadingTime = -1;
 }
 
+DataModulesEnum UrlCollection::getDataModules()  {
+    return URL_MODULE;
+}
+
+
 UrlCollection::~UrlCollection() {
-    for(Url* x: *urls){
-        delete x;
-    }
     delete urls;
 }
 
 std::string UrlCollection::getBaseUrl() { return baseUrl;}
 
-DataModulesEnum UrlCollection::getDataModuleType() {
-    return URL_MODULE;
+void UrlCollection::addUrl(std::string urlText, std::string url) {
+    Url tmpUrl(urlText, url);
+    urls->push_back(tmpUrl);
 }
 
-void UrlCollection::addUrl(Url* url) {
-    urls->push_back(url);
-}
-
-std::vector<Url*>* UrlCollection::getUrls(){ return urls; }
+std::list<Url>* UrlCollection::getUrls(){ return urls; }
 
 bool UrlCollection::isHttps(){ return baseUrlHttps;}
 
-int UrlCollection::getHttpResponseCode() const { return httpResponseCode;  }
+int UrlCollection::getHttpResponseCode() { return httpResponseCode;  }
 
 void UrlCollection::setHttpResponseCode(int httpResponseCode){
     this->httpResponseCode = httpResponseCode;
 }
 
-void UrlCollection::setBaseUrl(const std::string &baseUrl) {
+void UrlCollection::setBaseUrl(std::string baseUrl) {
     UrlCollection::baseUrl = baseUrl;
 }
 
@@ -47,15 +46,15 @@ void UrlCollection::setBaseUrlHttps(bool baseUrlHttps) {
     UrlCollection::baseUrlHttps = baseUrlHttps;
 }
 
-const std::string &UrlCollection::getClientErrorText() const {
+const std::string UrlCollection::getClientErrorText()  {
     return clientErrorText;
 }
 
-void UrlCollection::setClientErrorText(const std::string &clientErrorText) {
+void UrlCollection::setClientErrorText(std::string clientErrorText) {
     UrlCollection::clientErrorText = clientErrorText;
 }
 
-int UrlCollection::getLoadingTime() const {
+int UrlCollection::getLoadingTime() {
     return loadingTime;
 }
 
@@ -63,11 +62,19 @@ void UrlCollection::setLoadingTime(int loadingTime) {
     UrlCollection::loadingTime = loadingTime;
 }
 
-size_t UrlCollection::getSize() const {
+size_t UrlCollection::getSize() {
     return size;
 }
 
 void UrlCollection::setSize(size_t size) {
     UrlCollection::size = size;
+}
+
+std::string UrlCollection::getTitle() {
+    return title;
+}
+
+void UrlCollection::setTitle(std::string title) {
+    UrlCollection::title = title;
 }
 

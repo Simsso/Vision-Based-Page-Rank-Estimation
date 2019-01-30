@@ -5,40 +5,47 @@
 #ifndef DATACRAWLER_PROJECT_URLCOLLECTION_H
 #define DATACRAWLER_PROJECT_URLCOLLECTION_H
 
-#include "vector"
+#include "list"
 
 #include "../DataBase.h"
 #include "Url.h"
 
 class UrlCollection : public DataBase {
 private:
-    std::vector<Url*>* urls;
+    std::list<Url>* urls;
     std::string baseUrl;
     bool baseUrlHttps;
     int httpResponseCode;
     std::string clientErrorText;
     int loadingTime;
     size_t size;
+    std::string title;
+
 public:
-    size_t getSize() const;
+    std::string getTitle();
+
+    void setTitle(std::string title);
+
+    DataModulesEnum getDataModules();
+
+    size_t getSize();
     void setSize(size_t size);
 
-    int getLoadingTime() const;
+    int getLoadingTime();
     void setLoadingTime(int loadingTime);
 
-    const std::string &getClientErrorText() const;
-    void setClientErrorText(const std::string &clientErrorText);
+    const std::string getClientErrorText();
+    void setClientErrorText(std::string clientErrorText);
 
-    int getHttpResponseCode() const;
+    int getHttpResponseCode();
 
     void setHttpResponseCode(int httpResponseCode);
     std::string getBaseUrl();
-    void setBaseUrl(const std::string &baseUrl);
+    void setBaseUrl(std::string baseUrl);
     void setBaseUrlHttps(bool baseUrlHttps);
 
-    virtual DataModulesEnum getDataModuleType();
-    void addUrl(Url*);
-    std::vector<Url*>* getUrls();
+    void addUrl(std::string, std::string);
+    std::list<Url>* getUrls();
 
     bool isHttps();
 

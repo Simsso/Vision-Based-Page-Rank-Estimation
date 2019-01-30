@@ -13,25 +13,29 @@
 #include "../../util/Logger.h"
 #include "UrlCollection.h"
 #include "UrlRequestHandler.h"
+#include "UrlDisplayHandler.h"
 
 class UrlClient: public CefClient {
 private:
     IMPLEMENT_REFCOUNTING(UrlClient)
 
     Logger* logger;
-    CefRefPtr <CefLoadHandler> urlLoadHandler;
-    CefRefPtr <CefRenderHandler> urlRenderHandler;
-    CefRefPtr<CefRequestHandler> urlRequestHandler;
+    CefRefPtr <CefLoadHandler>    urlLoadHandler;
+    CefRefPtr <CefRenderHandler>  urlRenderHandler;
+    CefRefPtr <CefResponseFilter> urlResponseFilter;
+    CefRefPtr <CefRequestHandler> urlRequestHandler;
+    CefRefPtr <CefDisplayHandler> urlDisplayHandler;
     UrlCollection* urlCollection;
 
 public:
-    CefRefPtr<CefLoadHandler> GetLoadHandler() OVERRIDE;
-    CefRefPtr<CefRenderHandler> GetRenderHandler() OVERRIDE;
+    CefRefPtr<CefLoadHandler>    GetLoadHandler()    OVERRIDE;
+    CefRefPtr<CefRenderHandler>  GetRenderHandler()  OVERRIDE;
     CefRefPtr<CefRequestHandler> GetRequestHandler() OVERRIDE;
+    CefRefPtr<CefDisplayHandler> GetDisplayHandler() OVERRIDE;
 
     bool OnProcessMessageReceived(CefRefPtr<CefBrowser>, CefProcessId, CefRefPtr<CefProcessMessage>) OVERRIDE;
 
-    UrlClient(UrlLoadHandler*, UrlRenderHandler*, UrlCollection*, UrlRequestHandler*);
+    UrlClient(string, UrlCollection*, string&, size_t&);
     UrlClient();
     ~UrlClient();
 };

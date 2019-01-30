@@ -67,7 +67,7 @@ set(CEFSIMPLE_SRCS
         datamodules/url-datamodule/Url.cpp
         datamodules/url-datamodule/Url.h
         datamodules/url-datamodule/UrlCollection.cpp
-        datamodules/url-datamodule/UrlCollection.h GraphOutput.cpp GraphOutput.h datamodules/screenshot-datamodule/ScreenshotLoadhandler.cpp datamodules/screenshot-datamodule/ScreenshotLoadhandler.h datamodules/url-datamodule/UrlRequestHandler.cpp datamodules/url-datamodule/UrlRequestHandler.h datamodules/url-datamodule/UrlResponseFilter.cpp datamodules/url-datamodule/UrlResponseFilter.h)
+        datamodules/url-datamodule/UrlCollection.h GraphOutput.cpp GraphOutput.h datamodules/screenshot-datamodule/ScreenshotLoadhandler.cpp datamodules/screenshot-datamodule/ScreenshotLoadhandler.h datamodules/url-datamodule/UrlRequestHandler.cpp datamodules/url-datamodule/UrlRequestHandler.h datamodules/url-datamodule/UrlResponseFilter.cpp datamodules/url-datamodule/UrlResponseFilter.h datamodules/url-datamodule/UrlDisplayHandler.cpp datamodules/url-datamodule/UrlDisplayHandler.h)
 
 APPEND_PLATFORM_SOURCES(CEFSIMPLE_HELPER_SRCS)
 source_group(cefsimple FILES ${CEFSIMPLE_HELPER_SRCS})

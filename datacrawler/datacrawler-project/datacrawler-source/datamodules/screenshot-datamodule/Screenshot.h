@@ -6,17 +6,16 @@
 
 class Screenshot : public DataBase {
 private:
-    unsigned char* screenshot;
     int height;
     int width;
     bool mobile;
+    unsigned char * screenshot;
 
 public:
-    DataModulesEnum getDataModuleType();
     unsigned char* getScreenshot();
     int getHeight();
     int getWidth();
-    bool isMobile();
+    DataModulesEnum getDataModules();
 
     Screenshot(unsigned char*, int, int, bool);
     ~Screenshot();

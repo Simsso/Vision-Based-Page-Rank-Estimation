@@ -53,14 +53,14 @@ DataBase *ScreenshotDataModule::process(std::string url) {
 
     CefRefPtr<ScreenshotLoadhandler> screenshotLoadhandler(new ScreenshotLoadhandler(browserFinishedLoading.get()));
     CefRefPtr<ScreenshotRequestHandler> screenshotRequestHandler(new ScreenshotRequestHandler(map));
-    CefRefPtr<ScreenshotHandler> screenshotHandler(new ScreenshotHandler(height, width));
+    CefRefPtr<ScreenshotHandler> screenshotHandler(new ScreenshotHandler(height, width, quitMessageLoop.get()));
     CefRefPtr<ScreenshotClient> screenshotClient(new ScreenshotClient(screenshotHandler, screenshotRequestHandler, screenshotLoadhandler));
 
     CefWindowInfo cefWindowInfo;
     cefWindowInfo.SetAsWindowless(0);
 
     CefBrowserSettings browserSettings;
-    browserSettings.windowless_frame_rate = 300;
+    browserSettings.windowless_frame_rate = 1;
 
     CefRefPtr <CefBrowser> browser = CefBrowserHost::CreateBrowserSync(cefWindowInfo, screenshotClient.get(), url, browserSettings, NULL);
 

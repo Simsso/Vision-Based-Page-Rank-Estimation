@@ -3,16 +3,19 @@
 /**
  * ~ScreenshotHandler
  */
-ScreenshotHandler::~ScreenshotHandler() {}
+ScreenshotHandler::~ScreenshotHandler() {
+    delete lastScreenshot;
+}
 
 /**
  *
  */
-ScreenshotHandler::ScreenshotHandler(int renderHeight, int renderWidth) {
+ScreenshotHandler::ScreenshotHandler(int renderHeight, int renderWidth, bool * quitMessageLoop) {
     logger = Logger::getInstance();
 
     this->renderHeight = renderHeight;
     this->renderWidth = renderWidth;
+    this->quitMessageLoop = quitMessageLoop;
 
     lastScreenshot = new unsigned char[renderHeight * renderWidth * 4];
 }
@@ -33,7 +36,8 @@ void ScreenshotHandler::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect
 void ScreenshotHandler::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects,
                                 const void *buffer, int width, int height) {
 
-    memcpy(lastScreenshot, buffer, sizeof(unsigned char) * height * width * 4);
+    if(!*quitMessageLoop)
+        memcpy(lastScreenshot, buffer, sizeof(unsigned char) * height * width * 4);
 }
 
 /**
@@ -42,5 +46,13 @@ void ScreenshotHandler::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType 
  * @return Screenshot in size 4 Bytes * width of screenshot * height screenshot
  */
 unsigned char* ScreenshotHandler::getScreenshot(){
-    return lastScreenshot;
+
+    auto* screenshot = new unsigned char[renderHeight * renderWidth * 4];
+
+    // copying, since lastScreenshot will be cleaned after destructor call
+    for(int i = 0; i < renderHeight * renderWidth * 4; i++){
+        *(screenshot + i) = *(lastScreenshot + i);
+    }
+
+    return screenshot;
 }

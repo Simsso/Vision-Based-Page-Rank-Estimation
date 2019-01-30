@@ -11,8 +11,7 @@
 class UrlResponseFilter: public CefResponseFilter {
     IMPLEMENT_REFCOUNTING(UrlResponseFilter);
 private:
-    size_t * totalSize;
-    size_t left;
+    size_t& totalSize;
     Logger* logger;
 
 public:
@@ -24,7 +23,7 @@ public:
                         size_t data_out_size,
                         size_t& data_out_written) OVERRIDE;
 
-    UrlResponseFilter(unsigned long*);
+    UrlResponseFilter(size_t&);
     ~UrlResponseFilter();
 };
 

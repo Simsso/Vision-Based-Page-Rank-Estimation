@@ -4,7 +4,7 @@
 
 #include "UrlRequestHandler.h"
 
-UrlRequestHandler::UrlRequestHandler(UrlResponseFilter* urlResponseFilter) {
+UrlRequestHandler::UrlRequestHandler(CefResponseFilter* urlResponseFilter) {
     this->urlResponseFilter = urlResponseFilter;
     this->logger = Logger::getInstance();
 }
