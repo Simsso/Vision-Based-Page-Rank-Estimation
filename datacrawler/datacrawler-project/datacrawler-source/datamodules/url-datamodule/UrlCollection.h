@@ -5,14 +5,16 @@
 #ifndef DATACRAWLER_PROJECT_URLCOLLECTION_H
 #define DATACRAWLER_PROJECT_URLCOLLECTION_H
 
-#include "list"
+#include <map>
+#include <algorithm>
 
 #include "../DataBase.h"
 #include "Url.h"
+#include "../../graph/NodeElement.h"
 
 class UrlCollection : public DataBase {
 private:
-    std::list<Url>* urls;
+    std::vector<Url*> urls;
     std::string baseUrl;
     bool baseUrlHttps;
     int httpResponseCode;
@@ -45,10 +47,13 @@ public:
     void setBaseUrlHttps(bool baseUrlHttps);
 
     void addUrl(std::string, std::string);
-    std::list<Url>* getUrls();
+    std::vector<Url*>* getUrls();
 
     bool isHttps();
 
+    void deleteArbitaryEdges(std::map<std::string, NodeElement*>*);
+
+    UrlCollection(const UrlCollection&);
     UrlCollection();
     ~UrlCollection();
 };

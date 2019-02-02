@@ -26,13 +26,13 @@ void GraphOutput::generateGraph() {
 
     int nodeNum = 1;
     for(auto node : *graph){
-        std::list<DataBase*> nodeData = node.second->getData();
+        std::vector<DataBase*> * nodeData = node.second->getData();
 
         nlohmann::json nodeJson;
         nodeJson["id"] = nodeNum;
         nodeJson["startNode"] = node.second->isStartNode();
 
-        for(DataBase * entry : nodeData){
+        for(DataBase * entry : *nodeData){
             if(entry->getDataModules() == SCREENSHOT_MODULE || entry->getDataModules() == SCREENSHOT_MOBILE_MODULE){
                 Screenshot* screenshot = (Screenshot*) entry;
 
@@ -96,10 +96,10 @@ void GraphOutput::generateGraph() {
                 nodeJson["size"] = urlCollection->getSize();
                 nodeJson["title"] = urlCollection->getTitle();
 
-                for(Url url : *urlCollection->getUrls()){
+                for(Url* url : *urlCollection->getUrls()){
                     nlohmann::json tmp;
-                    tmp["url_text"] = url.getUrlText();
-                    tmp["url"] = url.getUrl();
+                    tmp["url_text"] = url->getUrlText();
+                    tmp["url"] = url->getUrl();
                     nodeJson["urls"].push_back(tmp);
                 }
 

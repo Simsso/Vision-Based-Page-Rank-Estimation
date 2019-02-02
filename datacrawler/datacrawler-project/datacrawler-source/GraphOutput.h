@@ -19,7 +19,7 @@ class GraphOutput {
 private:
     std::map<std::string, NodeElement *> *graph;
     std::string folderName;
-    std::string outputPath = "/home/doktorgibson/Desktop/test/";
+    std::string outputPath = "/opt/apt/output/";
     Logger* logger;
 
 public:

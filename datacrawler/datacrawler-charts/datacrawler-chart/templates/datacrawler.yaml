@@ -19,17 +19,6 @@ spec:
         volumeMounts:
         - name: datacrawler-output
           mountPath: /opt/apt/output
-        env:
-        - name: OUTPUT_PATH
-          value: "/opt/apt/output"
-        - name: ONPAINT_TIMEOUT
-          value: "25"
-        - name: ELAPSED_TIME_ONPAINT_TIMEOUT
-          value: "17500"
-        - name: CHANGE_THRESHOLD
-          value: "0.005"
-        - name: LAST_SCREENSHOTS
-          value: "20"
       restartPolicy: OnFailure
       volumes:
       - name: datacrawler-output

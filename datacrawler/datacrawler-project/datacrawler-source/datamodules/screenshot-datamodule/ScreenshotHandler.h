@@ -20,7 +20,7 @@ private:
     int renderHeight;
     int renderWidth;
     unsigned char* lastScreenshot;
-    bool * quitMessageLoop;
+    bool& quitMessageLoop;
 
 
 public:
@@ -29,7 +29,7 @@ public:
 
     unsigned char* getScreenshot();
 
-    ScreenshotHandler(int, int, bool*);
+    ScreenshotHandler(int, int, bool&);
     ~ScreenshotHandler() OVERRIDE;
 };
 

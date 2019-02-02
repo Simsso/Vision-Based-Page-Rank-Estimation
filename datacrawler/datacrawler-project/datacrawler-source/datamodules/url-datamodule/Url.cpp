@@ -11,6 +11,11 @@ Url::Url(std::string urlText, std::string url){
 
 Url::~Url(){}
 
+Url::Url(const Url& url){
+    this->url = url.url;
+    this->urlText = url.urlText;
+}
+
 std::string Url::getUrlText() { return urlText;}
 
 std::string Url::getUrl(){ return url;}

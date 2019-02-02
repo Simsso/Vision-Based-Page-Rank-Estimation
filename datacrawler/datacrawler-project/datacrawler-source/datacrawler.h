@@ -2,7 +2,6 @@
 #define DATACRAWLER_PROJECT_DATACRAWLER_H
 
 #include <iostream>
-#include <list>
 
 #include <include/internal/cef_linux.h>
 #include <include/cef_app.h>

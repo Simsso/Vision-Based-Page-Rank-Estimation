@@ -13,6 +13,9 @@
 #include "UrlClient.h"
 #include "UrlCollection.h"
 
+#include <thread>
+#include <chrono>
+
 
 class UrlDataModule: public DataModuleBase, public CefBaseRefCounted {
 private:
@@ -20,9 +23,6 @@ private:
 
 public:
     DataBase* process(std::string) OVERRIDE;
-
-    UrlDataModule();
-    ~UrlDataModule();
 };
 
 

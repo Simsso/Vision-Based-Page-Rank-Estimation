@@ -4,8 +4,9 @@
 
 #include "UrlResponseFilter.h"
 
-UrlResponseFilter::UrlResponseFilter(size_t& totalSize) : totalSize(totalSize) {
+UrlResponseFilter::UrlResponseFilter(size_t* totalSize) {
     this->logger = Logger::getInstance();
+    this->totalSize = totalSize;
 }
 
 UrlResponseFilter::~UrlResponseFilter() {}
@@ -31,7 +32,7 @@ CefResponseFilter::FilterStatus UrlResponseFilter::Filter(void* data_in,
     data_in_read = data_out_written;
     memcpy(data_out, data_in, data_out_written);
 
-    totalSize += data_out_written;
+    *totalSize += data_out_written;
 
     if(data_in_size > data_out_size){
         return RESPONSE_FILTER_NEED_MORE_DATA;

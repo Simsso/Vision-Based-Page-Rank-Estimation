@@ -10,14 +10,14 @@ UrlClient::UrlClient() {
 
 UrlClient::~UrlClient() {}
 
-UrlClient::UrlClient(string url, UrlCollection* urlCollection, string& title, size_t& totalSize) {
+UrlClient::UrlClient(string url, UrlCollection* urlCollection, bool* quitMessageLoop, UrlDisplayHandler* urlDisplayHandler, UrlRequestHandler * urlRequestHandler, UrlRenderHandler* urlRenderHandler, UrlLoadHandler * urlLoadHandler) {
     logger = Logger::getInstance();
-    urlDisplayHandler =new UrlDisplayHandler(title);
-    urlResponseFilter = new UrlResponseFilter(totalSize);
-    urlRequestHandler = new UrlRequestHandler(urlResponseFilter);
-    urlRenderHandler = new UrlRenderHandler();
-    urlLoadHandler = new UrlLoadHandler(url);
+    this->urlLoadHandler = urlLoadHandler;
+    this->urlRenderHandler = urlRenderHandler;
+    this->urlRequestHandler = urlRequestHandler;
+    this->urlDisplayHandler = urlDisplayHandler;
     this->urlCollection = urlCollection;
+    this->quitMessageLoop = quitMessageLoop;
 }
 
 CefRefPtr<CefLoadHandler> UrlClient::GetLoadHandler() {
@@ -69,14 +69,14 @@ bool UrlClient::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
             urlCollection->addUrl(tmpText, tmpUrl);
         }
         logger->info("Running URL-Datamodule .. finished !");
+        *quitMessageLoop = true;
 
-        CefQuitMessageLoop();
     } else if(message.get()->GetName() == "LoadingFailed") {
         string clientErrorText = message->GetArgumentList()->GetString(0);
         string baseUrl = message->GetArgumentList()->GetString(1);
         urlCollection->setClientErrorText(clientErrorText);
         urlCollection->setBaseUrl(baseUrl);
-        CefQuitMessageLoop();
+        *quitMessageLoop = true;
     }
 
     return false;

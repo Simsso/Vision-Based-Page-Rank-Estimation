@@ -97,6 +97,7 @@ if(OS_LINUX)
     -std=c99                        # Use the C99 language standard
     )
   list(APPEND CEF_CXX_COMPILER_FLAGS
+#-fsanitize=address
     #-fno-exceptions                 # Disable exceptions
     #-fno-rtti                       # Disable real-time type information
     -fno-threadsafe-statics         # Don't generate thread-safe statics
@@ -117,6 +118,7 @@ if(OS_LINUX)
     -D_FORTIFY_SOURCE=2             # Add memory and string function protection (security feature, related to stack-protector)
     )
   list(APPEND CEF_LINKER_FLAGS
+      #  -fsanitize=address
     -fPIC                           # Generate position-independent code for shared libraries
     -pthread                        # Use the pthread library
     -Wl,--disable-new-dtags         # Don't generate new-style dynamic tags in ELF

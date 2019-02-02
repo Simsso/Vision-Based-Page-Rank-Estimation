@@ -14,7 +14,8 @@ UrlLoadHandler::UrlLoadHandler(string url) {
     failed = false;
 }
 
-UrlLoadHandler::~UrlLoadHandler() {}
+UrlLoadHandler::~UrlLoadHandler() {
+}
 
 void UrlLoadHandler::OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
                                  CefLoadHandler::ErrorCode errorCode, const CefString &errorText,

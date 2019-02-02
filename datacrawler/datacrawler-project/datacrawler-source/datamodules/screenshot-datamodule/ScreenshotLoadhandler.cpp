@@ -5,13 +5,8 @@
 #include "ScreenshotLoadhandler.h"
 
 
-ScreenshotLoadhandler::ScreenshotLoadhandler() {
+ScreenshotLoadhandler::ScreenshotLoadhandler(bool& finishedLoading) : finishedLoading(finishedLoading) {
     logger = Logger::getInstance();
-}
-
-ScreenshotLoadhandler::ScreenshotLoadhandler(bool * finishedLoading) {
-    logger = Logger::getInstance();
-    this->finishedLoading = finishedLoading;
 }
 
 ScreenshotLoadhandler::~ScreenshotLoadhandler() {}
@@ -21,5 +16,5 @@ void ScreenshotLoadhandler::OnLoadingStateChange(CefRefPtr<CefBrowser> browser,
                                           bool canGoBack,
                                           bool canGoForward) {
 
-    *finishedLoading = !isLoading;
+    finishedLoading = !isLoading;
 }

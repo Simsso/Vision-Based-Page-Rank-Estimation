@@ -55,11 +55,15 @@ map<string, NodeElement*>* Datacrawler::process(string url) {
 
     for (DataModuleBase* x: dataModules) {
         startNode->addData(x->process(url));
+        std::thread screenshotHandlerStopped([]() {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        });
+        screenshotHandlerStopped.join();
     }
 
     logger->info("<" + url + "> processed!");
 
-    for (DataBase* x: startNode->getData()) {
+    for (DataBase* x: *startNode->getData()) {
         // get base url of starting node, which is different from domain name
         if (x->getDataModules() == URL_MODULE)
             startNodeUrlCollection = (UrlCollection*) x;
@@ -94,17 +98,13 @@ map<string, NodeElement*>* Datacrawler::process(string url) {
         nodes.pop();
     }
 
-    // delete arbitary edges
    for(auto node : *graph){
       auto nodeData = node.second->getData();
 
-      for(DataBase* entry : nodeData){
+      for(DataBase* entry : *nodeData){
           if(entry->getDataModules() != URL_MODULE)
               continue;
-          UrlCollection * urlCollection = (UrlCollection*)entry;
-          list<Url> * urls = urlCollection->getUrls();
-          urls->erase(std::remove_if(urls->begin(), urls->end(),
-                                 [&](Url url) { return (graph->find(url.getUrl()) == graph->end()); }), urls->end());
+          ((UrlCollection*)entry)->deleteArbitaryEdges(graph);
       }
    }
 
@@ -117,14 +117,14 @@ vector<pair<string, NodeElement*>> Datacrawler::buildNodes(NodeElement* startNod
     NodeElement *newNode;
     vector<pair<string,NodeElement*>> newNodes;
 
-    for (DataBase * x: startNode->getData()) {
+    for (DataBase * x: *startNode->getData()) {
        if (x->getDataModules() == URL_MODULE)
             urlCollection = (UrlCollection *) x;
     }
 
-    list<Url>* urls = urlCollection->getUrls();
-    for (Url edge : *urls) {
-        string edgeUrl = edge.getUrl();
+    vector<Url*>* urls = urlCollection->getUrls();
+    for (Url * edge : *urls) {
+        string edgeUrl = edge->getUrl();
 
         // check if exists in the graph
         if(graph->find(edgeUrl) != graph->end())
@@ -139,6 +139,10 @@ vector<pair<string, NodeElement*>> Datacrawler::buildNodes(NodeElement* startNod
         // calculate new node
         for (DataModuleBase* x: dataModules) {
             newNode->addData(x->process(edgeUrl));
+            std::thread screenshotHandlerStopped([]() {
+                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            });
+            screenshotHandlerStopped.join();
         }
 
         // insert into graph

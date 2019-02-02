@@ -10,7 +10,7 @@ UrlDOMVisitor::UrlDOMVisitor(vector<pair<string,string>>& urls, string url) : va
     this->url = url;
 }
 
-UrlDOMVisitor::~UrlDOMVisitor() {}
+UrlDOMVisitor::~UrlDOMVisitor() { }
 
 void UrlDOMVisitor::Visit(CefRefPtr<CefDOMDocument> domDocument) {
     logger->info("Parsing URLs !");
@@ -49,7 +49,6 @@ queue<CefRefPtr<CefDOMNode>> UrlDOMVisitor::traverseDOMTree(CefRefPtr<CefDOMNode
 
     nodeQueue.push(body);
 
-    // find all nodes with tag <a>
     while (!nodeQueue.empty()) {
         CefRefPtr<CefDOMNode> currentNode = nodeQueue.front();
 
@@ -98,7 +97,6 @@ void UrlDOMVisitor::filterURL(queue<CefRefPtr<CefDOMNode>> &aQueue) {
         string url = aQueue.front().get()->GetElementAttribute("href");
         aQueue.pop();
 
-        // TODO optimise
        if (regex_search(url, httpRegex)) {
            validUrlMap.insert(make_pair(url, urlText));
         } else if (regex_search(url, httpsRegex)) {

@@ -10,12 +10,11 @@ ScreenshotHandler::~ScreenshotHandler() {
 /**
  *
  */
-ScreenshotHandler::ScreenshotHandler(int renderHeight, int renderWidth, bool * quitMessageLoop) {
+ScreenshotHandler::ScreenshotHandler(int renderHeight, int renderWidth, bool& quitMessageLoop) : quitMessageLoop(quitMessageLoop) {
     logger = Logger::getInstance();
 
     this->renderHeight = renderHeight;
     this->renderWidth = renderWidth;
-    this->quitMessageLoop = quitMessageLoop;
 
     lastScreenshot = new unsigned char[renderHeight * renderWidth * 4];
 }
@@ -36,7 +35,7 @@ void ScreenshotHandler::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect
 void ScreenshotHandler::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects,
                                 const void *buffer, int width, int height) {
 
-    if(!*quitMessageLoop)
+    if(!quitMessageLoop)
         memcpy(lastScreenshot, buffer, sizeof(unsigned char) * height * width * 4);
 }
 

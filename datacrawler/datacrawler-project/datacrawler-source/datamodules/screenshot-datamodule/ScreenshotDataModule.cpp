@@ -48,12 +48,12 @@ DataBase *ScreenshotDataModule::process(std::string url) {
 
     logger->info("Runnning in UI thread!");
 
-    std::unique_ptr<bool> quitMessageLoop(new bool(false));
-    std::unique_ptr<bool> browserFinishedLoading(new bool(false));
+    bool quitMessageLoop = false;
+    bool browserFinishedLoading = false;
 
-    CefRefPtr<ScreenshotLoadhandler> screenshotLoadhandler(new ScreenshotLoadhandler(browserFinishedLoading.get()));
+    CefRefPtr<ScreenshotLoadhandler> screenshotLoadhandler(new ScreenshotLoadhandler(browserFinishedLoading));
     CefRefPtr<ScreenshotRequestHandler> screenshotRequestHandler(new ScreenshotRequestHandler(map));
-    CefRefPtr<ScreenshotHandler> screenshotHandler(new ScreenshotHandler(height, width, quitMessageLoop.get()));
+    CefRefPtr<ScreenshotHandler> screenshotHandler(new ScreenshotHandler(height, width, quitMessageLoop));
     CefRefPtr<ScreenshotClient> screenshotClient(new ScreenshotClient(screenshotHandler, screenshotRequestHandler, screenshotLoadhandler));
 
     CefWindowInfo cefWindowInfo;
@@ -68,7 +68,7 @@ DataBase *ScreenshotDataModule::process(std::string url) {
         int secondsSteps = 0;
 
         while(secondsSteps < elapsedTimeOnPaintTimeout){
-           if(*quitMessageLoop)
+           if(quitMessageLoop)
                 return;
 
             std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -77,21 +77,21 @@ DataBase *ScreenshotDataModule::process(std::string url) {
 
         logger->info("ScreenshotDataModule timed out after "+std::to_string(elapsedTimeOnPaintTimeout)+" seconds! Returning current screenshot result!");
 
-        *quitMessageLoop = true;
+        quitMessageLoop = true;
     });
 
     std::thread screenshotHandlerStopped([&]() {
 
-        while(!*browserFinishedLoading){
+        while(!browserFinishedLoading){
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
-            if(*quitMessageLoop)
+            if(quitMessageLoop)
                 return;
         }
 
         int secondsSteps = 0;
 
         while(secondsSteps < onPaintTimeout){
-            if(*quitMessageLoop)
+            if(quitMessageLoop)
                 return;
 
             std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -100,10 +100,10 @@ DataBase *ScreenshotDataModule::process(std::string url) {
 
         logger->info("Waited "+std::to_string(onPaintTimeout)+" seconds for rendering ..");
 
-        *quitMessageLoop = true;
+        quitMessageLoop = true;
     });
 
-    while (!(*quitMessageLoop)){
+    while (!quitMessageLoop){
         CefDoMessageLoopWork();
     }
 

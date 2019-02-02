@@ -8,12 +8,12 @@
 class NodeElement {
 
 private:
-   std::list<DataBase*> data;
+   std::vector<DataBase*> data;
    bool startNode;
 
 public:
     void addData(DataBase*);
-    std::list<DataBase*> getData();
+    std::vector<DataBase*>* getData();
     bool isStartNode();
 
     NodeElement(bool);

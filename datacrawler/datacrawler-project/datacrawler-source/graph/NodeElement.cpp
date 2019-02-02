@@ -28,7 +28,7 @@ void NodeElement::addData(DataBase * newData) {
  * getData - Returns the DataBase-instances saved in this NodeElement
  * @return A pointer on to a vector<DataBase*> having all DataBase-instances of this NodeElement
  */
-std::list<DataBase*> NodeElement::getData(){ return data;}
+std::vector<DataBase*>* NodeElement::getData(){ return &data;}
 
 bool NodeElement::isStartNode(){
     return startNode;

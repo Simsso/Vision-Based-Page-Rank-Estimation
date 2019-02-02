@@ -3,6 +3,7 @@
 //
 
 #include <thread>
+#include <include/wrapper/cef_helpers.h>
 #include "DatacrawlerRenderProcessHandler.h"
 
 DatacrawlerRenderProcessHandler::DatacrawlerRenderProcessHandler(){
@@ -15,6 +16,7 @@ DatacrawlerRenderProcessHandler::~DatacrawlerRenderProcessHandler(){}
 bool DatacrawlerRenderProcessHandler::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
                                       CefProcessId source_process,
                                       CefRefPtr<CefProcessMessage> message) {
+    CEF_REQUIRE_RENDERER_THREAD();
     /* URL-Datamodule*/
     if(message.get()->GetName() == "GetAllUrl") {
 

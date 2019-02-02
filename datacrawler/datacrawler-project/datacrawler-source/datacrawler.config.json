@@ -1,9 +1,9 @@
 {
-  "NUM_NODES" : 5,
+  "NUM_NODES" : 8,
   "DATAMODULES": [
     {
       "DATAMODULE": "SCREENSHOT_MODULE",
-      "DISABLED": true,
+      "DISABLED": false,
       "ATTRIBUTES":
       {
         "ONPAINT_TIMEOUT": 3,
@@ -14,7 +14,7 @@
     },
     {
       "DATAMODULE": "SCREENSHOT_MOBILE_MODULE",
-      "DISABLED": true,
+      "DISABLED": false,
       "ATTRIBUTES":
       {
         "ONPAINT_TIMEOUT": 3,

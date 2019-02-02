@@ -4,9 +4,16 @@
 
 #include "UrlDisplayHandler.h"
 
-UrlDisplayHandler::UrlDisplayHandler(std::string& title) : title(title) {
+UrlDisplayHandler::UrlDisplayHandler(std::string* title) {
+    logger = Logger::getInstance();
+    this->title = title;
+    this->wasCalled = false;
 }
 
 void UrlDisplayHandler::OnTitleChange( CefRefPtr< CefBrowser > browser, const CefString& title ){
-    this->title = title.ToString();
+
+    if(!wasCalled){
+        *this->title = title.ToString();
+        wasCalled = true;
+    }
 }

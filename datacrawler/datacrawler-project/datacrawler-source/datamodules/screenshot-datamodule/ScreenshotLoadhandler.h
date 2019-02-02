@@ -13,12 +13,11 @@ class ScreenshotLoadhandler : public CefLoadHandler {
 private:
     IMPLEMENT_REFCOUNTING(ScreenshotLoadhandler)
     Logger* logger;
-    bool * finishedLoading;
+    bool& finishedLoading;
 
 public:
     void OnLoadingStateChange(CefRefPtr<CefBrowser>, bool, bool, bool) OVERRIDE;
-    ScreenshotLoadhandler(bool*);
-    ScreenshotLoadhandler();
+    ScreenshotLoadhandler(bool&);
     ~ScreenshotLoadhandler() OVERRIDE;
 };
 

@@ -4,12 +4,6 @@
 
 #include "UrlDataModule.h"
 
-UrlDataModule::UrlDataModule() {
-}
-
-UrlDataModule::~UrlDataModule() {
-}
-
 DataBase *UrlDataModule::process(std::string url) {
     logger->info("Running URL-DataModule ..");
 
@@ -22,10 +16,17 @@ DataBase *UrlDataModule::process(std::string url) {
     logger->info("Runnning in UI thread!");
 
     UrlCollection * urlCollection = new UrlCollection;
-    size_t totalSize = 0;
+    bool quitMessageLoop = false;
+    size_t  totalSize = 0;
     string title = "";
 
-    CefRefPtr<UrlClient> urlClient(new UrlClient(url, urlCollection, title, totalSize));
+    CefRefPtr<UrlLoadHandler>    urlLoadHandler(new UrlLoadHandler(url));
+    CefRefPtr<UrlRenderHandler>  urlRenderHandler(new UrlRenderHandler());
+    CefRefPtr<UrlResponseFilter> urlResponseFilter(new UrlResponseFilter(&totalSize));
+    CefRefPtr<UrlRequestHandler> urlRequestHandler(new UrlRequestHandler(urlResponseFilter));
+    CefRefPtr<UrlDisplayHandler> urlDisplayHandler(new UrlDisplayHandler(&title));
+    CefRefPtr <UrlClient> urlClient = new UrlClient(url, urlCollection, &quitMessageLoop, urlDisplayHandler, urlRequestHandler, urlRenderHandler, urlLoadHandler );
+
 
     CefWindowInfo cefWindowInfo;
     cefWindowInfo.SetAsWindowless(0);
@@ -33,12 +34,15 @@ DataBase *UrlDataModule::process(std::string url) {
     CefBrowserSettings browserSettings;
     browserSettings.windowless_frame_rate = 1;
 
-    CefRefPtr<CefBrowser> browser = CefBrowserHost::CreateBrowserSync(cefWindowInfo, urlClient.get(), url, browserSettings, NULL);
+    CefRefPtr<CefBrowser> browser = CefBrowserHost::CreateBrowserSync(cefWindowInfo, urlClient, url, browserSettings, NULL);
 
-    CefRunMessageLoop();
+    while (!quitMessageLoop){
+        CefDoMessageLoopWork();
+    }
 
     urlCollection->setSize(totalSize / 1024);
     urlCollection->setTitle(title);
+
     browser->GetHost()->CloseBrowser(true);
 
     return urlCollection;

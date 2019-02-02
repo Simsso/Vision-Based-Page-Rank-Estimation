@@ -17,6 +17,7 @@ public:
     std::string getUrlText();
     std::string getUrl();
 
+    Url(const Url&);
     Url(std::string, std::string);
     ~Url();
 };

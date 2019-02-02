@@ -20,12 +20,12 @@ private:
     IMPLEMENT_REFCOUNTING(UrlClient)
 
     Logger* logger;
-    CefRefPtr <CefLoadHandler>    urlLoadHandler;
-    CefRefPtr <CefRenderHandler>  urlRenderHandler;
-    CefRefPtr <CefResponseFilter> urlResponseFilter;
-    CefRefPtr <CefRequestHandler> urlRequestHandler;
-    CefRefPtr <CefDisplayHandler> urlDisplayHandler;
     UrlCollection* urlCollection;
+    CefRefPtr<CefLoadHandler>   urlLoadHandler;
+    CefRefPtr<CefRenderHandler>  urlRenderHandler;
+    CefRefPtr<CefRequestHandler> urlRequestHandler;
+    CefRefPtr<CefDisplayHandler> urlDisplayHandler;
+    bool * quitMessageLoop;
 
 public:
     CefRefPtr<CefLoadHandler>    GetLoadHandler()    OVERRIDE;
@@ -35,7 +35,8 @@ public:
 
     bool OnProcessMessageReceived(CefRefPtr<CefBrowser>, CefProcessId, CefRefPtr<CefProcessMessage>) OVERRIDE;
 
-    UrlClient(string, UrlCollection*, string&, size_t&);
+    UrlClient(string, UrlCollection* , bool* , UrlDisplayHandler*, UrlRequestHandler*, UrlRenderHandler*, UrlLoadHandler*);
+
     UrlClient();
     ~UrlClient();
 };

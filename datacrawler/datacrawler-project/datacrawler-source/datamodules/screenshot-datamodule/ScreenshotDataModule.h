@@ -7,8 +7,6 @@
 
 #include <thread>
 #include <chrono>
-#include <mutex>
-
 
 #include <include/internal/cef_ptr.h>
 #include <include/cef_app.h>
