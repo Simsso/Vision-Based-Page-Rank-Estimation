@@ -28,7 +28,8 @@ COPY worker.py  /opt/apt/
 COPY run_datacrawler.sh /opt/apt/
 
 RUN mkdir /opt/apt/output
-
+RUN cat /opt/apt/datacrawler/datacrawler.config.json
+RUN chmod 777 /opt/apt/datacrawler/datacrawler.config.json
 RUN chmod +x /opt/apt/run_datacrawler.sh
 RUN chmod +x /opt/apt/datacrawler/datacrawler
 

@@ -5,7 +5,7 @@ metadata:
 spec:
   storageClassName: ""
   capacity:
-    storage: 125G
+    storage: 100G
   accessModes:
     - ReadWriteOnce
   gcePersistentDisk:
@@ -23,4 +23,4 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 125G
+      storage: 100G

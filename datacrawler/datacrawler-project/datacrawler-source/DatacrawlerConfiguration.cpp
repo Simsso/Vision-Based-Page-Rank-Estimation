@@ -15,7 +15,7 @@ DatacrawlerConfiguration::~DatacrawlerConfiguration() {
 DatacrawlerConfiguration::DatacrawlerConfiguration() {
     logger = Logger::getInstance();
 
-    ifstream file("datacrawler.config.json");
+    ifstream file("/opt/apt/datacrawler/datacrawler.config.json");
 
     if (file) {
         json config;
