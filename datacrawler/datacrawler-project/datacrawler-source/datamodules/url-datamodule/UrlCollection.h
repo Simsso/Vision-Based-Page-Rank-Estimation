@@ -20,7 +20,7 @@ private:
     int httpResponseCode;
     std::string clientErrorText;
     int loadingTime;
-    size_t size;
+    long size;
     std::string title;
 
 public:
@@ -33,8 +33,8 @@ public:
     size_t getSize();
     void setSize(size_t size);
 
-    int getLoadingTime();
-    void setLoadingTime(int loadingTime);
+    long getLoadingTime();
+    void setLoadingTime(long loadingTime);
 
     const std::string getClientErrorText();
     void setClientErrorText(std::string clientErrorText);

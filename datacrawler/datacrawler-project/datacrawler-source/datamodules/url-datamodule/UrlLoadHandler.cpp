@@ -12,6 +12,7 @@ UrlLoadHandler::UrlLoadHandler(string url) {
     this->url = url;
     notified = false;
     failed = false;
+    this->httpStatusCode = -1;
 }
 
 UrlLoadHandler::~UrlLoadHandler() {

@@ -9,6 +9,8 @@ UrlCollection::UrlCollection() {
     this->baseUrlHttps = false;
     this->clientErrorText = "null";
     this->loadingTime = -1;
+    this->size = 0;
+    this->title = "null";
 }
 
 UrlCollection::UrlCollection(const UrlCollection& urlCollection) {
@@ -71,11 +73,11 @@ void UrlCollection::setClientErrorText(std::string clientErrorText) {
     UrlCollection::clientErrorText = clientErrorText;
 }
 
-int UrlCollection::getLoadingTime() {
+long UrlCollection::getLoadingTime() {
     return loadingTime;
 }
 
-void UrlCollection::setLoadingTime(int loadingTime) {
+void UrlCollection::setLoadingTime(long loadingTime) {
     UrlCollection::loadingTime = loadingTime;
 }
 

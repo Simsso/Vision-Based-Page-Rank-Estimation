@@ -83,18 +83,30 @@ void GraphOutput::generateGraph() {
                 else
                     nodeJson["loading_time"] = loadingTime;
 
-                if (responseCode == -1 )
-                    nodeJson["server_status"] = nullptr;
-                else
-                    nodeJson["server_status"] = responseCode;
-
                 if (clientErrorText == "null")
                     nodeJson["client_status"] = nullptr;
                 else
                     nodeJson["client_status"] = clientErrorText;
 
-                nodeJson["size"] = urlCollection->getSize();
-                nodeJson["title"] = urlCollection->getTitle();
+                if (responseCode == -1 ) {
+                    nodeJson["server_status"] = nullptr;
+                    nodeJson["client_status"] = "NOT_REACHABLE";
+                } else
+                    nodeJson["server_status"] = responseCode;
+
+                long size = urlCollection->getSize();
+
+                if(size == 0)
+                    nodeJson["size"] = nullptr;
+                else
+                    nodeJson["size"] = size;
+
+                std::string title = urlCollection->getTitle();
+
+                if(title == "null")
+                    nodeJson["title"] = nullptr;
+                else
+                    nodeJson["title"] = title;
 
                 for(Url* url : *urlCollection->getUrls()){
                     nlohmann::json tmp;

@@ -5,6 +5,9 @@
 #ifndef DATACRAWLER_PROJECT_URLLOADHANDLER_H
 #define DATACRAWLER_PROJECT_URLLOADHANDLER_H
 
+
+#include <thread>
+
 #include <include/cef_load_handler.h>
 #include "../../util/Logger.h"
 #include "UrlDOMVisitor.h"
