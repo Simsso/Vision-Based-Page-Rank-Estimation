@@ -46,14 +46,14 @@ class TrainingRun:
         for epoch in range(epochs):
             logging.info("Starting epoch #{}".format(epoch + 1))
             for batch in self.data_loader.train:
-                if self.step_ctr % 5 == 0:
+                if self.step_ctr % 128 == 0:
                     self._run_valid()
 
                 imgs = batch['img'].to(self.device)
-                label = batch['label'].to(self.device)
-                self._train_step(imgs, label)
+                logranks = batch['logrank'].to(self.device).float()
+                self._train_step(imgs, logranks)
 
-    def _train_step(self, inputs: torch.Tensor, labels: torch.Tensor) -> None:
+    def _train_step(self, inputs: torch.Tensor, logranks: torch.Tensor) -> None:
         self.net.train()
 
         self.step_ctr += 1
@@ -61,17 +61,11 @@ class TrainingRun:
 
         model_out: torch.Tensor = self.net.forward(inputs)
 
-        loss = self.loss_fn(model_out, labels)
+        loss = self.loss_fn(model_out, logranks)
         loss.backward()
         self.opt.step()
 
-        # accuracy
-        _, predicted = model_out.max(dim=1)
-        correct_prediction: torch.Tensor = predicted == labels
-        accuracy = correct_prediction.sum(dim=0) / model_out.size(0)
-
         self.writer.add_scalar('loss_train', loss, self.step_ctr)
-        self.writer.add_scalar('accuracy_train', accuracy, self.step_ctr)
 
     def _run_valid(self) -> None:
         logging.info("Running validation")
@@ -79,28 +73,20 @@ class TrainingRun:
         self.net.eval()
 
         # accumulators
-        loss_sum, correct_ctr = 0., 0
+        loss_sum = 0.
 
         for batch in tqdm(self.data_loader.valid):
             imgs: torch.Tensor = batch['img'].to(self.device)
-            labels: torch.Tensor = batch['label'].to(self.device)
+            logranks: torch.Tensor = batch['logrank'].to(self.device).float()
 
             # forward pass
             with torch.no_grad():
                 model_out: torch.Tensor = self.net.forward(imgs)
 
-            loss = self.loss_fn(model_out, labels)
+            loss = self.loss_fn(model_out, logranks)
             loss_sum += loss
-
-            # accuracy
-            # TODO: take class weights into account
-            _, predicted = model_out.max(dim=1)
-            correct_prediction: torch.Tensor = predicted == labels
-            correct_ctr += correct_prediction.sum(dim=0)
 
         n = len(self.data_loader.valid)
         loss = loss_sum / n
-        accuracy = correct_ctr / n
 
         self.writer.add_scalar('loss_valid', loss, self.step_ctr)
-        self.writer.add_scalar('accuracy_valid', accuracy, self.step_ctr)

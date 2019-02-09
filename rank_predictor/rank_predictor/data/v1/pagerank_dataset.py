@@ -5,14 +5,14 @@ from torch.utils.data import Dataset, DataLoader
 from typing import Dict, List, Tuple
 from torchvision.transforms import ToPILImage, Resize, Normalize, Compose, ToTensor
 from tqdm import tqdm
-
+from math import log
 from data.v1.utils import img_loading_possible
 from rank_predictor.data import threefold
 from rank_predictor.data.v1.transforms import ImageTransform, ToCudaTensor
 import logging
 
 
-class ScreenshotPagerankDatasetV1(Dataset):
+class DatasetV1(Dataset):
     """
     Dataset v1 of screenshot pageranks.
     Each sample is a dictionary with
@@ -22,9 +22,10 @@ class ScreenshotPagerankDatasetV1(Dataset):
     """
 
     num_labels = 3
+    max_rank = 10**5
 
     def __init__(self, img_paths: List[str]) -> None:
-        super(ScreenshotPagerankDatasetV1).__init__()
+        super(DatasetV1).__init__()
 
         self.img_paths = img_paths
         ranks = map(self.filename_to_rank, self.img_paths)
@@ -55,6 +56,7 @@ class ScreenshotPagerankDatasetV1(Dataset):
             'img': img,
             'rank': rank,
             'label': self.rank_to_label(rank),
+            'logrank': self.rank_to_logrank(rank),
         }
 
         # apply pre-processing
@@ -91,7 +93,7 @@ class ScreenshotPagerankDatasetV1(Dataset):
     
     @staticmethod
     def rank_to_label(rank: int) -> int:
-        assert 0 < rank <= 10**5, "Rank '{}' is out of range.".format(rank)
+        assert 0 < rank <= DatasetV1.max_rank, "Rank '{}' is out of range.".format(rank)
 
         if rank <= 10**3:
             return 0
@@ -100,12 +102,24 @@ class ScreenshotPagerankDatasetV1(Dataset):
         return 2
 
     @staticmethod
+    def rank_to_logrank(rank: int) -> float:
+        """
+        Maps a rank from {1, ..., max_rank} to [0,1] in a logarithmic fashion.
+        :param rank: The rank to map, in {1, ..., max_rank}
+        :return: Scalar in [0,1]
+        """
+        max_rank = DatasetV1.max_rank
+        assert 0 < rank <= max_rank, "Rank '{}' is out of range.".format(rank)
+
+        return log(rank*max_rank+1) / log(max_rank)
+
+    @staticmethod
     def from_path(root_dir: str):
         assert os.path.isdir(root_dir), "The provided path '{}' is not a directory".format(root_dir)
 
         img_paths = sorted(glob.glob(os.path.join(root_dir, '*.png')))
 
-        return ScreenshotPagerankDatasetV1(img_paths)
+        return DatasetV1(img_paths)
 
     @staticmethod
     def get_threefold(root_dir: str, train_ratio: float, valid_ratio: float) -> threefold.Data:
@@ -114,7 +128,7 @@ class ScreenshotPagerankDatasetV1(Dataset):
 
         logging.info("Loading and splitting dataset v1")
 
-        img_paths = sorted(glob.glob(os.path.join(root_dir, '*.png')))
+        img_paths = sorted(glob.glob(os.path.join(root_dir, '*.jpg')))
 
         assert len(img_paths) > 0, "No images found at '{}'".format(root_dir)
 
@@ -136,7 +150,7 @@ class ScreenshotPagerankDatasetV1(Dataset):
                 test_paths.append(path)
 
         return threefold.Data(
-            train=ScreenshotPagerankDatasetV1(train_paths),
-            valid=ScreenshotPagerankDatasetV1(valid_paths),
-            test=ScreenshotPagerankDatasetV1(test_paths),
+            train=DatasetV1(train_paths),
+            valid=DatasetV1(valid_paths),
+            test=DatasetV1(test_paths),
         )

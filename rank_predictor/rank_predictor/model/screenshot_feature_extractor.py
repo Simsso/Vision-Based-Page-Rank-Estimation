@@ -1,4 +1,7 @@
 from __future__ import print_function
+
+import torch
+
 import rank_predictor.model.util as uf
 import torch.nn as nn
 import torch.nn.functional as F
@@ -13,7 +16,7 @@ class ScreenshotFeatureExtractor(nn.Module):
     def __init__(self):
         super(ScreenshotFeatureExtractor, self).__init__()
 
-        self.conv1a = nn.Conv2d(4, 32, kernel_size=(3, 3))
+        self.conv1a = nn.Conv2d(3, 32, kernel_size=(3, 3))
         self.conv1b = nn.Conv2d(32, 32, kernel_size=(3, 3))
 
         self.conv2a = nn.Conv2d(32, 64, kernel_size=(3, 3))
@@ -23,7 +26,7 @@ class ScreenshotFeatureExtractor(nn.Module):
         self.conv3b = nn.Conv2d(128, 128, kernel_size=(3, 3))
 
         self.dense1 = nn.Linear(1024, 256)  # diverging from the paper here
-        self.dense2 = nn.Linear(256, 3)
+        self.dense2 = nn.Linear(256, 1)
 
     def forward(self, x):
         x = F.relu(self.conv1a(x))
@@ -47,6 +50,6 @@ class ScreenshotFeatureExtractor(nn.Module):
         x = F.dropout(x, p=.3, training=self.training)
 
         x = self.dense2(x)
-        x = F.softmax(x, dim=1)
+        x = torch.sigmoid(x)
 
         return x
