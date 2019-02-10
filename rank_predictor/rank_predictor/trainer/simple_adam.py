@@ -6,7 +6,6 @@ from rank_predictor.model.screenshot_feature_extractor import ScreenshotFeatureE
 from torch import nn, optim
 from rank_predictor.trainer.training_run import TrainingRun
 
-
 logging.basicConfig(level=logging.INFO)
 use_cuda = torch.cuda.is_available()
 device = torch.device("cuda" if use_cuda else "cpu")
@@ -20,10 +19,13 @@ net = ScreenshotFeatureExtractor()
 net.cuda()
 
 # optimizer
-opt = optim.Adam(net.parameters(), lr=1e-4)
+opt = optim.Adam(net.parameters(), lr=1e-3)
+
 
 # loss
-loss = nn.MSELoss()
+def weighted_mse_loss(prediction, target, weight):
+    return torch.sum(weight * (prediction - target) ** 2)
 
-training_run = TrainingRun(net, opt, loss, dataset_v1, batch_size=24, device=device)
-training_run(1)
+
+training_run = TrainingRun(net, opt, weighted_mse_loss, dataset_v1, batch_size=24, device=device)
+training_run(10)

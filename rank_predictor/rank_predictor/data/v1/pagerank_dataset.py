@@ -1,5 +1,7 @@
 import glob
 import os
+
+import torch
 from skimage import io
 from torch.utils.data import Dataset, DataLoader
 from typing import Dict, List, Tuple
@@ -111,7 +113,7 @@ class DatasetV1(Dataset):
         max_rank = DatasetV1.max_rank
         assert 0 < rank <= max_rank, "Rank '{}' is out of range.".format(rank)
 
-        return log(rank*max_rank+1) / log(max_rank)
+        return log(rank*max_rank) / log(max_rank) - 1.
 
     @staticmethod
     def from_path(root_dir: str):
@@ -136,7 +138,7 @@ class DatasetV1(Dataset):
 
         for path in tqdm(img_paths):
             if os.getenv('validate_imgs', False) and not img_loading_possible(path):
-                logging.warning("The image '{}' could not be loaded.".format(path))
+                logging.warning("The image '{}' could not be loaded".format(path))
                 continue
 
             n_train, n_valid, n_test = len(train_paths), len(valid_paths), len(test_paths)

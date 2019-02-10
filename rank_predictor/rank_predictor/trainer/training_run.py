@@ -6,6 +6,8 @@ from torch import nn, optim
 from tensorboardX import SummaryWriter
 from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm
+
+from data.v1.utils import compute_accuracy
 from rank_predictor.data import threefold
 
 
@@ -22,6 +24,7 @@ class TrainingRun:
         self.loss_fn = loss_fn
         self.step_ctr = 0
         self.device = device
+        self.batch_size = batch_size
 
         cpu_count = multiprocessing.cpu_count()
         worker_count = max(cpu_count - 1, 1)
@@ -40,13 +43,13 @@ class TrainingRun:
 
         self.net.to(device)
 
-        self.writer = SummaryWriter('logs')
+        self.writer = SummaryWriter('logs/deeper_highlr')
 
     def __call__(self, epochs: int) -> None:
         for epoch in range(epochs):
             logging.info("Starting epoch #{}".format(epoch + 1))
             for batch in self.data_loader.train:
-                if self.step_ctr % 128 == 0:
+                if self.step_ctr % 512 == 0:
                     self._run_valid()
 
                 imgs = batch['img'].to(self.device)
@@ -61,11 +64,16 @@ class TrainingRun:
 
         model_out: torch.Tensor = self.net.forward(inputs)
 
-        loss = self.loss_fn(model_out, logranks)
+        loss = self.loss_fn(model_out, logranks, (1-logranks))
         loss.backward()
         self.opt.step()
 
+        accuracy, _ = compute_accuracy(target_ranks=logranks, model_outputs=model_out)
+
         self.writer.add_scalar('loss_train', loss, self.step_ctr)
+        self.writer.add_scalar('accuracy_train', accuracy, self.step_ctr)
+        self.writer.add_histogram('model_out_train', model_out, self.step_ctr)
+        self.writer.add_histogram('model_target_train', logranks, self.step_ctr)
 
     def _run_valid(self) -> None:
         logging.info("Running validation")
@@ -73,7 +81,7 @@ class TrainingRun:
         self.net.eval()
 
         # accumulators
-        loss_sum = 0.
+        loss_sum, correct_ctr = 0., 0
 
         for batch in tqdm(self.data_loader.valid):
             imgs: torch.Tensor = batch['img'].to(self.device)
@@ -83,10 +91,16 @@ class TrainingRun:
             with torch.no_grad():
                 model_out: torch.Tensor = self.net.forward(imgs)
 
-            loss = self.loss_fn(model_out, logranks)
+            loss = self.loss_fn(model_out, logranks, (1-logranks))
             loss_sum += loss
+
+            _, batch_correct_ctr = compute_accuracy(target_ranks=logranks, model_outputs=model_out)
+            correct_ctr += batch_correct_ctr
 
         n = len(self.data_loader.valid)
         loss = loss_sum / n
 
+        accuracy = correct_ctr.float() / (n * self.batch_size ** 2)
+
         self.writer.add_scalar('loss_valid', loss, self.step_ctr)
+        self.writer.add_scalar('accuracy_valid', accuracy, self.step_ctr)
