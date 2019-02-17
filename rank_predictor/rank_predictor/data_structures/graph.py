@@ -6,6 +6,12 @@ from data_structures.node import Node
 
 
 class Graph:
+    """
+    Following the DeepMind "Graph Nets" paper (https://arxiv.org/abs/1806.01261).
+    This graph is a directed, attributed multi-graph with a global attribute.
+    Directed, because edges distinguish between sender and receiver. An attribute can be 'any' information. Multi-graph,
+    because there can be more than one edge between vertices, including self-edges.
+    """
 
     def __init__(self, nodes: Set[Node], edges: Set[Edge], attribute: Attribute):
         self.nodes = nodes  # V

@@ -1,16 +1,16 @@
 import glob
 import os
 
-import torch
-from skimage import io
-from torch.utils.data import Dataset, DataLoader
-from typing import Dict, List, Tuple
+from torch.utils.data import Dataset
+from typing import Dict, List
 from torchvision.transforms import ToPILImage, Resize, Normalize, Compose, ToTensor
 from tqdm import tqdm
 from math import log
+
+from data.utils import filename_to_rank, load_image
 from data.v1.utils import img_loading_possible
 from rank_predictor.data import threefold
-from rank_predictor.data.v1.transforms import ImageTransform, ToCudaTensor
+from rank_predictor.data.v1.transforms import ImageTransform
 import logging
 
 
@@ -30,7 +30,7 @@ class DatasetV1(Dataset):
         super(DatasetV1).__init__()
 
         self.img_paths = img_paths
-        ranks = map(self.filename_to_rank, self.img_paths)
+        ranks = map(filename_to_rank, self.img_paths)
         self.labels = list(map(self.rank_to_label, ranks))
 
         self.transform = Compose([
@@ -44,15 +44,10 @@ class DatasetV1(Dataset):
         img_path = self.img_paths[index]
         img_name = os.path.basename(img_path)
 
-        # load the image
-        try:
-            img = io.imread(img_path)
-        except ValueError:
-            logging.error("The image '{}' could not be loaded.".format(img_path))
-            raise
+        img = load_image(img_path)
 
         # parse rank from image name
-        rank = self.filename_to_rank(img_name)
+        rank = filename_to_rank(img_name)
 
         sample = {
             'img': img,
@@ -81,17 +76,6 @@ class DatasetV1(Dataset):
         label_weights = list(map(lambda c: (n / c), label_ctr))
 
         return label_weights
-
-    @staticmethod
-    def filename_to_rank(file_name: str) -> int:
-        try:
-            path_parts = os.path.split(file_name)
-            filename_with_ext = path_parts[-1]
-            rank = int(os.path.splitext(filename_with_ext)[0])
-        except ValueError:
-            logging.error("Could not parse the file name '{}'.".format(file_name))
-            raise
-        return rank
     
     @staticmethod
     def rank_to_label(rank: int) -> int:
