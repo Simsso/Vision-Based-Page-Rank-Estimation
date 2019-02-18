@@ -53,9 +53,9 @@ $X^{(r)} = (G,u,r,h)$
 
 \subsubsection{The Directed Graph $G$}
 \label{TheDirectedGraph}
-The directed graph provides a topological view on the given website by representing all associated web pages within the same domain as vertices and connections as arrows. Figure \ref{fig:PartialDirectedGraph_timodenk.com} illustrates this by means of an example. During the crawling process as described in Section \ref{Datacrawler} vertices and arrows of the graph are created and enriched with local information about the visited web pages.
+The directed graph provides a topological view on the given website by representing all associated web pages within the same domain as vertices and connections as arrows. During the crawling process as described in Section \ref{Datacrawler} vertices and arrows of the graph are created and enriched with local information about the visited web pages. Figure \ref{fig:PartialDirectedGraph_timodenk.com} illustrates this by means of an example.
 
-The directed graph $G$ is characterized by a set of nodes $\mathbb{V}$ and edges $\mathbb{E}$. Each node $v \in \mathbb{V}$ represents a web page of the given domain associated with the graph. A node is characterized by the following tuple:
+The directed graph $G$ is characterized by a set of nodes $\mathbb{V}$ and edges $\mathbb{A}$. Each node $v \in \mathbb{V}$ represents a web page of the given domain associated with the graph. A node is characterized by the following tuple:
 
 \begin{center}
 $v = (u, \tensorsym{I}, \tensorsym{M},t, l, s)$
@@ -69,10 +69,10 @@ $v = (u, \tensorsym{I}, \tensorsym{M},t, l, s)$
 \end{itemize}
 \end{center}
 
-Each edge represents a possible navigation from web page $v_1$ to $v_2$ in the graph $G$. It can be understood as a hyperlink or button found on web page $v_1$ (source), which points to $v_2$ (target) in the same domain. 
+Each edge $a$ represents a possible navigation from web page $v_1$ to $v_2$ in the graph $G$. It can be understood as a hyperlink or button found on web page $v_1$ (source), which points to $v_2$ (target) in the same domain. 
 
 \begin{center}
-	$v \in (v_1, v_2, t)$
+	$a \in (v_1, v_2, t)$
 	\begin{itemize}
 		\item[$v_1$] The source node (web page).
 		\item[$v_2$] The target node that $v_1$ points to.
@@ -127,6 +127,6 @@ Each edge represents a possible navigation from web page $v_1$ to $v_2$ in the g
 \draw[-latex] (timodenk.one west) to [bend right=30](imprint.one north);
 \end{tikzpicture}
 }
-\caption{Illustrates partial directed graph of domain \texttt{timodenk.com} with three web pages, corresponding arrows and vertices}
+\caption{The figure illustrates the partial directed graph $G = (\mathbb{V}, \mathbb{A})$ of the domain \texttt{timodenk.com} with the web pages \texttt{timodenk.com}, \texttt{timodenk.com/imprint},   and \texttt{sites.timodenk.com} . Each webpage is a node $v \in \mathbb{V}$ represented as a box containing the tuple of attributes $v = (u, \tensorsym{I}, \tensorsym{M},t, l, s)$ as specified in \ref{TheDirectedGraph}. Each attribute is represented as an entry in the box and contains respective values of the webpage. Nodes are connected with directed edges $a \in \mathbb{A}$ represented by the arrows in the figure. Moreover, the arrows are annotated exemplary representing the URL of the target node $v_2$ they are pointing to as specified in \ref{TheDirectedGraph}. }
 \label{fig:PartialDirectedGraph_timodenk.com}
 \end{figure}
