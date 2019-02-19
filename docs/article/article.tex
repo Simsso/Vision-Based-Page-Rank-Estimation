@@ -1,13 +1,13 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
+\usepackage{tikz}
 
 \title{Pagerank Estimation with Deep Graph Networks}
-\author{Timo Denk, Samed Guener}
+\author{Timo Denk, Samed Güner}
 \date{June 2019}
 
 % todo
 \usepackage{xargs}                      % Use more than one optional parameter in a new commands
-\usepackage[pdftex,dvipsnames]{xcolor}  % Coloured text etc.
 \usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
 \newcommandx{\unsure}[2][1=]{\todo[linecolor=red,backgroundcolor=red!25,bordercolor=red,#1]{#2} \PackageWarning{}{#2!}}
 \newcommandx{\change}[2][1=]{\todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue,#1]{#2}\PackageWarning{}{#2!}}
@@ -15,26 +15,36 @@
 \newcommandx{\improve}[2][1=]{\todo[linecolor=Plum,backgroundcolor=Plum!25,bordercolor=Plum,#1]{#2}\PackageWarning{}{#2!}}
 \newcommandx{\thiswillnotshow}[2][1=]{\todo[disable,#1]{#2}\PackageWarning{}{#2!}}
 
+% math
+\usepackage{amsmath}
+\usepackage{amssymb}  % special set sybmols e.g. for real numbers R
+\usepackage{bm}  % bold math
+\usepackage{isomath}
+
 % citing
 \usepackage[backend=bibtex,style=alphabetic]{biblatex}
 \addbibresource{bibliography.bib}
+
+% new paragraph spacing and indent
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+% line spacing
+\renewcommand{\baselinestretch}{1.2}
+\usepackage{setspace}
 
 \begin{document}
 
 \maketitle
 
-\section{Introduction}
-General description, open problems, motivation, goals of this work, contributions, structure
+\input{content/introduction}
 
-\section{Background}
-Methods, literature, related work (perhaps as a separate subsection)
-Description of GCP, K8s, infrastructure background
+\input{content/background}
 
 \section{Method}
 Our contributions, novel aspects, great detail
 
-\section{Datasets}
-Description of the dataset versions, where to get them, and an exact specification.
+\include{content/datasets}
 
 \section{Implementation Details}
 Technical aspects of our methods, things we have tried that might have failed, code snippets
