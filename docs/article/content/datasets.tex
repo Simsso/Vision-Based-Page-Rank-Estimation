@@ -52,7 +52,7 @@ $X^{(r)} = (G,u,r)$
 
 \subsubsection{The Directed Graph $G$}
 \label{TheDirectedGraph}
-The directed graph provides a topological view on the given website by representing all associated web pages within the same domain as nodes and connections as arrows. During the crawling process as described in Section \ref{Datacrawler} nodes and arrows of the graph are created and enriched with local information about the visited web pages. 
+The directed graph provides a topological view on the given website by representing all associated web pages within the same domain as nodes and connections as arrows. During the crawling process as described in Section \ref{Datacrawler} nodes and arrows of the graph are created and enriched with local information about the visited web pages. Figure \ref{fig:PartialDirectedGraph_timodenk.com} illustrates the partial directed graph for the domain \texttt{timodenk.com} with three webpages represented as nodes with corresponding attributes and edges.
 
 The directed graph $G$ is characterized by a set of nodes $\mathbb{V}$ and edges $\mathbb{A}$. Each node $v \in \mathbb{V}$ represents a web page of the given domain associated with the graph. A node is characterized by the following tuple:
 
@@ -79,8 +79,6 @@ Each edge $a$ represents a possible navigation from web page $v_1$ to $v_2$ in t
 		\item[$t$] If existent, the text that links from source to target web page.
 	\end{itemize}
 \end{center}
-
-Figure \ref{fig:PartialDirectedGraph_timodenk.com} illustrates the partial directed graph for the domain \texttt{timodenk.com} with three webpages represented as nodes with corresponding attributes and edges.
 
 \begin{figure}
 \centering
