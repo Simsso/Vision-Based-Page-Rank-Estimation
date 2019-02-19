@@ -1,10 +1,17 @@
 from glob import glob
 import json
 import os
+from json import JSONDecodeError
 from typing import Set, Union, Dict, Tuple, List
 from torch.utils.data import Dataset
+from tqdm import tqdm
+
 from data.utils import Image, load_image, folder_to_rank
+from data.v2.attributes import PageAttributeVal, LinkAttribute
+from data_structures.attribute import Attribute
+from data_structures.edge import Edge
 from data_structures.graph import Graph
+from data_structures.node import Node
 
 
 class DatasetV2(Dataset):
@@ -50,8 +57,36 @@ class DatasetV2(Dataset):
 
         assert len(pages_json) == len(imgs), "Number of pages and number of screenshots mismatch in '{}'.".format(path)
 
-        # TODO: build graph from pages_json and imgs
-        pass
+        # extract nodes
+        nodes = {}
+        for page_json in pages_json:
+            node_attribute = PageAttributeVal.from_json(page_json)
+            url = page_json['base_url']
+            assert url not in nodes, "Found two nodes with the same URL."
+            node = Node(node_attribute)
+            nodes[url] = node
+
+        # extract edges
+        edges = set()
+        for page_json in pages_json:
+
+            url = page_json['base_url']
+            source_node = nodes[url]
+
+            for edge_json in page_json.get('urls', []):
+
+                target_url = edge_json['url']
+                assert target_url in nodes, "Invalid link target URL. Could not find a node that corresponds to it."
+                target_node = nodes[target_url]
+
+                edge_attribute = LinkAttribute(target_url)
+                edge = Edge(edge_attribute, sender=source_node, receiver=target_node)
+
+                edges.add(edge)
+
+        g = Graph(nodes=set(nodes.values()), edges=edges, attribute=Attribute(None))
+
+        return g
 
     @staticmethod
     def load_images(path: str) -> List[Tuple[Image, Image]]:
@@ -94,5 +129,15 @@ class DatasetV2(Dataset):
 
 
 dataset = DatasetV2.from_path(os.path.expanduser('~/dev/pagerank/data/v2'))
-x = dataset[1000]
-i = 0
+
+assertion_errors, json_errors = 0, 0
+for i in tqdm(range(len(dataset))):
+    try:
+        x = dataset[i]
+    except AssertionError:
+        assertion_errors += 1
+    except JSONDecodeError:
+        json_errors += 1
+
+print("Assertion errors: {}".format(assertion_errors))
+print("JSON errors: {}".format(json_errors))

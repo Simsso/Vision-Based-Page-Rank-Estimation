@@ -25,3 +25,7 @@ class Graph:
             if edge.receiver not in self.nodes or edge.sender not in self.nodes:
                 return False
         return True
+
+    def add_node(self, node: Node) -> None:
+        self.nodes.add(node)
+

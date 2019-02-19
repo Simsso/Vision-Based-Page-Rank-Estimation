@@ -11,3 +11,6 @@ class Edge:
         self.attribute = attribute  # e
         self.sender = sender  # s
         self.receiver = receiver  # r
+
+        sender.sending_edges.add(self)
+        receiver.receiving_edges.add(self)

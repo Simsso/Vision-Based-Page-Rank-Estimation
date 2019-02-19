@@ -8,3 +8,5 @@ class Node:
 
     def __init__(self, attribute: Attribute) -> None:
         self.attribute = attribute  # v
+        self.receiving_edges = set()  # incoming
+        self.sending_edges = set()  # outgoing
