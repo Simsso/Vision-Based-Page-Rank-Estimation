@@ -12,37 +12,44 @@ In the last section (\ref{datacrawler_scale}) we will discuss how we successfull
 The requirements in functionality for the datacrawler arise from the dataset specifications (\ref{DatasetVersion1}, \ref{DatasetVersion2}). The next section will derive the requirements from the dataset specifications and discuss them profoundly.
 
 \subsubsection{Browser Emulation}
+\label{browser_emulation}
 One of the major requirements for the datacrawler is to find a convenient way of emulating a web browser. According to the dataset specifications, for every given website a screenshot $\tensorsym{I}$ has to be taken. In addition to that, every screenshot must represent the website as the user would see in a common browser. The latter and other attributes such as the loading time $l$ of a website like in a common browser make the emulation of a browser an inevitable requirement. 
 
 \subsubsection{Information Accessibility}
+\label{information_accessibility}
 Accessing \textit{low-level} information such as the \textit{HTTP-Request} to change the \textit{user-agent} to generate a mobile screenshot $\tensorsym{M}$ (\ref{datacrawler_mobilescreenshot_datamodule}) or the \textit{Document Object Model (DOM)} (\ref{datacrawler_url_datamodule}) to generate edges $a$ in the graph according to dataset version 2 specification (\ref{DatasetVersion2}) is inevitable. The datacrawler has to be able to manipulate internal data structures and even able to inject own \textit{JavaScript-code} (\ref{datacrawler_screenshot_datamodule}) on the website.
 
 \subsubsection{Modularity}
+\label{modularity}
 The datacrawler has to be as modular for allowing us to extend the datacrawler easily and decide which attribute should be calculated. This requirement in flexibility is raised from the fact that our dataset specifications might change over the time or new ones might be added.
 
 This flexibility led to a sophisticated architecture such as the \text{DataModule-System} (\ref{datacrawler_datamodulesystem}), which makes it possible to pass the dataset specification directly into the datacrawler.
 
 \subsubsection{Scalability}
+\label{scalability}
 Both dataset versions require the analysis of at least 100,000 websites. Therefore, datacrawler has to be horizontally scalable to allow the analysis of multiple domains at once, and efficient in terms analysis time and start-up time. An inefficient and not scalable datacrawler would lead to multiple days of required analysis time and reflect also in high infrastructure costs.
 
 \subsection{Framework}
 \label{datacrawler_framework_language}
 The previous section has shown some of the intricate requirements for the datacrawler. To answer those requirements in the given time frame, we investigated in frameworks, which would do most of the heavy-lifting for us such as networking, I/O or rendering of the website.
 
-This section will introduce two frameworks \texttt{Puppeteer} and \texttt{Chromium Embedded Framework} (\texttt{CEF}), compare both and discuss our decision for \texttt{CEF}.
+This section will introduce two frameworks \texttt{Puppeteer} and \texttt{Chromium Embedded Framework} (\texttt{CEF}), compare both and discuss our decision for \texttt{CEF}. Both frameworks are providing an API to instrument the well-known browser \texttt{Chrome} (or \texttt{Chromium}).
 
 \subsubsection{Puppeteer}
-Puppeteer is a open-source library for the JavaScript runtime \texttt{Node.js}, which provides a high-level API to control instances of the browser \texttt{Chrome} and \texttt{Chromium}. It wraps the \texttt{Chrome DevTools Protocol} in JavaScript, which allows web developers to instrument, inspect and debug instances of \texttt{Chrome} and \texttt{Chromium}. Technically, the protocol is exposed over the port for debugging by \texttt{Chrome} and \texttt{Chromium}.
+\texttt{Puppeteer} is a open-source library for the JavaScript runtime \texttt{Node.js}, which provides a high-level API to control instances of the browser \texttt{Chrome} and \texttt{Chromium}. It wraps the \texttt{Chrome DevTools Protocol} in JavaScript, which allows web developers to instrument, inspect and debug instances of \texttt{Chrome} and \texttt{Chromium}. Technically, the protocol is exposed at the port for debugging by \texttt{Chrome} and \texttt{Chromium}.
 
 The protocol offers a varies number of functionalities, which are grouped into domains. Some of the interesting domains for our use-case are:
 \begin{description}
 	\item[Page]: API to load and take a screenshot of the given website.
 	\item[DOM]: API to read and manipulate the DOM of the given website.
 	\item[Network]: API to intercept network requests, track downloaded data and network issues.
-	\item[Emulation]: API to emulate different a geolocation, network stability and user-agent.
+	\item[Emulation]: API to emulate different geolocation, network bandwith and mobile devices.
 \end{description}
 
-During start up \texttt{Puppeteer} starts a \textit{headless} instance of \texttt{Chrome}, attaches to the instances using the port for debugging and afterwards it executes custom code of the user.
+During start up \texttt{Puppeteer} starts an instance of \texttt{Chrome}, attaches to the instances using the port for debugging and afterwards custom code of the user will be executed against the instance. The instance will be started in \texttt{headless}-mode meaning that no UI will be visible.
+
+\texttt{Puppeteer} fulfills all requirements (\ref{datacrawler_requirements}) raised from the dataset specifications. For example the requirement of \textbf{Browser Emulation} (\ref{browser_emulation}), since it is using an instance of \texttt{Chrome} to render websites. Furthermore the requirement in \textbf{Information Accessibility} (\ref{information_accessibility}), due to functionalities in the domains DOM and Network. \textbf{Modularity} (\ref{modularity}) is given by using JavaScript as the programming language, which makes the use of polymorphism possible as used in DataModule-System (\ref{datacrawler_datamodulesystem}). The usage of \texttt{Chrome} ensures efficiency in terms of loading, rendering websites and retrieval of website information. Moreover, the combination of \texttt{Chrome} and \texttt{Puppeteer} can be scaled-out easily by using our system described in \ref{datacrawler_scale} fulfilling \textbf{Scalability} (\ref{scalability}).
+
 \subsubsection{Chromium Embedded Framework}
 \subsection{Datacrawler Architecture}
 \label{datacrawler_architecture}
