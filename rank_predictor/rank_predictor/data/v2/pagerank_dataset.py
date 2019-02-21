@@ -76,7 +76,11 @@ class DatasetV2(Dataset):
             for edge_json in page_json.get('urls', []):
 
                 target_url = edge_json['url']
-                assert target_url in nodes, "Invalid link target URL. Could not find a node that corresponds to it."
+
+                if target_url not in nodes:
+                    continue  # skip invalid edges
+                # assert target_url in nodes, "Invalid link target URL. Could not find a node that corresponds to it."
+
                 target_node = nodes[target_url]
 
                 edge_attribute = LinkAttribute(target_url)
