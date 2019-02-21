@@ -28,8 +28,8 @@ def compute_accuracy(target_ranks: Tensor, model_outputs: Tensor) -> (Tensor, Te
     model_lt = torch.lt(model_outputs, model_outputs_t)
 
     correct_pairs = torch.eq(target_lt, model_lt)
-    num_correct = torch.sum(correct_pairs) - n
+    num_correct = torch.sum(correct_pairs) - n  # ignore diagonal entries (x_i ranked vs. x_i)
 
-    correct_ratio = num_correct.float() / (n-1) ** 2
+    correct_ratio = num_correct.float() / (n ** 2 - n)
 
     return correct_ratio, num_correct

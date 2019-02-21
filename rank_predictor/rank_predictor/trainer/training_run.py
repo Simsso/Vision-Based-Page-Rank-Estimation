@@ -43,7 +43,7 @@ class TrainingRun:
 
         self.net.to(device)
 
-        self.writer = SummaryWriter('logs/prob_loss3')
+        self.writer = SummaryWriter('logs/prob_loss4')
 
     def __call__(self, epochs: int) -> None:
         for epoch in range(epochs):
