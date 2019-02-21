@@ -33,12 +33,12 @@ Both dataset versions require the analysis of at least 100,000 websites. Therefo
 \label{datacrawler_framework_language}
 The previous section has shown some of the intricate requirements for the datacrawler. To answer those requirements in the given time frame, we investigated in frameworks, which would do most of the heavy-lifting for us such as networking, I/O or rendering of the website.
 
-This section will introduce two frameworks \texttt{Puppeteer} and \texttt{Chromium Embedded Framework} (\texttt{CEF}), compare both and discuss our decision for \texttt{CEF}. Both frameworks are providing an API to instrument the well-known browser \texttt{Chrome} (or \texttt{Chromium}).
+This section will introduce two frameworks \texttt{Puppeteer} and \texttt{Chromium Embedded Framework} (\texttt{CEF}), compare both and discuss our decision for \texttt{CEF}. Both frameworks are providing an API to instrument the well-known browser \texttt{Chrome}.
 
 \subsubsection{Puppeteer}
-\texttt{Puppeteer} is a open-source library for the JavaScript runtime \texttt{Node.js}, which provides a high-level API to control instances of the browser \texttt{Chrome} and \texttt{Chromium}. It wraps the \texttt{Chrome DevTools Protocol} in JavaScript, which allows web developers to instrument, inspect and debug instances of \texttt{Chrome} and \texttt{Chromium}. Technically, the protocol is exposed at the port for debugging by \texttt{Chrome} and \texttt{Chromium}.
+\texttt{Puppeteer} is a open-source library for the JavaScript runtime \texttt{Node.js}, which provides a high-level API to control instances of the browsers \texttt{Chrome} or \texttt{Chromium}. One of the main goals of \texttt{Puppeteer} is to grow adoption in automated browser testing \cite{PuppeteerFAQ}.  For this purpose, it wraps the \texttt{Chrome DevTools Protocol} in JavaScript, which allows web developers to instrument, inspect and debug instances of \texttt{Chrome}. Technically, the protocol is exposed at the port for debugging by \texttt{Chrome}.
 
-The protocol offers a varies number of functionalities, which are grouped into domains. Some of the interesting domains for our use-case are:
+The protocol offers a varies number of functionalities, which are grouped into domains \cite{DevToolsProtocol}. Some of the interesting domains for our use-case are:
 \begin{description}
 	\item[Page]: API to load and take a screenshot of the given website.
 	\item[DOM]: API to read and manipulate the DOM of the given website.
@@ -48,9 +48,15 @@ The protocol offers a varies number of functionalities, which are grouped into d
 
 During start up \texttt{Puppeteer} starts an instance of \texttt{Chrome}, attaches to the instances using the port for debugging and afterwards custom code of the user will be executed against the instance. The instance will be started in \texttt{headless}-mode meaning that no UI will be visible.
 
-\texttt{Puppeteer} fulfills all requirements (\ref{datacrawler_requirements}) raised from the dataset specifications. For example the requirement of \textbf{Browser Emulation} (\ref{browser_emulation}), since it is using an instance of \texttt{Chrome} to render websites. Furthermore the requirement in \textbf{Information Accessibility} (\ref{information_accessibility}), due to functionalities in the domains DOM and Network. \textbf{Modularity} (\ref{modularity}) is given by using JavaScript as the programming language, which makes the use of polymorphism possible as used in DataModule-System (\ref{datacrawler_datamodulesystem}). The usage of \texttt{Chrome} ensures efficiency in terms of loading, rendering websites and retrieval of website information. Moreover, the combination of \texttt{Chrome} and \texttt{Puppeteer} can be scaled-out easily by using our system described in \ref{datacrawler_scale} fulfilling \textbf{Scalability} (\ref{scalability}).
+\texttt{Puppeteer} fulfills all requirements (\ref{datacrawler_requirements}) raised from the dataset specifications:
+The requirement of \textbf{Browser Emulation} (\ref{browser_emulation}), since it is using an instance of \texttt{Chrome} to render websites. The requirement of \textbf{Information Accessibility} (\ref{information_accessibility}), due to functionalities in the domains DOM and Network. Furthermore \textbf{Modularity} (\ref{modularity}) is given per se by using JavaScript as the programming language, which makes the use of polymorphism possible as used in DataModule-System (\ref{datacrawler_datamodulesystem}). The usage of \texttt{Chrome} ensures efficiency in terms of loading, rendering websites and retrieval of website information. Moreover, the combination of \texttt{Chrome} and \texttt{Puppeteer} can be scaled-out easily fulfilling the last requirement \textbf{Scalability} (\ref{scalability}) by using our system described in \ref{datacrawler_scale}.
 
 \subsubsection{Chromium Embedded Framework}
+\texttt{Chromium Embedded Framework (CEF)} is an open-source framework for embedding the \texttt{Chromium} browser into other applications. The main goal of \texttt{CEF} is to enable developers in adding web browsing functionality such as using HTML, CSS and JavaScript to create application UI. Well-known applications such as \texttt{Adobe Acrobat}, \texttt{Spotify Desktop} and \texttt{MATLAB} are using \texttt{CEF}.
+
+\texttt{CEF} has in total three versions, whereas \texttt{CEF 2} was abandoned due to the appearance of the \texttt{Chromium Content API} which will be discussed later. \texttt{CEF 1} is a single process implementation and based on the old \texttt{Chromium WebKit API}, due to deprecation of the \texttt{Chromium WebKit API} it is no longer supported and developed. \texttt{CEF 3} is a multi process implementation and based on the current \texttt{Chromium Content API}.
+
+As the \texttt{Chromium} code base has grown, it was inevitable to avoid opaque dependencies and features in the wrong places. Therefore the \textit{content module} was introduced, which contains the core functionality of \texttt{Chromium}. The \texttt{Chromium Content API} wraps the \texttt{content module} and offers isolation for developers from the core functionalities \cite{ChromiumContentAPI}.
 \subsection{Datacrawler Architecture}
 \label{datacrawler_architecture}
 
