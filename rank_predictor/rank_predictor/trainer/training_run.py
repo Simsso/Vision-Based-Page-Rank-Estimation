@@ -7,7 +7,7 @@ from tensorboardX import SummaryWriter
 from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm
 
-from data.v1.utils import compute_accuracy
+from trainer.ranking.utils import compute_accuracy
 from rank_predictor.data import threefold
 
 
@@ -43,7 +43,7 @@ class TrainingRun:
 
         self.net.to(device)
 
-        self.writer = SummaryWriter('logs/deeper_highlr')
+        self.writer = SummaryWriter('logs/prob_loss3')
 
     def __call__(self, epochs: int) -> None:
         for epoch in range(epochs):
@@ -64,7 +64,7 @@ class TrainingRun:
 
         model_out: torch.Tensor = self.net.forward(inputs)
 
-        loss = self.loss_fn(model_out, logranks, (1-logranks))
+        loss = self.loss_fn(model_out, logranks)  # weighting (1-logranks)
         loss.backward()
         self.opt.step()
 
@@ -91,7 +91,7 @@ class TrainingRun:
             with torch.no_grad():
                 model_out: torch.Tensor = self.net.forward(imgs)
 
-            loss = self.loss_fn(model_out, logranks, (1-logranks))
+            loss = self.loss_fn(model_out, logranks)  # weight (1-logranks)
             loss_sum += loss
 
             _, batch_correct_ctr = compute_accuracy(target_ranks=logranks, model_outputs=model_out)

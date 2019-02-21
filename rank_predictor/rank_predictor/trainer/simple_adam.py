@@ -5,6 +5,7 @@ from rank_predictor.data.v1.pagerank_dataset import DatasetV1
 from rank_predictor.model.screenshot_feature_extractor import ScreenshotFeatureExtractor
 from torch import nn, optim
 from rank_predictor.trainer.training_run import TrainingRun
+from trainer.ranking.probabilistic_loss import ProbabilisticLoss
 
 logging.basicConfig(level=logging.INFO)
 use_cuda = torch.cuda.is_available()
@@ -19,13 +20,10 @@ net = ScreenshotFeatureExtractor()
 net.cuda()
 
 # optimizer
-opt = optim.Adam(net.parameters(), lr=1e-3)
-
+opt = optim.Adam(net.parameters(), lr=4e-4)
 
 # loss
-def weighted_mse_loss(prediction, target, weight):
-    return torch.sum(weight * (prediction - target) ** 2)
+loss = ProbabilisticLoss()
 
-
-training_run = TrainingRun(net, opt, weighted_mse_loss, dataset_v1, batch_size=24, device=device)
+training_run = TrainingRun(net, opt, loss, dataset_v1, batch_size=12, device=device)
 training_run(10)
