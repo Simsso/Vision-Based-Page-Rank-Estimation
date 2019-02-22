@@ -43,7 +43,7 @@ class TrainingRun:
 
         self.net.to(device)
 
-        self.writer = SummaryWriter('logs/prob_loss4')
+        self.writer = SummaryWriter('logs/prob_loss_weighted2')
 
     def __call__(self, epochs: int) -> None:
         for epoch in range(epochs):
@@ -64,7 +64,7 @@ class TrainingRun:
 
         model_out: torch.Tensor = self.net.forward(inputs)
 
-        loss = self.loss_fn(model_out, logranks)  # weighting (1-logranks)
+        loss = self.loss_fn(model_out, logranks, w=(1-logranks))
         loss.backward()
         self.opt.step()
 
@@ -91,7 +91,7 @@ class TrainingRun:
             with torch.no_grad():
                 model_out: torch.Tensor = self.net.forward(imgs)
 
-            loss = self.loss_fn(model_out, logranks)  # weight (1-logranks)
+            loss = self.loss_fn(model_out, logranks, w=(1-logranks))
             loss_sum += loss
 
             _, batch_correct_ctr = compute_accuracy(target_ranks=logranks, model_outputs=model_out)
@@ -100,7 +100,7 @@ class TrainingRun:
         n = len(self.data_loader.valid)
         loss = loss_sum / n
 
-        accuracy = correct_ctr.float() / (n * self.batch_size ** 2)
+        accuracy = correct_ctr.float() / (n * (self.batch_size ** 2 - self.batch_size))
 
         self.writer.add_scalar('loss_valid', loss, self.step_ctr)
         self.writer.add_scalar('accuracy_valid', accuracy, self.step_ctr)

@@ -5,9 +5,10 @@ from torch import Tensor
 def compute_accuracy(target_ranks: Tensor, model_outputs: Tensor) -> (Tensor, Tensor):
     """
     Computes the ratio of correct relative rank predictions within a batch.
-    :param target_ranks: Target ranks of the samples in a batch
+    :param target_ranks: Target ranks of the samples in a batch of size n
     :param model_outputs: Model predictions for the batch
-    :return: Ratio of correct predictions (aka. accuracy) and number of correct predictions (pairwise)
+    :return: Ratio of correct predictions (aka. accuracy) and number of correct predictions (pairwise).
+             Note that the num_correct is in {0, ..., 2 * n - n}
     """
     assert len(target_ranks.size()) == 1, "Target ranks must be a vector, i.e. shape [n]"
     assert len(model_outputs.size()) == 1, "Model outputs must be a vector, i.e. shape [n]"
