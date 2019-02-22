@@ -58,7 +58,7 @@ class ScreenshotFeatureExtractor(nn.Module):
         x = F.dropout(x, p=.3, training=self.training)
 
         x = self.dense2(x)
-        x = torch.sigmoid(x)
+        # x = torch.sigmoid(x)
         assert x.size(1) == 1
         x = x.view((-1,))
 
