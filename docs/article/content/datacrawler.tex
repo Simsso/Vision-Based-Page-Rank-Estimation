@@ -54,9 +54,19 @@ The requirement of \textbf{Browser Emulation} (\ref{browser_emulation}), since i
 \subsubsection{Chromium Embedded Framework}
 \texttt{Chromium Embedded Framework (CEF)} is an open-source framework for embedding the \texttt{Chromium} browser into other applications. The main goal of \texttt{CEF} is to enable developers in adding web browsing functionality such as using HTML, CSS and JavaScript to create application UI. Well-known applications such as \texttt{Adobe Acrobat}, \texttt{Spotify Desktop} and \texttt{MATLAB} are using \texttt{CEF}.
 
+\texttt{CEF} was designed ground-up with performance and ease-use in mind. The framework exposes \texttt{C++} interfaces with default implementation for all features requiring little or no integration work. Furthermore, the community added wrappers for the base implementation to support a wide-range of operating systems and programming languages.
+
 \texttt{CEF} has in total three versions, whereas \texttt{CEF 2} was abandoned due to the appearance of the \texttt{Chromium Content API} which will be discussed later. \texttt{CEF 1} is a single process implementation and based on the old \texttt{Chromium WebKit API}, due to deprecation of the \texttt{Chromium WebKit API} it is no longer supported and developed. \texttt{CEF 3} is a multi process implementation and based on the current \texttt{Chromium Content API}.
 
 As the \texttt{Chromium} code base has grown, it was inevitable to avoid opaque dependencies and features in the wrong places. Therefore the \textit{content module} was introduced, which contains the core functionality of \texttt{Chromium}. The \texttt{Chromium Content API} wraps the \texttt{content module} and offers isolation for developers from the core functionalities \cite{ChromiumContentAPI}.
+\texttt{CEF 3} insulates the user from the underlying complexity of \texttt{Chromium} by using the \texttt{Chromium Content API} and offering production-quality stable APIs \cite{CEFGeneralUsage}. The offered and consumed APIs by the datacrawler will be profoundly discussed in \textbf{Datacrawler Architecture} (\ref{datacrawler_architecture}).
+
+Through the use of \texttt{Chromium Content API}, \texttt{CEF 3} provides a close integration between the browser and the host application including support for custom JavaScript objects and JavaScript extensions. Moreover, the host application is able to control resource loading, intercept the network, navigation and many more, while taking advantage of the same performance and technologies available in the \texttt{Google Chrome Web browser} \cite{CEFGeneralUsage}.
+
+\texttt{CEF 3} clearly fulfills the requirement of \textbf{Browser Emulation} (\ref{browser_emulation}) and \textbf{Information Accessibility} (\ref{information_accessibility}). Moreover, \textbf{Modularity} (\ref{modularity}) and \textbf{Scalability} (\ref{scalability}) is also given by using \texttt{C++} and the core functionalities of \texttt{Chromium}.
+
+\subsubsection{Framework Decision}
+
 \subsection{Datacrawler Architecture}
 \label{datacrawler_architecture}
 
