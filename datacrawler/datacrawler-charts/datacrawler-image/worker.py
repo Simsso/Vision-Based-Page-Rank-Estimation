@@ -17,9 +17,10 @@ while not q.empty():
     os.environ["RANK"] = data[0]
     os.environ["URL"] = data[1]
 
-    subprocess.call(["/opt/apt/datacrawler/datacrawler", "--no-sandbox", "--headless", "--disable-gpu","--disk-cache-dir=/dev/null", "--disk-cache-size=1"])
-
-    q.complete(item)
+    return_code = subprocess.call(["/opt/apt/datacrawler/datacrawler", "--no-sandbox", "--headless", "--disable-gpu","--disk-cache-dir=/dev/null", "--disk-cache-size=1"])
+    
+    if return_code == 0:
+      q.complete(item)
   else:
     print("Waiting for work")
 print("Queue empty, exiting")

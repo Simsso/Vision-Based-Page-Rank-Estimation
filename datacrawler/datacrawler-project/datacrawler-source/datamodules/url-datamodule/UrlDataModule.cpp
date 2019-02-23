@@ -40,7 +40,7 @@ DataBase *UrlDataModule::process(std::string url) {
     std::thread loadingTimer([&](){
         int secondsSteps = 0;
 
-        while(secondsSteps < 21){
+        while(secondsSteps < 31){
             if(quitMessageLoop)
                 return;
 

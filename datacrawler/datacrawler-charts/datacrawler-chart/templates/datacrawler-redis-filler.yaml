@@ -7,5 +7,5 @@ metadata:
 spec:
   containers:
     - name: datacrawler-redis-filler
-      image: gcr.io/nips-2018-102018/datacrawler-redis-filler:latest
+      image: gcr.io/projects-220919/datacrawler-redis-filler:latest
   restartPolicy: Never

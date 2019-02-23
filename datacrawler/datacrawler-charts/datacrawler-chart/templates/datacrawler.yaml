@@ -3,7 +3,7 @@ kind: Job
 metadata:
   name: datacrawler-job
 spec:
-  parallelism: 38
+  parallelism: 30
   template:
     metadata:
       labels:
@@ -11,7 +11,7 @@ spec:
     spec:
       containers:
       - name: datacrawler
-        image: gcr.io/nips-2018-102018/datacrawler:latest
+        image: gcr.io/projects-220919/datacrawler:latest
         resources:
           requests:
             cpu: 500m
@@ -19,6 +19,8 @@ spec:
         volumeMounts:
         - name: datacrawler-output
           mountPath: /opt/apt/output
+        securityContext:
+          allowPrivilegeEscalation: true
       restartPolicy: OnFailure
       volumes:
       - name: datacrawler-output

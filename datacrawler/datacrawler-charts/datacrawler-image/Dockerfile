@@ -22,7 +22,7 @@ RUN apt-get install -y  python-pip
 RUN pip install redis 
 
 COPY datacrawler-bin/ /opt/apt/datacrawler/
-
+RUN chmod 777 /opt/apt/datacrawler/datacrawler
 COPY rediswq.py /opt/apt/
 COPY worker.py  /opt/apt/
 COPY run_datacrawler.sh /opt/apt/
@@ -30,6 +30,7 @@ COPY run_datacrawler.sh /opt/apt/
 RUN mkdir /opt/apt/output
 RUN cat /opt/apt/datacrawler/datacrawler.config.json
 RUN chmod 777 /opt/apt/datacrawler/datacrawler.config.json
+RUN chmod 777 /opt/apt/run_datacrawler.sh
 RUN chmod +x /opt/apt/run_datacrawler.sh
 RUN chmod +x /opt/apt/datacrawler/datacrawler
 
