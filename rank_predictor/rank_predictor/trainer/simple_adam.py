@@ -20,10 +20,10 @@ net = ScreenshotFeatureExtractor()
 net.cuda()
 
 # optimizer
-opt = optim.Adam(net.parameters(), lr=4e-4)
+opt = optim.Adam(net.parameters(), lr=5e-4)
 
 # loss
 loss = ProbabilisticLoss()
 
-training_run = TrainingRun(net, opt, loss, dataset_v1, batch_size=12, device=device)
-training_run(10)
+training_run = TrainingRun(net, opt, loss, dataset_v1, batch_size=24, device=device)
+training_run(50)
