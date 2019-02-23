@@ -20,7 +20,7 @@ net = ScreenshotFeatureExtractor()
 net.cuda()
 
 # optimizer
-opt = optim.Adam(net.parameters(), lr=5e-4)
+opt = optim.Adam(net.parameters(), lr=2e-4)
 
 # loss
 loss = ProbabilisticLoss()
