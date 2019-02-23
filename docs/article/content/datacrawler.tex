@@ -2,7 +2,6 @@
 \label{Datacrawler}
 The main goal of the datacrawler is to deliver the required datasets as specified in \ref{datasets}. The input to the datacrawler is simply a domain, which is provided by the ground truth. Depending on the configuration the output of the datacrawler can vary from a single screenshot (\ref{DatasetVersion1}) to a complete graph of the given domain (\ref{DatasetVersion2}).
 
-
 The following section (\ref{datacrawler_requirements}) will profoundly discuss the requirements in functionality for the datacrawler, which will serve as a basis for discussion for the decision between the frameworks \texttt{Puppeeter} and \texttt{Chromium Embedded Framework} (\ref{datacrawler_framework_language}). Afterwards we will give an overview of the architecture (\ref{datacrawler_architecture}) and highlight the idea of \textit{DataModules} in the crawler (\ref{datacrawler_datamodulesystem}). Following that, we will discuss profoundly all developed \textit{DataModules} with their role in the datacrawler (\ref{datacrawler_screenshot_datamodule}, \ref{datacrawler_mobilescreenshot_datamodule}, \ref{datacrawler_url_datamodule}). We will wrap up the internals of the datacrawler by taking a look into the workflow of the datacrawler (\ref{datacrawler_workflow}).
 
 In the last section (\ref{datacrawler_scale}) we will discuss how we successfully designed a sophisticated system to scale-out the datacrawler reducing the total dataset creation time on Google Cloud Platform.  
@@ -33,10 +32,10 @@ Both dataset versions require the analysis of at least 100,000 websites. Therefo
 \label{datacrawler_framework_language}
 The previous section has shown some of the intricate requirements for the datacrawler. To answer those requirements in the given time frame, we investigated in frameworks, which would do most of the heavy-lifting for us such as networking, I/O or rendering of the website.
 
-This section will introduce two frameworks \texttt{Puppeteer} and \texttt{Chromium Embedded Framework} (\texttt{CEF}), compare both and discuss our decision for \texttt{CEF}. Both frameworks are providing an API to instrument the well-known browser \texttt{Chrome}.
+In our research we focused on the evaluation of frameworks, which base on the most common browser \texttt{Google Chrome} \cite{CommonBrowsers}. This section will introduce two frameworks \texttt{Puppeteer} and \texttt{Chromium Embedded Framework} (\texttt{CEF}), compare both and discuss our decision for \texttt{CEF}. Both frameworks are providing an API to instrument the well-known browser \texttt{Chrome}.
 
 \subsubsection{Puppeteer}
-\texttt{Puppeteer} is a open-source library for the JavaScript runtime \texttt{Node.js}, which provides a high-level API to control instances of the browsers \texttt{Chrome} or \texttt{Chromium}. One of the main goals of \texttt{Puppeteer} is to grow adoption in automated browser testing \cite{PuppeteerFAQ}.  For this purpose, it wraps the \texttt{Chrome DevTools Protocol} in JavaScript, which allows web developers to instrument, inspect and debug instances of \texttt{Chrome}. Technically, the protocol is exposed at the port for debugging by \texttt{Chrome}.
+\texttt{Puppeteer} is a open-source library for the JavaScript runtime \texttt{Node.js}, which provides a high-level API to control instances of the browsers \texttt{Chrome} or \texttt{Chromium}. One of the main goals of \texttt{Puppeteer} is to grow adoption in automated browser testing \cite{PuppeteerFAQ}.  For this purpose, it wraps the \texttt{Chrome DevTools Protocol} in JavaScript, which allows web developers to instrument, inspect and debug instances of \texttt{Chrome}. Technically, the protocol is HTTP-based and exposed as a RESTful API at the port for debugging by \texttt{Chrome}.
 
 The protocol offers a varies number of functionalities, which are grouped into domains \cite{DevToolsProtocol}. Some of the interesting domains for our use-case are:
 \begin{description}
@@ -59,16 +58,45 @@ The requirement of \textbf{Browser Emulation} (\ref{browser_emulation}), since i
 \texttt{CEF} has in total three versions, whereas \texttt{CEF 2} was abandoned due to the appearance of the \texttt{Chromium Content API} which will be discussed later. \texttt{CEF 1} is a single process implementation and based on the old \texttt{Chromium WebKit API}, due to deprecation of the \texttt{Chromium WebKit API} it is no longer supported and developed. \texttt{CEF 3} is a multi process implementation and based on the current \texttt{Chromium Content API}.
 
 As the \texttt{Chromium} code base has grown, it was inevitable to avoid opaque dependencies and features in the wrong places. Therefore the \textit{content module} was introduced, which contains the core functionality of \texttt{Chromium}. The \texttt{Chromium Content API} wraps the \texttt{content module} and offers isolation for developers from the core functionalities \cite{ChromiumContentAPI}.
-\texttt{CEF 3} insulates the user from the underlying complexity of \texttt{Chromium} by using the \texttt{Chromium Content API} and offering production-quality stable APIs \cite{CEFGeneralUsage}. The offered and consumed APIs by the datacrawler will be profoundly discussed in \textbf{Datacrawler Architecture} (\ref{datacrawler_architecture}).
+\texttt{CEF 3} insulates the user from the underlying complexity of \texttt{Chromium} by using the \texttt{Chromium Content API} and offering production-quality stable APIs \cite{CEFGeneralUsage}. The offered and consumed APIs as well as the multi-process architecture will be profoundly discussed in \textbf{Datacrawler Architecture} (\ref{datacrawler_architecture}).
 
 Through the use of \texttt{Chromium Content API}, \texttt{CEF 3} provides a close integration between the browser and the host application including support for custom JavaScript objects and JavaScript extensions. Moreover, the host application is able to control resource loading, intercept the network, navigation and many more, while taking advantage of the same performance and technologies available in the \texttt{Google Chrome Web browser} \cite{CEFGeneralUsage}.
 
 \texttt{CEF 3} clearly fulfills the requirement of \textbf{Browser Emulation} (\ref{browser_emulation}) and \textbf{Information Accessibility} (\ref{information_accessibility}). Moreover, \textbf{Modularity} (\ref{modularity}) and \textbf{Scalability} (\ref{scalability}) is also given by using \texttt{C++} and the core functionalities of \texttt{Chromium}.
 
 \subsubsection{Framework Decision}
-
+Both \texttt{Puppeteer} and \texttt{CEF} fulfill the requirements raised by the dataset specifications. At first glance it seemed a free choice, but after close investigation we found additional points speaking for \texttt{CEF}. In the end we decided to use \texttt{CEF 3} for the datacrawler, due to following additional points:
+\begin{itemize}
+\item Our team has an outstanding expertise in \texttt{C++}, which is the programming language used in both \texttt{CEF 3} and \texttt{Chromium}.
+\item While as \texttt{Puppeteer} is limited to the \texttt{Chrome DevTools Protocol}, \texttt{CEF 3} provides low-level access to the core of \texttt{Chromium}. This ultimately gives us more freedom of control.
+\item \texttt{CEF 3} is integrated into \texttt{Chromium} leading to a faster start-up and execution time Whereas \texttt{Puppeteer} has to start up an instance of \texttt{Chrome} and communicate via a RESTful HTTP API, which represents an addition overhead.
+\end{itemize}
 \subsection{Datacrawler Architecture}
 \label{datacrawler_architecture}
+One of the major points in the design and implementation of the Datacrawler was to meet the \textbf{Modularity} requirement (\ref{modularity}). This led to the development of the sophisticated \textit{DataModule}-System and introduced the concept of \textit{Datamodules}. The Datamodule-System represents the architecture of the Datacrawler. 
+
+Before diving into our implementation details by introducing the \textit{DataModule}-System, we will discuss how applications using \texttt{CEF 3} are build and work in general (\ref{datacrawler_cef_architecture}). Following that, we will introduce the \textit{DataModule}-System (\ref{datacrawler_datamodulesystem}) in great detail giving the required information to understand how \textit{Datamodules} work. Afterwards we will discuss how we take a screenshot of a website and tackle the challenge of detecting when a website has finished loading in the \textit{Screenshot}-Datamodule (\ref{datacrawler_screenshot_datamodule}). Beyond that we will discuss how we take screenshots by emulating a mobile device (\ref{datacrawler_mobilescreenshot_datamodule}) and collect URLs by traversing the DOM (\ref{datacrawler_url_datamodule}). In the end we will show how we generate and output the graph (\ref{datacrawler_graph}) and wrap up by taking a look into the end-to-end workflow of the Datacrawler (\ref{datacrawler_workflow}). 
+
+\subsubsection{CEF 3 Application Structure}
+\label{datacrawler_cef_architecture}
+\texttt{CEF 3} is based on multiple processes. It can mainly be divided into the \textit{browser}-process and \textit{render}-process.
+
+\begin{itemize}
+\item The browser-process represents the host process of the application, which handles window creation, painting and network access. Furthermore, most of the application logic will run in the browser-process. 
+\item Multiple render-processes are responsible for rendering websites, executing JavaScript and running some application logic. Following the process model of \texttt{Chrome}, \texttt{CEF 3} spawns for every unique origin a render-process ensuring resource isolation, parallelism and better failure management.
+\end{itemize}
+
+The separate spawned processes communicate using \textit{Inter-Process Communication} (IPC). Application logic implemented in browser- and render-process can communicate by sending asynchronous messages as \textbf{URL-Datamodule} (\ref{datacrawler_url_datamodule})  will show. Other processes are spawned when needed such as the \textit{plugin}-process for handling of plugins like \textit{Flash}.
+
+In general \texttt{CEF 3} application consists of the class \texttt{CefApp} and \texttt{CefClient}. \texttt{CefApp} is responsible for process-specific callbacks such as returning handler for a custom render-process implementation (\ref{datacrawler_url_datamodule}). Whereas \texttt{CefClient} is responsible for handling browser-instance-specific callbacks such as returning handler for a customer website render implementation (\ref{datacrawler_screenshot_datamodule}). It contains most of the application logic and is being used to create browser instances. As mentioned before, it can be used to control the browser-instance with custom implementation.
+
+The following will briefly describe the start-up of an application using \texttt{CEF 3}:
+\begin{enumerate}
+	\item The \texttt{CefExecuteProcess}-method is used with custom implementation of \texttt{CefApp} to start the separate processes. The application executable will be started multiple times representing new processes.
+	\item \texttt{CreateBrowser} is used with custom implementation of \texttt{CefClient} to create a browser-instance. The browser instance is created in the browser-process, which means that there is only one browser at a time. Futhermore, an initial URL is passed to the browser-instance.
+	\item In the implementation of \texttt{CefClient} \texttt{CefMessageLoop}-method is executed, which starts the event loop of the browser-instance. This means that browser-instance will start loading the given URL, handling network, rendering and many more. \texttt{CEF} takes care of spawning and using of existing render-processes.
+	\item Once \texttt{CefQuitMessageLoop}-method is called, the message loop will be quit.
+\end{enumerate}
 
 \subsubsection{DataModule-System}
 \label{datacrawler_datamodulesystem}
@@ -82,8 +110,8 @@ Through the use of \texttt{Chromium Content API}, \texttt{CEF 3} provides a clos
 \subsubsection{URL-Datamodule}
 \label{datacrawler_url_datamodule}
 
-\improve{[IMPROVE] Add documentation for new datamodules}
-
+\subsubsection{Generating the Graph}
+\label{datacrawler_graph}
 \subsubsection{Datacrawler Workflow}
 \label{datacrawler_workflow}
 
