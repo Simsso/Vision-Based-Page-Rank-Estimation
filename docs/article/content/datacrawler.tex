@@ -1,6 +1,6 @@
 \section{Datacrawler}
 \label{Datacrawler}
-The main goal of the datacrawler is to deliver the required datasets as specified in \ref{datasets}. The input to the datacrawler is simply a domain, which is provided by the ground truth. Depending on the configuration the output of the datacrawler can vary from a single screenshot (\ref{DatasetVersion1}) to a complete graph of the given domain (\ref{DatasetVersion2}).
+The main goal of the datacrawler is to deliver the required datasets as specified in chapter \ref{datasets}. The input to the datacrawler is simply a domain, which is provided by the ground truth. Depending on the configuration the output of the datacrawler can vary from a single screenshot (\ref{DatasetVersion1}) to a complete graph of the given domain (\ref{DatasetVersion2}).
 
 The following section (\ref{datacrawler_requirements}) will profoundly discuss the requirements in functionality for the datacrawler, which will serve as a basis for discussion for the decision between the frameworks \texttt{Puppeeter} and \texttt{Chromium Embedded Framework} (\ref{datacrawler_framework_language}). Afterwards we will give an overview of the architecture (\ref{datacrawler_architecture}) and highlight the idea of \textit{DataModules} in the crawler (\ref{datacrawler_datamodulesystem}). Following that, we will discuss profoundly all developed \textit{DataModules} with their role in the datacrawler (\ref{datacrawler_screenshot_datamodule}, \ref{datacrawler_mobilescreenshot_datamodule}, \ref{datacrawler_url_datamodule}). We will wrap up the internals of the datacrawler by taking a look into the workflow of the datacrawler (\ref{datacrawler_workflow}).
 
@@ -92,7 +92,7 @@ In general \texttt{CEF 3} application consists of the class \texttt{CefApp} and 
 
 The following will briefly describe the start-up of an application using \texttt{CEF 3}:
 \begin{enumerate}
-	\item The \texttt{CefExecuteProcess}-method is used with custom implementation of \texttt{CefApp} to start the separate processes. The application executable will be started multiple times representing new processes.
+	\item The \texttt{CefExecuteProcess}-method is used with custom implementation of \texttt{CefApp} to start separate processes. The application executable will be started multiple times representing new processes.
 	\item \texttt{CreateBrowser} is used with custom implementation of \texttt{CefClient} to create a browser-instance. The browser instance is created in the browser-process, which means that there is only one browser at a time. Futhermore, an initial URL is passed to the browser-instance.
 	\item In the implementation of \texttt{CefClient} \texttt{CefMessageLoop}-method is executed, which starts the event loop of the browser-instance. This means that browser-instance will start loading the given URL, handling network, rendering and many more. \texttt{CEF} takes care of spawning and using of existing render-processes.
 	\item Once \texttt{CefQuitMessageLoop}-method is called, the message loop will be quit.
@@ -100,6 +100,24 @@ The following will briefly describe the start-up of an application using \texttt
 
 \subsubsection{DataModule-System}
 \label{datacrawler_datamodulesystem}
+The naming of the DataModule-System derives from the use of Datamodules and represents the core of the Datacrawler. The system consists of several components, which enable developers to implement and test Datamodules independently increasing flexibility and reducing potential failures. In a plugin-and-play-manner developers can easily develop and add Datamodules to the Datacrawler.
+
+The main idea of a Datamodule is to represents a single attribute in the dataset, which is calculated and added independently from other attributes to the dataset. In addition, each Datamodule can be individually configured and turned on or off by the user.
+
+In order for a Datamodule to be executable, it has to implement following interfaces:
+
+\begin{itemize}
+	\item[DataModuleBaseConfiguration] description
+	\item[DataModulebase] description
+	\item[DataBase] description
+\end{itemize}
+
+\begin{figure}[h]
+	\centering
+	 \includegraphics[scale=0.65]{resources/datacrawler_uml_diagram}
+	 \caption{The figure shows the simplified UML-diagram of the datacrawler with the most prominent classes and methods. Classes in the white boxes represent essential components of the DataModule-System such as the classes \textit{Datacrawler}, \textit{DatacrawlerConfiguration}, \textit{NodeElement} and the interfaces \textit{DataModuleBaseConfiguration}, \textit{DataModulBase} and \textit{DataBase}. Classes in the red boxes represent implementation of DataModules such as the \textit{URLDatamodule} (\ref{datacrawler_url_datamodule}), \textit{ScreenshotDatamodule} (\ref{datacrawler_screenshot_datamodule}) and \textit{MobileScreenshotDatamodule} (\ref{datacrawler_mobilescreenshot_datamodule}).}
+	\label{fig:datacrawler_uml_diagram}
+\end{figure}
 
 \subsubsection{Screenshot-Datamodule}
 \label{datacrawler_screenshot_datamodule}
@@ -114,6 +132,15 @@ The following will briefly describe the start-up of an application using \texttt
 \label{datacrawler_graph}
 \subsubsection{Datacrawler Workflow}
 \label{datacrawler_workflow}
+
+In general Datacrawler can be divided mainly into three functional parts:
+
+\begin{enumerate}
+	\item[Initializiation] : The Datacrawler reads the Datamodule configuration from a local file and initializes the Datamodules accordingly.
+	\item[Crawling] : The Datacrawler crawls the passed domain according to the activated Datamodules and calculates attributes for the dataset.
+	\item[Output] : The Datacrawler generates and saves the graph to the disk.
+\end{enumerate}
+
 
 \subsection{Scaling the Datacrawler}
 \label{datacrawler_scale}
