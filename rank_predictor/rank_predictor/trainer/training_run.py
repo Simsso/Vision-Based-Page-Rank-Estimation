@@ -51,7 +51,7 @@ class TrainingRun:
             for batch in self.data_loader.train:
                 if self.step_ctr % 1000 == 0:
                     self._run_valid(self.data_loader.valid, 'valid')
-                    self._run_valid(self.data_loader.train, 'train')
+                    # self._run_valid(self.data_loader.train, 'train')
 
                 imgs = batch['img'].to(self.device)
                 logranks = batch['logrank'].to(self.device).float()
