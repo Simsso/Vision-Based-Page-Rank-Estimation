@@ -49,8 +49,9 @@ class TrainingRun:
         for epoch in range(epochs):
             logging.info("Starting epoch #{}".format(epoch + 1))
             for batch in self.data_loader.train:
-                if self.step_ctr % 512 == 0:
-                    self._run_valid()
+                if self.step_ctr % 1000 == 0:
+                    self._run_valid(self.data_loader.valid, 'valid')
+                    self._run_valid(self.data_loader.train, 'train')
 
                 imgs = batch['img'].to(self.device)
                 logranks = batch['logrank'].to(self.device).float()
@@ -70,20 +71,20 @@ class TrainingRun:
 
         accuracy, _ = compute_batch_accuracy(target_ranks=logranks, model_outputs=model_out)
 
-        self.writer.add_scalar('loss_train', loss, self.step_ctr)
-        self.writer.add_scalar('accuracy_train', accuracy, self.step_ctr)
-        self.writer.add_histogram('model_out_train', model_out, self.step_ctr)
-        self.writer.add_histogram('model_target_train', logranks, self.step_ctr)
+        self.writer.add_scalar('batch_loss_train', loss, self.step_ctr)
+        self.writer.add_scalar('batch_accuracy_train', accuracy, self.step_ctr)
+        self.writer.add_histogram('batch_model_out_train', model_out, self.step_ctr)
+        self.writer.add_histogram('batch_model_target_train', logranks, self.step_ctr)
 
-    def _run_valid(self) -> None:
-        logging.info("Running validation")
+    def _run_valid(self, dataset: Dataset, name: str) -> None:
+        logging.info("Running validation on {}".format(name))
 
         self.net.eval()
 
         # accumulators
         loss_sum, model_out_batches, rank_batches = 0., [], []
 
-        for batch in tqdm(self.data_loader.valid):
+        for batch in tqdm(dataset):
             imgs: torch.Tensor = batch['img'].to(self.device)
             logranks: torch.Tensor = batch['logrank'].to(self.device).float()
             rank_batches.append(logranks)
@@ -96,10 +97,10 @@ class TrainingRun:
             loss = self.loss_fn(model_out, logranks, w=(1-logranks))
             loss_sum += loss
 
-        n = len(self.data_loader.valid)
+        n = len(dataset)
         loss = loss_sum / n
 
         accuracy, _ = compute_multi_batch_accuracy(rank_batches, model_out_batches)
 
-        self.writer.add_scalar('loss_valid', loss, self.step_ctr)
-        self.writer.add_scalar('accuracy_valid', accuracy, self.step_ctr)
+        self.writer.add_scalar('loss_{}'.format(name), loss, self.step_ctr)
+        self.writer.add_scalar('accuracy_{}'.format(name), accuracy, self.step_ctr)
