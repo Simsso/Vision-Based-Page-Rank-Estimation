@@ -5,7 +5,7 @@ from rank_predictor.data.v1.pagerank_dataset import DatasetV1
 from rank_predictor.model.screenshot_feature_extractor import ScreenshotFeatureExtractor
 from torch import nn, optim
 from rank_predictor.trainer.training_run import TrainingRun
-from trainer.ranking.probabilistic_loss import ProbabilisticLoss
+from rank_predictor.trainer.ranking.probabilistic_loss import ProbabilisticLoss
 
 logging.basicConfig(level=logging.INFO)
 use_cuda = torch.cuda.is_available()

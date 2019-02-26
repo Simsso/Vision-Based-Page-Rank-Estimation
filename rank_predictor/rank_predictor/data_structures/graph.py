@@ -1,8 +1,8 @@
 from typing import Set
 
-from data_structures.attribute import Attribute
-from data_structures.edge import Edge
-from data_structures.node import Node
+from rank_predictor.data_structures.attribute import Attribute
+from rank_predictor.data_structures.edge import Edge
+from rank_predictor.data_structures.node import Node
 
 
 class Graph:

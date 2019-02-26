@@ -1,4 +1,4 @@
-from data_structures.attribute import Attribute
+from rank_predictor.data_structures.attribute import Attribute
 
 
 class Node:

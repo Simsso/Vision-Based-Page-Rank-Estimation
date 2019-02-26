@@ -7,8 +7,8 @@ from torchvision.transforms import ToPILImage, Resize, Normalize, Compose, ToTen
 from tqdm import tqdm
 from math import log
 
-from data.utils import filename_to_rank, load_image
-from data.v1.utils import img_loading_possible
+from rank_predictor.data.utils import filename_to_rank, load_image
+from rank_predictor.data.v1.utils import img_loading_possible
 from rank_predictor.data import threefold
 from rank_predictor.data.v1.transforms import ImageTransform
 import logging

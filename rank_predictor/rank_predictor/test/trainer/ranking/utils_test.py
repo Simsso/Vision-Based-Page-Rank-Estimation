@@ -3,7 +3,7 @@ import numpy as np
 import torch
 from unittest import TestCase
 
-from trainer.ranking.utils import compute_batch_accuracy, compute_multi_batch_accuracy
+from rank_predictor.trainer.ranking.utils import compute_batch_accuracy, compute_multi_batch_accuracy
 
 
 class UtilsTest(TestCase):

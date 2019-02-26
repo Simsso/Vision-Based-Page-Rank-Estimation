@@ -7,7 +7,7 @@ from tensorboardX import SummaryWriter
 from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm
 
-from trainer.ranking.utils import compute_batch_accuracy, compute_multi_batch_accuracy
+from rank_predictor.trainer.ranking.utils import compute_batch_accuracy, compute_multi_batch_accuracy
 from rank_predictor.data import threefold
 
 
