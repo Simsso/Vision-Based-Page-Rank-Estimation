@@ -7,7 +7,7 @@ from tensorboardX import SummaryWriter
 from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm
 
-from trainer.ranking.utils import compute_accuracy
+from trainer.ranking.utils import compute_batch_accuracy, compute_multi_batch_accuracy
 from rank_predictor.data import threefold
 
 
@@ -43,7 +43,7 @@ class TrainingRun:
 
         self.net.to(device)
 
-        self.writer = SummaryWriter('logs/prob_loss_weighted_nosig_4c')
+        self.writer = SummaryWriter('logs/prob_loss_weighted_nosig_4c_correct')
 
     def __call__(self, epochs: int) -> None:
         for epoch in range(epochs):
@@ -68,7 +68,7 @@ class TrainingRun:
         loss.backward()
         self.opt.step()
 
-        accuracy, _ = compute_accuracy(target_ranks=logranks, model_outputs=model_out)
+        accuracy, _ = compute_batch_accuracy(target_ranks=logranks, model_outputs=model_out)
 
         self.writer.add_scalar('loss_train', loss, self.step_ctr)
         self.writer.add_scalar('accuracy_train', accuracy, self.step_ctr)
@@ -81,26 +81,25 @@ class TrainingRun:
         self.net.eval()
 
         # accumulators
-        loss_sum, correct_ctr = 0., 0
+        loss_sum, model_out_batches, rank_batches = 0., [], []
 
         for batch in tqdm(self.data_loader.valid):
             imgs: torch.Tensor = batch['img'].to(self.device)
             logranks: torch.Tensor = batch['logrank'].to(self.device).float()
+            rank_batches.append(logranks)
 
             # forward pass
             with torch.no_grad():
                 model_out: torch.Tensor = self.net.forward(imgs)
+                model_out_batches.append(model_out)
 
             loss = self.loss_fn(model_out, logranks, w=(1-logranks))
             loss_sum += loss
 
-            _, batch_correct_ctr = compute_accuracy(target_ranks=logranks, model_outputs=model_out)
-            correct_ctr += batch_correct_ctr
-
         n = len(self.data_loader.valid)
         loss = loss_sum / n
 
-        accuracy = correct_ctr.float() / (n * (self.batch_size ** 2 - self.batch_size))
+        accuracy, _ = compute_multi_batch_accuracy(rank_batches, model_out_batches)
 
         self.writer.add_scalar('loss_valid', loss, self.step_ctr)
         self.writer.add_scalar('accuracy_valid', accuracy, self.step_ctr)

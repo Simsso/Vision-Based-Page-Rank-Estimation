@@ -77,9 +77,9 @@ class DatasetV2(Dataset):
 
                 target_url = edge_json['url']
 
-                if target_url not in nodes:
-                    continue  # skip invalid edges
-                # assert target_url in nodes, "Invalid link target URL. Could not find a node that corresponds to it."
+                #if target_url not in nodes:
+                #    continue  # skip invalid edges
+                assert target_url in nodes, "Invalid link target URL. Could not find a node that corresponds to it."
 
                 target_node = nodes[target_url]
 
@@ -132,7 +132,7 @@ class DatasetV2(Dataset):
         return DatasetV2(page_paths)
 
 
-dataset = DatasetV2.from_path(os.path.expanduser('~/dev/pagerank/data/v2'))
+dataset = DatasetV2.from_path(os.path.expanduser('~/Development/pagerank/data/v2'))
 
 assertion_errors, json_errors = 0, 0
 for i in tqdm(range(len(dataset))):
