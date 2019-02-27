@@ -100,23 +100,40 @@ The following will briefly describe the start-up of an application using \texttt
 
 \subsubsection{DataModule-System}
 \label{datacrawler_datamodulesystem}
-The naming of the DataModule-System derives from the use of Datamodules and represents the core of the Datacrawler. The system consists of several components, which enable developers to implement and test Datamodules independently increasing flexibility and reducing potential failures. In a plugin-and-play-manner developers can easily develop and add Datamodules to the Datacrawler.
+The naming of the DataModule-System derives from the purpose to bind, execute instances of Datamodules, collect results and output the dataset. The system consists of several components, which enable developers to implement and execute Datamodules independently increasing flexibility and reducing potential failures. In a plugin-and-play-manner developers can easily develop and add Datamodules to the Datacrawler.
 
 The main idea of a Datamodule is to represents a single attribute in the dataset, which is calculated and added independently from other attributes to the dataset. In addition, each Datamodule can be individually configured and turned on or off by the user.
 
-In order for a Datamodule to be executable, it has to implement following interfaces:
+ We are heavily utilizing polymorphism language feature of \texttt{C++} to enable previous mentioned features. Thus, a Datamodule consists of the implementation of the following interfaces:
 
 \begin{itemize}
-	\item[DataModuleBaseConfiguration] description
-	\item[DataModulebase] description
-	\item[DataBase] description
+	\item[\texttt{DataModuleBaseConfiguration}] This interface has to be implemented by each Datamodule. It is responsible for the creation and configuration of instances of a given Datamodule.
+	\item[\texttt{DataModuleBase}] The DatamoduleBase-interface represents the core of each Datamodule. Most of application logic of the Datamodule will be implemented here.
+	\item[\texttt{DataBase}] This has to be implemented if the result of the Datamodule should be stored in the graph. It represents the results of the implemented Datamodule.
 \end{itemize}
+
+Figure \ref{datacrawler_uml_diagram} represents a simplified UML-Diagram of the Datacrawler with the most important classes, interfaces and methods for understandig the DataModule-system. The figure does not show the implementation details of \texttt{CEF 3}, which are isolated and located in each Datamodule.
+
+The class \texttt{Datacrawler} represents the entrypoint of the Datacrawler. It holds an instance of the class \texttt{DatacrawlerConfiguration}, which is responsible to load the user-defined Datamodules configuration using the method \texttt{loadConfigFromJSON()}. Upon successful loading, the Datacrawler creates instances of Datamodules using the method \texttt{createInstance()}. The interface method is implemented individually by each Datamodule reflecting custom Datamodule configuration. 
+
+Once the \texttt{process(url)}-method has been called with an URL in \texttt{Datacrawler}, we create \texttt{NodeElement} representing the starting node and add it into our graph. Our graph represents a key-value list, whereas the key represents the URL and value our \texttt{NodeElement}-object. For dataset version 1 (\ref{DatasetVersion1}) we assume to have a single node with a single screenshot. Afterwards we go through the our instantiated Datamodules and execute custom implementation of the method \texttt{process(url)}. As soon as a Datamodule returns, we add the results to the current \texttt{NodeElement} and add \texttt{NodeElement} to our graph. 
+
+Upon the completion of all Datamodules for a given URL, we add all generated edges of the Datamodule \texttt{URLDatamodule} into a FIFO queue. Afterwards we repeat the process of creating a new object of \texttt{NodeElement}, executing of Datamodules, adding the results into new \texttt{NodeElement} and URLs to our FIFO queue for the oldest entry. We skip a given URL if there is a key-value pair in our list or if we reach our maximal number of nodes in the graph.
+
+\begin{figure}
+	\centering
+	\includegraphics[scale=0.35]{resources/breadth-first}
+	\caption{This figure illustrates the breadth-first search. The numbers in the nodes show the order in which nodes are expanded in breadth-first search. It clearly shows that all nodes reachable from a selected nodes is expanded, before moving to edges of other nodes and expanding the nodes reachable from those. E.g the selected node is \textbf{1} and \textbf{2}, \textbf{3} \textbf{4} is expanded, before we expand \textbf{5}.}
+	\label{datacrawler_breadth_search}
+\end{figure}
+
+The use of the FIFO queue leads to breadth-first search in our graph in opposition to a deep search, which is implemented using a LIFO queue. The breadth-first search means that we expand all nodes reachable from the edges of our current node, rather than using the first edge, expanding the reachable node and selecting it as the current node. This approach reduces the number of edges pointing to not available nodes in the graph, thus maximizing the number of edges to other nodes in the graph. Figure \ref{datacrawler_breadth_search} illustrates the breadth search exemplary.
 
 \begin{figure}[h]
 	\centering
 	 \includegraphics[scale=0.65]{resources/datacrawler_uml_diagram}
-	 \caption{The figure shows the simplified UML-diagram of the datacrawler with the most prominent classes and methods. Classes in the white boxes represent essential components of the DataModule-System such as the classes \textit{Datacrawler}, \textit{DatacrawlerConfiguration}, \textit{NodeElement} and the interfaces \textit{DataModuleBaseConfiguration}, \textit{DataModulBase} and \textit{DataBase}. Classes in the red boxes represent implementation of DataModules such as the \textit{URLDatamodule} (\ref{datacrawler_url_datamodule}), \textit{ScreenshotDatamodule} (\ref{datacrawler_screenshot_datamodule}) and \textit{MobileScreenshotDatamodule} (\ref{datacrawler_mobilescreenshot_datamodule}).}
-	\label{fig:datacrawler_uml_diagram}
+	 \caption{The figure shows the simplified UML-diagram of the datacrawler with the most important classes and methods. Classes in the white boxes represent essential components of the DataModule-System such as the classes \textit{Datacrawler}, \textit{DatacrawlerConfiguration}, \textit{NodeElement} and the interfaces \textit{DataModuleBaseConfiguration}, \textit{DataModulBase} and \textit{DataBase}. Classes in the red boxes represent implementation of DataModules such as the \textit{URLDatamodule} (\ref{datacrawler_url_datamodule}), \textit{ScreenshotDatamodule} (\ref{datacrawler_screenshot_datamodule}) and \textit{MobileScreenshotDatamodule} (\ref{datacrawler_mobilescreenshot_datamodule}).}
+	\label{datacrawler_uml_diagram}
 \end{figure}
 
 \subsubsection{Screenshot-Datamodule}
