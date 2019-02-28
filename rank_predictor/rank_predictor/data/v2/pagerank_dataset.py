@@ -78,7 +78,7 @@ class DatasetV2(Dataset):
                 target_node = nodes[target_url]
 
                 edge_attribute = LinkAttribute(target_url)
-                edge = Edge(edge_attribute, sender=source_node, receiver=target_node)
+                edge = Edge(sender=source_node, receiver=target_node, attribute=edge_attribute)
 
                 edges.add(edge)
 

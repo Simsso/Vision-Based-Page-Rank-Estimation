@@ -26,7 +26,7 @@ class SumAggregation(Aggregation):
 
         attr_vals_sum = torch.sum(attr_vals, dim=0, keepdim=False)
 
-        return attr_vals_sum
+        return Attribute(attr_vals_sum)
 
 
 class AverageAggregation(Aggregation):
@@ -46,4 +46,9 @@ class AverageAggregation(Aggregation):
         attr_vals_sum = torch.sum(attr_vals, dim=0, keepdim=False)
         attr_vals_avg = attr_vals_sum / n
 
-        return attr_vals_avg
+        return Attribute(attr_vals_avg)
+
+
+class ScalarSumAggregation(Aggregation):
+    def __call__(self, attrs: List[Attribute]) -> Attribute:
+        return Attribute(sum([a.val for a in attrs]))

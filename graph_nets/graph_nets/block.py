@@ -59,7 +59,7 @@ class GNBlock:
 
         for v in g.nodes:
             # aggregate incoming edges (where v is e.r)
-            aggr_e = self.rho_ev(list(v.receiving_edges))
+            aggr_e = self.rho_ev([e.attribute for e in v.receiving_edges])
 
             # update node
             v.attribute = self.phi_v(aggr_e=aggr_e,
@@ -75,8 +75,8 @@ class GNBlock:
         u = g.attribute
 
         # aggregate nodes and edges
-        aggr_e = self.rho_eu(list(g.edges))
-        aggr_v = self.rho_vu(list(g.nodes))
+        aggr_e = self.rho_eu([e.attribute for e in g.edges])
+        aggr_v = self.rho_vu([n.attribute for n in g.nodes])
 
         # update global state (graph attribute)
         u_prime = self.phi_u(aggr_e=aggr_e, aggr_v=aggr_v, u=u)
