@@ -1,4 +1,7 @@
 from copy import deepcopy
+
+from torch import nn
+
 from graph_nets import Aggregation, EdgeUpdate, Graph, GlobalStateUpdate, NodeUpdate
 
 
@@ -79,3 +82,27 @@ class GNBlock:
         u_prime = self.phi_u(aggr_e=aggr_e, aggr_v=aggr_v, u=u)
 
         g.attribute = u_prime
+
+
+class GNBlockModule(nn.Module):
+    """
+    Wrapper around GNBlock that can be used with PyTorch.
+    """
+
+    def __init__(self, phi_e: EdgeUpdate, phi_v: NodeUpdate, phi_u: GlobalStateUpdate, rho_ev: Aggregation,
+                 rho_vu: Aggregation, rho_eu: Aggregation) -> None:
+        """
+        Graph network block initialization function.
+        :param phi_e: Edge update function
+        :param phi_v: Node update function
+        :param phi_u: Global state update function
+        :param rho_ev: Edge aggregation function for nodes
+        :param rho_vu: Node aggregation function for the global state
+        :param rho_eu: Edge aggregation function for the global state
+        """
+
+        super().__init__()
+        self.gn_block = GNBlock(phi_e, phi_v, phi_u, rho_ev, rho_vu, rho_eu)
+
+    def forward(self, g: Graph):
+        return self.gn_block(g)

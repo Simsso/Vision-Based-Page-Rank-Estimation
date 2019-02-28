@@ -2,11 +2,10 @@ from typing import List, Union
 import numpy as np
 import torch
 from unittest import TestCase
-
 from rank_predictor.trainer.ranking.utils import compute_batch_accuracy, compute_multi_batch_accuracy
 
 
-class UtilsTest(TestCase):
+class TestUtils(TestCase):
     def _feed_multi_batch_accuracy(self, target_ranks_list: List[List[Union[float, int]]],
                                    model_outputs_list: List[List[float]], accuracy_target: float,
                                    correct_ctr_target: int) -> None:

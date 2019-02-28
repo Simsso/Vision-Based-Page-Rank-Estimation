@@ -1,4 +1,4 @@
-from . import *
+from . import Attribute, Node
 
 
 class Edge:
