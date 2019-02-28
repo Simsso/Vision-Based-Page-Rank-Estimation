@@ -1,4 +1,6 @@
-from rank_predictor.data_structures.attribute import Attribute
+from typing import Set
+from . import Edge
+from . import Attribute
 
 
 class Node:
@@ -8,5 +10,5 @@ class Node:
 
     def __init__(self, attribute: Attribute) -> None:
         self.attribute = attribute  # v
-        self.receiving_edges = set()  # incoming
-        self.sending_edges = set()  # outgoing
+        self.receiving_edges: Set[Edge] = set()  # incoming
+        self.sending_edges: Set[Edge] = set()  # outgoing

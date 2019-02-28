@@ -1,7 +1,8 @@
-from rank_predictor.data_structures.graph import Graph
-from rank_predictor.graphnets.functions.aggregation import Aggregation
-from rank_predictor.graphnets.functions.update import EdgeUpdate, NodeUpdate, GlobalStateUpdate
+from graph_nets.data_structures.graph import Graph
 from copy import deepcopy
+
+from graph_nets.functions.aggregation import Aggregation
+from graph_nets.functions.update import EdgeUpdate, NodeUpdate, GlobalStateUpdate
 
 
 class GNBlock:

@@ -1,6 +1,6 @@
 import torch
 from typing import List
-from rank_predictor.data_structures.attribute import Attribute
+from graph_nets.data_structures.attribute import Attribute
 
 
 class Aggregation:

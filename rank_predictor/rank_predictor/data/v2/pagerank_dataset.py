@@ -7,10 +7,10 @@ from torch.utils.data import Dataset
 from tqdm import tqdm
 from rank_predictor.data.utils import Image, load_image, folder_to_rank
 from rank_predictor.data.v2.attributes import PageAttributeVal, LinkAttribute
-from rank_predictor.data_structures.attribute import Attribute
-from rank_predictor.data_structures.edge import Edge
-from rank_predictor.data_structures.graph import Graph
-from rank_predictor.data_structures.node import Node
+from graph_nets.data_structures import Attribute
+from graph_nets.data_structures import Edge
+from graph_nets.data_structures import Graph
+from graph_nets.data_structures.node import Node
 
 
 class DatasetV2(Dataset):

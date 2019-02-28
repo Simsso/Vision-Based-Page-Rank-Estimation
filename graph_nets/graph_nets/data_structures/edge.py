@@ -1,5 +1,4 @@
-from rank_predictor.data_structures.attribute import Attribute
-from rank_predictor.data_structures.node import Node
+from . import *
 
 
 class Edge:

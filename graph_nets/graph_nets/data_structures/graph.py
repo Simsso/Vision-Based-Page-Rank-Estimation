@@ -1,7 +1,7 @@
 from typing import Set
-from rank_predictor.data_structures.attribute import Attribute
-from rank_predictor.data_structures.edge import Edge
-from rank_predictor.data_structures.node import Node
+from . import Attribute
+from . import Node
+from . import Edge
 
 
 class Graph:
