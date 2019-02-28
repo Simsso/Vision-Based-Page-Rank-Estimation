@@ -1,0 +1,21 @@
+from unittest import TestCase
+from graph_nets import Attribute, Node
+from graph_nets.data_structures.utils import sets_equal
+
+
+class TestUtils(TestCase):
+
+    def test_sets_equal_ordering(self):
+        s1 = {1, 2, 3, 4}
+        s2 = {2, 3, 4, 1}
+        self.assertTrue(sets_equal(s1, s2))
+
+    def test_sets_equal_objects_comparator(self):
+        s1 = {Node(Attribute(1)), Node(Attribute(2)), Node(Attribute("test"))}
+        s2 = {Node(Attribute(2)), Node(Attribute(1)), Node(Attribute("test"))}
+        self.assertTrue(sets_equal(s1, s2, comparator=Node.eq_attr))
+
+    def test_sets_different_length(self):
+        s1 = {1, 2}
+        s2 = {}
+        self.assertFalse(sets_equal(s1, s2))

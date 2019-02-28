@@ -72,5 +72,3 @@ class TestGNBlock(TestCase):
         g_2_target = Graph(nodes=vs, edges=es, attribute=Attribute(1+12+43-35))
 
         self.assertTrue(g_2 == g_2_target)
-
-
