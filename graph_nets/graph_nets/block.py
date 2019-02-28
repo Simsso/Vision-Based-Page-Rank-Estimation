@@ -1,8 +1,5 @@
-from graph_nets.data_structures.graph import Graph
 from copy import deepcopy
-
-from graph_nets.functions.aggregation import Aggregation
-from graph_nets.functions.update import EdgeUpdate, NodeUpdate, GlobalStateUpdate
+from graph_nets import Aggregation, EdgeUpdate, Graph, GlobalStateUpdate, NodeUpdate
 
 
 class GNBlock:

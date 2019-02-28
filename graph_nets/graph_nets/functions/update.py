@@ -1,4 +1,4 @@
-from graph_nets.data_structures.attribute import Attribute
+from graph_nets import Attribute
 
 
 class EdgeUpdate:
