@@ -1,4 +1,8 @@
-from typing import Set, Callable
+from typing import Set, Callable, List
+
+
+def default_comparator(a, b) -> bool:
+    return a == b
 
 
 def sets_equal(s1: Set, s2: Set, comparator: Callable[[any, any], bool] = None) -> bool:
@@ -14,7 +18,7 @@ def sets_equal(s1: Set, s2: Set, comparator: Callable[[any, any], bool] = None) 
     s2 = s2.copy()
 
     if comparator is None:
-        comparator = lambda a, b: a == b
+        comparator = default_comparator
 
     while len(s1):
         x1 = s1.pop()
@@ -27,6 +31,20 @@ def sets_equal(s1: Set, s2: Set, comparator: Callable[[any, any], bool] = None) 
                 found = True
                 break
         if not found:
+            return False
+
+    return True
+
+
+def lists_equal(l1: List, l2: List, comparator: Callable[[any, any], bool] = None) -> bool:
+    if len(l1) != len(l2):
+        return False
+
+    if comparator is None:
+        comparator = default_comparator
+
+    for i in range(len(l1)):
+        if not comparator(l1[i], l2[i]):
             return False
 
     return True

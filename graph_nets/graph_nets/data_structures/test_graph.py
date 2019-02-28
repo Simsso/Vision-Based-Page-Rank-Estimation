@@ -12,24 +12,29 @@ class TestGraph(TestCase):
         """
         v_0, v_1, v_2 = Node(), Node(), Node()
         v_3 = Node()
-        vs = {v_0, v_1, v_2}  # nodes
-        es = {Edge(v_0, v_1), Edge(v_0, v_2)}
+        vs = [v_0, v_1, v_2]  # nodes
+        es = [Edge(v_0, v_1), Edge(v_0, v_2)]
 
         Graph(nodes=vs, edges=es)  # pass for valid edge set
 
-        es.add(Edge(v_1, v_3))
-        with self.assertRaises(AssertionError):
+        es.append(Edge(v_1, v_3))
+        with self.assertRaises(ValueError):
             Graph(nodes=vs, edges=es)
 
     def test_graph_equality(self):
         v_0, v_1, v_2 = Node(Attribute(0.)), Node(Attribute(1.)), Node(Attribute(2.))
-        vs = {v_0, v_1, v_2}  # nodes
-        es = {Edge(v_0, v_1), Edge(v_0, v_2)}  # edges
+        vs = [v_0, v_1, v_2]  # nodes
+        es = [Edge(v_0, v_1), Edge(v_0, v_2)]  # edges
         g_0 = Graph(nodes=vs, edges=es)
 
         v_0, v_1, v_2 = Node(Attribute(0.)), Node(Attribute(1.)), Node(Attribute(2.))
-        vs = {v_1, v_2, v_0}  # nodes
-        es = {Edge(v_0, v_2), Edge(v_0, v_1)}  # edges
+        vs = [v_0, v_1, v_2]  # nodes
+        es = [Edge(v_0, v_1), Edge(v_0, v_2)]  # edges
         g_1 = Graph(nodes=vs, edges=es)
 
         self.assertTrue(g_0 == g_1)
+
+    def test_input_dtype_check(self):
+        with self.assertRaises(AssertionError):
+            # noinspection PyTypeChecker
+            Graph({Node()}, edges=[])

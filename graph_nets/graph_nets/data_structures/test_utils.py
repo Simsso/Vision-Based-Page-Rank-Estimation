@@ -1,6 +1,6 @@
 from unittest import TestCase
 from graph_nets import Attribute, Node
-from graph_nets.data_structures.utils import sets_equal
+from graph_nets.data_structures.utils import sets_equal, lists_equal
 
 
 class TestUtils(TestCase):
@@ -19,3 +19,17 @@ class TestUtils(TestCase):
         s1 = {1, 2}
         s2 = {}
         self.assertFalse(sets_equal(s1, s2))
+
+    def test_lists_equal(self):
+        l1 = [1, 2]
+        l2 = [1, 2]
+        self.assertTrue(lists_equal(l1, l2))
+
+        l1.append(3)
+        l2.append(4)
+        self.assertFalse(lists_equal(l1, l2))
+
+    def test_lists_equal_objects_comparator(self):
+        l1 = [Node(Attribute(1)), Node(Attribute(2)), Node(Attribute("test"))]
+        l2 = [Node(Attribute(1)), Node(Attribute(2)), Node(Attribute("test"))]
+        self.assertTrue(lists_equal(l1, l2, comparator=Node.eq_attr))
