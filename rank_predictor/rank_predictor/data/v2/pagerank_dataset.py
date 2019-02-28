@@ -78,11 +78,11 @@ class DatasetV2(Dataset):
                 target_node = nodes[target_url]
 
                 edge_attribute = LinkAttribute(target_url)
-                edge = Edge(sender=source_node, receiver=target_node, attribute=edge_attribute)
+                edge = Edge(sender=source_node, receiver=target_node, attr=edge_attribute)
 
                 edges.add(edge)
 
-        g = Graph(nodes=set(nodes.values()), edges=edges, attribute=Attribute(None))
+        g = Graph(nodes=set(nodes.values()), edges=edges, attr=Attribute(None))
 
         return g
 

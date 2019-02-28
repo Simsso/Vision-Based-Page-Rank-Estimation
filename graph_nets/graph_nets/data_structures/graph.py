@@ -14,19 +14,19 @@ class Graph:
     because there can be more than one edge between vertices, including self-edges.
     """
 
-    def __init__(self, nodes: List[Node], edges: List[Edge], attribute: Optional[Attribute] = None):
-        if attribute is None:
-            attribute = Attribute(val=None)
+    def __init__(self, nodes: List[Node], edges: List[Edge], attr: Optional[Attribute] = None):
+        if attr is None:
+            attr = Attribute(val=None)
 
         assert isinstance(nodes, list) and isinstance(edges, list), "Nodes and edges must be lists"
 
         self.nodes = set(nodes)  # V
         self.edges = set(edges)  # E
-        self.attribute = attribute  # e
+        self.attr = attr  # e
 
         # store ordered representations for easy alignment of two graphs with equal structure
-        self.nodes_ordered = nodes
-        self.edges_ordered = edges
+        self.ordered_nodes = nodes
+        self.ordered_edges = edges
 
         self._check_integrity()
 
@@ -40,28 +40,28 @@ class Graph:
                 raise ValueError("Edges must only connect nodes that are contained in the graph")
 
     def _check_ordered_references_integrity(self) -> None:
-        if len(self.edges_ordered) != len(self.edges):
+        if len(self.ordered_edges) != len(self.edges):
             raise ValueError("Number of ordered edges must be equal to the number of edges in the hash set")
 
-        if len(self.nodes_ordered) != len(self.nodes):
+        if len(self.ordered_nodes) != len(self.nodes):
             raise ValueError("Number of ordered nodes must be equal to the number of nodes in the hash set")
 
-        for e in self.edges_ordered:
+        for e in self.ordered_edges:
             if e not in self.edges:
                 raise ValueError("Every edge in edges_ordered must be contained in edges")
 
-        for n in self.nodes_ordered:
+        for n in self.ordered_nodes:
             if n not in self.nodes:
                 raise ValueError("Every node in nodes_ordered must be contained in nodes")
 
     def add_node(self, new_node: Node) -> None:
         self.nodes.add(new_node)
-        self.nodes_ordered.append(new_node)
+        self.ordered_nodes.append(new_node)
         self._check_integrity()
 
     def add_edge(self, new_edge: Edge) -> None:
         self.edges.add(new_edge)
-        self.edges_ordered.append(new_edge)
+        self.ordered_edges.append(new_edge)
         self._check_integrity()
 
     def add_all_edges(self, reflexive: bool = True, attribute_generator: Optional[Callable[[Node, Node], Attribute]] = None) -> None:
@@ -88,10 +88,15 @@ class Graph:
         g1._check_integrity()
         g2._check_integrity()
 
-        if not lists_equal(g1.nodes_ordered, g2.nodes_ordered, comparator=Node.eq_attr):
+        if not lists_equal(g1.ordered_nodes, g2.ordered_nodes, comparator=Node.eq_attr):
             return False
 
-        if not lists_equal(g1.edges_ordered, g2.edges_ordered, comparator=Edge.eq_attr_and_ctx):
+        if not lists_equal(g1.ordered_edges, g2.ordered_edges, comparator=Edge.eq_attr_and_ctx):
             return False
 
         return True
+
+    def __repr__(self) -> str:
+        return self.attr.__repr__()
+
+

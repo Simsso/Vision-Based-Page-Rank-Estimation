@@ -1,5 +1,5 @@
 import torch
-from typing import List
+from typing import List, Optional
 from graph_nets import Attribute
 
 
@@ -52,3 +52,14 @@ class AverageAggregation(Aggregation):
 class ScalarSumAggregation(Aggregation):
     def __call__(self, attrs: List[Attribute]) -> Attribute:
         return Attribute(sum([a.val for a in attrs]))
+
+
+class ConstantAggregation(Aggregation):
+
+    def __init__(self, const_val: Optional[any] = None) -> None:
+        super().__init__()
+
+        self.constant_val = const_val
+
+    def __call__(self, attrs: List[Attribute]) -> Attribute:
+        return Attribute(self.constant_val)

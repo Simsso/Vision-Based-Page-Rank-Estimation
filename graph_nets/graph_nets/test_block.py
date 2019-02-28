@@ -44,7 +44,7 @@ class TestGNBlock(TestCase):
         v_0, v_1, v_2 = Node(Attribute(1)), Node(Attribute(10)), Node(Attribute(20))
         vs = [v_0, v_1, v_2]  # nodes
         es = [Edge(v_0, v_1), Edge(v_0, v_2), Edge(v_1, v_2)]
-        g_0 = Graph(nodes=vs, edges=es, attribute=Attribute(0))
+        g_0 = Graph(nodes=vs, edges=es, attr=Attribute(0))
 
         # create block w/ functions
         block = GNBlock(
@@ -60,7 +60,7 @@ class TestGNBlock(TestCase):
         v_0, v_1, v_2 = Node(Attribute(1)), Node(Attribute(10+1)), Node(Attribute(20+11))
         vs = [v_0, v_1, v_2]  # nodes
         es = [Edge(v_0, v_1, Attribute(1)), Edge(v_0, v_2, Attribute(1)), Edge(v_1, v_2, Attribute(10))]
-        g_1_target = Graph(nodes=vs, edges=es, attribute=Attribute(35))
+        g_1_target = Graph(nodes=vs, edges=es, attr=Attribute(35))
 
         self.assertTrue(g_1 == g_1_target)
 
@@ -69,6 +69,6 @@ class TestGNBlock(TestCase):
         v_0, v_1, v_2 = Node(Attribute(1)), Node(Attribute(10+2)), Node(Attribute(20+11+12))
         vs = [v_0, v_1, v_2]  # nodes
         es = [Edge(v_0, v_1, Attribute(1)), Edge(v_0, v_2, Attribute(1)), Edge(v_1, v_2, Attribute(11))]
-        g_2_target = Graph(nodes=vs, edges=es, attribute=Attribute(1+12+43-35))
+        g_2_target = Graph(nodes=vs, edges=es, attr=Attribute(1 + 12 + 43 - 35))
 
         self.assertTrue(g_2 == g_2_target)
