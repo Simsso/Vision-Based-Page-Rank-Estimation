@@ -1,5 +1,4 @@
 from typing import Set
-
 from rank_predictor.data_structures.attribute import Attribute
 from rank_predictor.data_structures.edge import Edge
 from rank_predictor.data_structures.node import Node
@@ -28,4 +27,5 @@ class Graph:
 
     def add_node(self, node: Node) -> None:
         self.nodes.add(node)
+
 

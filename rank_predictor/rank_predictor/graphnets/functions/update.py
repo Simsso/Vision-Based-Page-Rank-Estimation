@@ -1,10 +1,9 @@
-from torch import nn
-
 from rank_predictor.data_structures.attribute import Attribute
 
 
-class EdgeUpdate(nn.Module):
-    def forward(self, e: Attribute, v_r: Attribute, v_s: Attribute, u: Attribute) -> Attribute:
+class EdgeUpdate:
+
+    def __call__(self, e: Attribute, v_r: Attribute, v_s: Attribute, u: Attribute) -> Attribute:
         """
         Edge update function phi^(e). Converts e into e' given the attributes of the two adjacent nodes and the global
         state u.
@@ -17,9 +16,9 @@ class EdgeUpdate(nn.Module):
         raise NotImplementedError
 
 
-class NodeUpdate(nn.Module):
+class NodeUpdate:
 
-    def forward(self, aggr_e: Attribute, v: Attribute, u: Attribute) -> Attribute:
+    def __call__(self, aggr_e: Attribute, v: Attribute, u: Attribute) -> Attribute:
         """
         Node update function phi^(v). Converts v into v' given the aggregated, updated edge attributes of all adjacent
         edges and the global state u.
@@ -31,9 +30,9 @@ class NodeUpdate(nn.Module):
         raise NotImplementedError
 
 
-class GlobalStateUpdate(nn.Module):
+class GlobalStateUpdate:
 
-    def forward(self, aggr_e: Attribute, aggr_v: Attribute, u: Attribute) -> Attribute:
+    def __call__(self, aggr_e: Attribute, aggr_v: Attribute, u: Attribute) -> Attribute:
         """
         Global state update function phi^(u). Converts u into u' given the aggregated edges and aggregated nodes.
         :param aggr_e: Aggregated edges
