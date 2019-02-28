@@ -37,6 +37,7 @@ class TestGNBlock(TestCase):
     def test_basic(self):
         """
         Basic test w/o PyTorch, all attributes are scalars, edges do not have attributes.
+        Feeds a graph through a basic graph block twice and compares to the target values after both passes.
         """
 
         # create data structure
@@ -62,3 +63,14 @@ class TestGNBlock(TestCase):
         g_1_target = Graph(nodes=vs, edges=es, attribute=Attribute(35))
 
         self.assertTrue(g_1 == g_1_target)
+
+        g_2 = block(g_1)
+
+        v_0, v_1, v_2 = Node(Attribute(1)), Node(Attribute(10+2)), Node(Attribute(20+11+12))
+        vs = {v_0, v_1, v_2}  # nodes
+        es = {Edge(v_0, v_1, Attribute(1)), Edge(v_0, v_2, Attribute(1)), Edge(v_1, v_2, Attribute(11))}
+        g_2_target = Graph(nodes=vs, edges=es, attribute=Attribute(1+12+43-35))
+
+        self.assertTrue(g_2 == g_2_target)
+
+
