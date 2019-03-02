@@ -138,7 +138,7 @@ The use of the FIFO queue leads to breadth-first search in our graph in oppositi
 
 \subsubsection{Screenshot-Datamodule}
 \label{datacrawler_screenshot_datamodule}
-The Screenshot-Datamodule is responsible for visiting a website by a given URL and taking a screenshot upon successful loading. The entrypoint of the Datamodule is \texttt{process(url)}-method in \texttt{ScreenshotDatamodule}-class. Upon completion the Datamodule returns an instance of \texttt{Screenshot}, which contains a screenshot and information about width and height of the screenshot.
+The Screenshot-Datamodule is responsible for visiting a website by a given URL and taking a screenshot upon successful loading. The entrypoint of the Datamodule is \texttt{process(url)}-method in \texttt{ScreenshotDatamodule}-class. Upon completion, the Datamodule returns an instance of \texttt{Screenshot}, which contains a screenshot and information about width and height of the screenshot.
 
 In general the Screenshot-Datamodule addresses three difficult problems with the help of \texttt{CEF 3}: 
 
@@ -170,9 +170,71 @@ In each invocation of \texttt{OnPaint()} following information are passed as par
 
 The buffer is an array of respectively one byte encoded single characters, where each character is representing a channel of the color space \texttt{BGRA}. Consequently, a single pixel corresponds to four characters in the buffer. The array represents the pixels from the left most to the right most starting from the top of the viewport in repeating order of the color space. Thus, the buffer itself contains only information about visible area as defined in \texttt{GetViewRect()}, which reflects the viewport of the browser.
 
-On each invocation we allocate total of $4 * \texttt{width} * \texttt{heights}$ bytes and copy the content of our buffer into it. Once we detect the website has finished loading, we can access the latest painting of \texttt{OnPaint()} from \texttt{ScreenshotDatamodule}.
+On each invocation we allocate total of $4 * \texttt{width} * \texttt{heights}$ bytes in the memory and copy the content of our buffer into it. Once we detect the website has finished loading, we can access the latest painting of \texttt{OnPaint()} from the memory.
 
-\paragraph{Detecting}
+\paragraph{Detection}
+In our current implementation the browser instance calls \texttt{OnPaint()}-method to update the view port, whenever a change occurs on the website. In practice this means that our implementation will return screenshots of partially loaded websites. The simple solution to wait a given time $t$ and take the most recent screenshot is not an option. This static approach would lead to high analysis time per website and violate the scalability requirement (\ref{scalability}). We have to detect, when a given website has finished loading to reduce our analysis time per website.
+
+In general, there are multiple states during the loading of a website, which can be interpreted that a given website has finished loading. Before we discuss our approaches to tackle this complex problem, we define our understanding when a website has finished loading:
+
+\begin{center}
+\textit{A website has finished loading, if and only if all elements are painted on the view port and no new elements are being painted.}
+\end{center}
+
+Our definition includes the painting and rendering of the given website in the browser and represents the \textit{natural} behavior of a browser. The following definition does not include those aspects:
+
+\begin{center}
+\textit{A website has finished loading, if and only if all the content of the website has been downloaded successfully from the internet.}
+\end{center}
+
+Based on our assumption we have developed two algorithms for this problem:
+
+\begin{itemize}
+	\item Detection based on calculation of the deviation of \textit{change} matrices. 
+	\item Detection based on \texttt{OnLoadEnd()}-method of \texttt{CEF 3} and hard coded waiting time.
+\end{itemize}
+
+Our algorithm based on calculation of the deviation of change matrices, assumes that the number of changed pixels per screenshot will dramatically reduce over time. In other words, given the screenshots $I_{t}, I_{t+1}, I_{t+2}\in \{0, ... , 255\}^{width\times height \times 4}$ taken at times $t$, $t+1$,  and $t+2$ respectively, the total number of changed pixels  $|\Delta_{t,t+1}|$ between $I_{t}$ and $I_{t+1}$ will be less than $|\Delta_{t+1,t+2}|$. Furthermore, we assume that the $|\Delta|$ will converge for $t \rightarrow \infty$ meaning that the website has finished loading.
+
+In order to calculate the number of changed pixels between two screenshots $I_{t}$ and $I_{t+1}$, we have introduced the change matrix $C_{t,t+1} \in \{0,1\}^{width\times height}$. Each element $c_{i,j} \in C_{t,t+1}$ represents the change state between the pixels $\mathbf{s}^{t}_{i,j,} \in I_{t}$ and $\mathbf{s}^{t+1}_{i,j,}  \in I_{t+1}$, which in turn are in $\{0, ... , 255\}^{4}$ representing the color space \texttt{BGRA}.
+
+On every invocation of \texttt{OnPaint()} we calculate the change matrix $C_{t,t+1}$ on basis of the current screenshot $I_{t+1}$ and the screenshot $I_{t}$ of the previous invocation. The following applies for each element $c_{i,j} \in C_{t,t+1}$ :
+
+\[
+c_{i,j} =
+\begin{cases}
+1,& \text{if $\mathbf{s}^{t}_{i,j,} \neq \mathbf{s}^{t+1}_{i,j,}$ } \\
+0,              & \text{otherwise}
+\end{cases}
+\]
+
+We compute the total number of changes from $I_{t}$ to $I_{t+1}$ with matrix norm $|| C_{t,t+1}||$.
+
+\begin{figure}
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+title={Assumption on number of changes},
+axis lines = left,
+xmin=0, xmax=50,
+ymin=0, ymax=1500000,
+xlabel = time $t$,
+ylabel = {number of changes},
+ymajorgrids=true,
+grid style=dashed,
+]
+%Here the blue parabloa is defined
+\addplot[
+color=blue,
+mark=*,
+]
+coordinates {
+	(0,1500000)(10,750000)(20,325000)(30,162500)(40,81250)(50,40000)
+};
+\end{axis}
+
+\end{tikzpicture}
+\end{figure}
 
 \subsubsection{MobileScreenshot-Datamodule}
 \label{datacrawler_mobilescreenshot_datamodule}
