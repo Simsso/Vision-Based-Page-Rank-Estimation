@@ -85,6 +85,11 @@ class DatasetV1(Dataset):
 
     @staticmethod
     def filename_to_rank(file_name: str) -> int:
+        """
+        Converts a filename into the corresponding rank, e.g. "1234.jpg" --> 1234 (integer)
+        :param file_name: File name, e.g. "1234.jpg"
+        :return: Rank for the file, e.g. 1234
+        """
         try:
             path_parts = os.path.split(file_name)
             filename_with_ext = path_parts[-1]
@@ -112,6 +117,7 @@ class DatasetV1(Dataset):
         :param b: Base makes the weighting steeper b --> 0, more linear b --> 10, or inverted b > 10
         :return: Scalar in [0,1]
         """
+
         max_rank = DatasetV1.max_rank
         assert 0 < rank <= max_rank, "Rank '{}' is out of range.".format(rank)
 
@@ -127,6 +133,15 @@ class DatasetV1(Dataset):
 
     @staticmethod
     def get_threefold(root_dir: str, train_ratio: float, valid_ratio: float) -> threefold.Data:
+        """
+        Load dataset from root_dir and split it into three parts (train, validation, test).
+        The function splits in a deterministic way.
+        :param root_dir: Directory of the dataset
+        :param train_ratio: Value in [0,1] defining the ratio of training samples
+        :param valid_ratio: Value in [0,1] defining the ratio of validation samples
+        :return: Three datasets (train, validation, test)
+        """
+
         assert train_ratio + valid_ratio <= 1., "Train and validation ratio must be less than or equal to 1."
         assert os.path.isdir(root_dir), "The provided path '{}' is not a directory".format(root_dir)
 
@@ -156,5 +171,4 @@ class DatasetV1(Dataset):
         return threefold.Data(
             train=DatasetV1(train_paths),
             valid=DatasetV1(valid_paths),
-            test=DatasetV1(test_paths),
-        )
+            test=DatasetV1(test_paths))
