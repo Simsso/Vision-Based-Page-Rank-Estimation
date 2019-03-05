@@ -9,6 +9,11 @@ Image = np.ndarray
 
 
 def filename_to_rank(file_name: str) -> int:
+    """
+    Converts a filename into the corresponding rank, e.g. "1234.jpg" --> 1234 (integer)
+    :param file_name: File name, e.g. "1234.jpg"
+    :return: Rank for the file, e.g. 1234
+    """
     try:
         path_parts = os.path.split(file_name)
         filename_with_ext = path_parts[-1]
