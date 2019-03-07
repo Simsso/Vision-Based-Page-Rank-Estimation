@@ -1,5 +1,5 @@
 from typing import Optional, Dict
-from rank_predictor.data_structures.attribute import Attribute
+from graph_nets import Attribute
 
 
 class PageAttributeVal:

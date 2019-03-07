@@ -7,10 +7,7 @@ from torch.utils.data import Dataset
 from tqdm import tqdm
 from rank_predictor.data.utils import Image, load_image, folder_to_rank
 from rank_predictor.data.v2.attributes import PageAttributeVal, LinkAttribute
-from rank_predictor.data_structures.attribute import Attribute
-from rank_predictor.data_structures.edge import Edge
-from rank_predictor.data_structures.graph import Graph
-from rank_predictor.data_structures.node import Node
+from graph_nets import Attribute, Edge, Graph, Node
 
 
 class DatasetV2(Dataset):
@@ -76,18 +73,16 @@ class DatasetV2(Dataset):
 
                 target_url = edge_json['url']
 
-                #if target_url not in nodes:
-                #    continue  # skip invalid edges
                 assert target_url in nodes, "Invalid link target URL. Could not find a node that corresponds to it."
 
                 target_node = nodes[target_url]
 
                 edge_attribute = LinkAttribute(target_url)
-                edge = Edge(edge_attribute, sender=source_node, receiver=target_node)
+                edge = Edge(sender=source_node, receiver=target_node, attr=edge_attribute)
 
                 edges.add(edge)
 
-        g = Graph(nodes=set(nodes.values()), edges=edges, attribute=Attribute(None))
+        g = Graph(nodes=list(nodes.values()), edges=list(edges), attr=Attribute(None))
 
         return g
 
