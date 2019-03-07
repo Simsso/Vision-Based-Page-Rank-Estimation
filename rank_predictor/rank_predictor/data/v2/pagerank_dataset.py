@@ -1,3 +1,4 @@
+import logging
 from glob import glob
 import json
 import os
@@ -33,7 +34,6 @@ class DatasetV2(Dataset):
             'rank': rank,
             'graph': self.load_graph(page_path)
         }
-
         return sample
 
     def __len__(self) -> int:
@@ -58,7 +58,9 @@ class DatasetV2(Dataset):
         for page_json in pages_json:
             node_attribute = PageAttributeVal.from_json(page_json)
             url = page_json['base_url']
-            assert url not in nodes, "Found two nodes with the same URL."
+            if url in nodes:
+                logging.debug("Found two nodes with the same URL.")
+                continue
             node = Node(node_attribute)
             nodes[url] = node
 
@@ -73,7 +75,9 @@ class DatasetV2(Dataset):
 
                 target_url = edge_json['url']
 
-                assert target_url in nodes, "Invalid link target URL. Could not find a node that corresponds to it."
+                if target_url not in nodes:
+                    logging.debug("Invalid link target URL. Could not find a node that corresponds to it.")
+                    continue
 
                 target_node = nodes[target_url]
 
@@ -124,18 +128,3 @@ class DatasetV2(Dataset):
         page_paths = set(page_paths)
 
         return DatasetV2(page_paths)
-
-
-dataset = DatasetV2.from_path(os.path.expanduser('~/Development/pagerank/data/v2'))
-
-assertion_errors, json_errors = 0, 0
-for i in tqdm(range(len(dataset))):
-    try:
-        x = dataset[i]
-    except AssertionError:
-        assertion_errors += 1
-    except JSONDecodeError:
-        json_errors += 1
-
-print("Assertion errors: {}".format(assertion_errors))
-print("JSON errors: {}".format(json_errors))

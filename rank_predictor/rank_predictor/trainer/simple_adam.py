@@ -3,7 +3,7 @@ import os
 import torch
 from rank_predictor.data.v1.pagerank_dataset import DatasetV1
 from rank_predictor.model.screenshot_feature_extractor import ScreenshotFeatureExtractor
-from torch import nn, optim
+from torch import optim
 from rank_predictor.trainer.training_run import TrainingRun
 from rank_predictor.trainer.ranking.probabilistic_loss import ProbabilisticLoss
 
