@@ -4,14 +4,15 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-class ScreenshotFeatureExtractor(nn.Module):
+class DesktopScreenshotFeatureExtractor(nn.Module):
     """
     Screenshot feature extraction architecture inspied by "pix2code".
     (arXiv link: https://arxiv.org/abs/1705.07962)
+    Input image resolution 480x270
     """
 
     def __init__(self):
-        super(ScreenshotFeatureExtractor, self).__init__()
+        super(DesktopScreenshotFeatureExtractor, self).__init__()
 
         self.conv1a = nn.Conv2d(3, 32, kernel_size=(3, 3))
         self.conv1b = nn.Conv2d(32, 32, kernel_size=(3, 3))

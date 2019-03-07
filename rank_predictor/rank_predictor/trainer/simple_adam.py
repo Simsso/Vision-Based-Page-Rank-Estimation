@@ -2,7 +2,7 @@ import logging
 import os
 import torch
 from rank_predictor.data.v1.pagerank_dataset import DatasetV1
-from rank_predictor.model.screenshot_feature_extractor import ScreenshotFeatureExtractor
+from rank_predictor.model.screenshot_feature_extractor import DesktopScreenshotFeatureExtractor
 from torch import optim
 from rank_predictor.trainer.training_run import TrainingRun
 from rank_predictor.trainer.ranking.probabilistic_loss import ProbabilisticLoss
@@ -12,11 +12,11 @@ use_cuda = torch.cuda.is_available()
 device = torch.device("cuda" if use_cuda else "cpu")
 
 # dataset
-dataset_dir = os.getenv('dataset_v1_path')
+dataset_dir = os.path.expanduser(os.getenv('dataset_v1_path'))
 dataset_v1 = DatasetV1.get_threefold(dataset_dir, train_ratio=0.85, valid_ratio=0.1)
 
 # model with weights
-net = ScreenshotFeatureExtractor()
+net = DesktopScreenshotFeatureExtractor()
 net.cuda()
 
 # optimizer

@@ -5,6 +5,7 @@ import os
 from typing import Set, Union, Dict, Tuple, List
 from torch.utils.data import Dataset
 
+from rank_predictor.data import threefold
 from rank_predictor.data.threefold import get_threefold
 from rank_predictor.data.utils import Image, load_image, folder_to_rank
 from rank_predictor.data.v2.attributes import PageAttributeVal, LinkAttribute

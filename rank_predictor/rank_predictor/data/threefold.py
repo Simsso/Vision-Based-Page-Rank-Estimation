@@ -7,7 +7,7 @@ from tqdm import tqdm
 Data = namedtuple('ThreefoldData', ['train', 'valid', 'test'])
 
 
-def get_threefold(klass: Type, sample_paths: List[str], train_ratio: float, valid_ratio: float) -> threefold.Data:
+def get_threefold(klass: Type, sample_paths: List[str], train_ratio: float, valid_ratio: float) -> Data:
     """
     :param klass: Dataset class, e.g. DatasetV2
     :param sample_paths: List of paths that point to the samples of the dataset
