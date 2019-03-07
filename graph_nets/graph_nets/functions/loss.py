@@ -4,6 +4,7 @@ from torch import Tensor
 from torch.nn import MSELoss
 from graph_nets import Graph, Attribute
 
+
 LossFn = Union[Callable[[Tensor, Tensor], Tensor], MSELoss]
 
 

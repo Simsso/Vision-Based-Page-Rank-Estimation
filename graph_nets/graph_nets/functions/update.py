@@ -1,7 +1,5 @@
 from typing import Callable
-
 from torch import nn
-
 from graph_nets import Attribute
 
 

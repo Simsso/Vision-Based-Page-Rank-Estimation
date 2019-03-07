@@ -1,13 +1,14 @@
+import unittest
 from typing import Tuple
 import torch
 from unittest import TestCase
 from copy import deepcopy
 from torch import nn, optim
 from torch.nn import MSELoss
-
 from graph_nets import Graph, Node, Attribute, Edge
 from graph_nets.block import LinearIndependentGNBlock, GNBlock
 from graph_nets.functions.loss import GraphLossPyTorch
+
 
 code_size = 32
 
@@ -66,3 +67,60 @@ class LinearGNBlock(TestCase):
         final_loss = loss.detach().numpy()
         print(final_loss)
         self.assertTrue(final_loss < 1e-3)
+
+
+class TestGNBlockModuleSortDemo(TestCase):
+    """
+    Tests of the PyTorch interface for the graph network block.
+    """
+
+    def setUp(self) -> None:
+        super().setUp()
+        torch.manual_seed(15092017)
+
+    @staticmethod
+    def _create_tuple(x_min: int, x_max: int) -> Tuple[Graph, Graph]:
+        """
+        Creates a sorting task training sample, i.e. a tuple consisting of (input, target).
+        :param x_min: Number min value
+        :param x_max: Number max value (exclusive)
+        :return: Two graphs, both fully connected, one with randomly initialized attributes, the other one with targets.
+        """
+        assert x_min < x_max
+
+        vec = torch.arange(x_min, x_max)
+        nodes = [Node(Attribute(x)) for x in vec]
+
+        g_in = Graph(nodes, [])
+        g_out = deepcopy(g_in)
+
+        def sorted_edge_attribute_generator(n1: Node, n2: Node) -> Attribute:
+            val = [0, 1] if n1.attr.val < n2.attr.val else [1, 0]
+            return Attribute(torch.Tensor(val).float())
+
+        g_in.add_all_edges(reflexive=False, attribute_generator=lambda n1, n2: Attribute(torch.randn(2)))
+        g_out.add_all_edges(reflexive=False, attribute_generator=sorted_edge_attribute_generator)
+
+        return g_in, g_out
+
+    @staticmethod
+    def _build_encoder() -> GNBlock:
+        return LinearIndependentGNBlock(e_config=(2, code_size, True), v_config=None, u_config=None)
+
+    @staticmethod
+    def _build_core_block() -> GNBlock:
+        raise NotImplementedError()
+
+    @staticmethod
+    def _build_decoder() -> GNBlock:
+        return LinearIndependentGNBlock(e_config=(code_size, 2, True), v_config=None, u_config=None)
+
+    @unittest.skip("Not implemented yet")
+    def test_sort_demo(self):
+        """
+        Sort demo, inspired by this example (https://github.com/deepmind/graph_nets#run-sort-demo-in-browser).
+        Short description: Represent a list of elements as a graph, where each number corresponds to a node. The graph
+        is fully connected and the training target is to learn to mark the starting node and edges that connect from
+        smaller to next larger element (similar to a linked list).
+        """
+        raise NotImplementedError()

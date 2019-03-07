@@ -1,6 +1,5 @@
 from typing import Optional
 from .attribute import Attribute
-
 from .node import Node
 
 

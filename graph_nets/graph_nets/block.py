@@ -1,8 +1,6 @@
 from copy import deepcopy
 from typing import Optional, Tuple
-
 from torch import nn
-
 from graph_nets import Aggregation, EdgeUpdate, Graph, GlobalStateUpdate, NodeUpdate, IndependentEdgeUpdate, \
     IdentityNodeUpdate, IdentityGlobalStateUpdate, IdentityEdgeUpdate, IndependentNodeUpdate, \
     IndependentGlobalStateUpdate, ConstantAggregation

@@ -1,6 +1,5 @@
 from unittest import TestCase
 from copy import deepcopy
-
 from graph_nets import Graph, Node, Attribute, Edge, GNBlock, EdgeUpdate, NodeUpdate, GlobalStateUpdate, \
     ScalarSumAggregation
 
@@ -10,7 +9,7 @@ class SenderIdentityEdgeUpdate(EdgeUpdate):
     Copies the sender node attribute into the edge attribute.
     """
 
-    def __call__(self, e: Attribute, v_r: Attribute, v_s: Attribute, u: Attribute) -> Attribute:
+    def forward(self, e: Attribute, v_r: Attribute, v_s: Attribute, u: Attribute) -> Attribute:
         return deepcopy(v_s)
 
 
@@ -19,7 +18,7 @@ class EdgeNodeSumNodeUpdate(NodeUpdate):
     Adds the aggregated edge values to the node value.
     """
 
-    def __call__(self, aggr_e: Attribute, v: Attribute, u: Attribute) -> Attribute:
+    def forward(self, aggr_e: Attribute, v: Attribute, u: Attribute) -> Attribute:
         return Attribute(aggr_e.val + v.val)
 
 
@@ -28,7 +27,7 @@ class MixedGlobalStateUpdate(GlobalStateUpdate):
     Adds aggregated nodes and edges to the negative global state.
     """
 
-    def __call__(self, aggr_e: Attribute, aggr_v: Attribute, u: Attribute) -> Attribute:
+    def forward(self, aggr_e: Attribute, aggr_v: Attribute, u: Attribute) -> Attribute:
         return Attribute(aggr_e.val + aggr_v.val - u.val)
 
 

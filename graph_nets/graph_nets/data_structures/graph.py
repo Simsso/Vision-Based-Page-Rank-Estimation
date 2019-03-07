@@ -1,6 +1,5 @@
-from typing import Set, Optional, Callable, List
-
-from graph_nets.data_structures.utils import sets_equal, lists_equal
+from typing import Optional, Callable, List
+from graph_nets.data_structures.utils import lists_equal
 from . import Attribute
 from graph_nets.data_structures.node import Node
 from . import Edge
