@@ -1,15 +1,13 @@
-import glob
+from glob import glob
 import os
 from torch.utils.data import Dataset
 from typing import Dict, List
 from torchvision.transforms import ToPILImage, Resize, Normalize, Compose, ToTensor
-from tqdm import tqdm
 from math import log
+from rank_predictor.data.threefold import get_threefold
 from rank_predictor.data.utils import filename_to_rank, load_image
-from rank_predictor.data.v1.utils import img_loading_possible
 from rank_predictor.data import threefold
 from rank_predictor.data.v1.transforms import ImageTransform
-import logging
 
 
 class DatasetV1(Dataset):
@@ -118,34 +116,8 @@ class DatasetV1(Dataset):
         :param valid_ratio: Value in [0,1] defining the ratio of validation samples
         :return: Three datasets (train, validation, test)
         """
-
-        assert train_ratio + valid_ratio <= 1., "Train and validation ratio must be less than or equal to 1."
         assert os.path.isdir(root_dir), "The provided path '{}' is not a directory".format(root_dir)
 
-        logging.info("Loading and splitting dataset v1")
+        sample_paths = glob(os.path.join(root_dir, '*.jpg'))
 
-        img_paths = sorted(glob.glob(os.path.join(root_dir, '*.jpg')))
-
-        assert len(img_paths) > 0, "No images found at '{}'".format(root_dir)
-
-        train_paths, valid_paths, test_paths = [], [], []
-
-        for path in tqdm(img_paths):
-            if os.getenv('validate_imgs', False) and not img_loading_possible(path):
-                logging.warning("The image '{}' could not be loaded".format(path))
-                continue
-
-            n_train, n_valid, n_test = len(train_paths), len(valid_paths), len(test_paths)
-            n_total = n_train + n_valid + n_test
-
-            if n_total == 0 or n_train / n_total < train_ratio:
-                train_paths.append(path)
-            elif n_valid / n_total < valid_ratio:
-                valid_paths.append(path)
-            else:
-                test_paths.append(path)
-
-        return threefold.Data(
-            train=DatasetV1(train_paths),
-            valid=DatasetV1(valid_paths),
-            test=DatasetV1(test_paths))
+        return get_threefold(DatasetV1, sample_paths, train_ratio, valid_ratio)

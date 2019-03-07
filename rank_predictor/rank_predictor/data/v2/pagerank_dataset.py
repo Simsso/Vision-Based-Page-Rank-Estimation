@@ -2,10 +2,10 @@ import logging
 from glob import glob
 import json
 import os
-from json import JSONDecodeError
 from typing import Set, Union, Dict, Tuple, List
 from torch.utils.data import Dataset
-from tqdm import tqdm
+
+from rank_predictor.data.threefold import get_threefold
 from rank_predictor.data.utils import Image, load_image, folder_to_rank
 from rank_predictor.data.v2.attributes import PageAttributeVal, LinkAttribute
 from graph_nets import Attribute, Edge, Graph, Node
@@ -120,11 +120,31 @@ class DatasetV2(Dataset):
         return images
 
     @staticmethod
-    def from_path(root_dir: str):
+    def _get_page_paths(root_dir: str) -> Set[str]:
         assert os.path.isdir(root_dir), "The provided path '{}' is not a directory".format(root_dir)
 
         query_str = os.path.join(root_dir, '*', '')
         page_paths = sorted(glob(query_str))
         page_paths = set(page_paths)
 
+        return set(page_paths)
+
+    @staticmethod
+    def from_path(root_dir: str):
+        page_paths = DatasetV2._get_page_paths(root_dir)
         return DatasetV2(page_paths)
+
+    @staticmethod
+    def get_threefold(root_dir: str, train_ratio: float, valid_ratio: float) -> threefold.Data:
+        """
+        Load dataset from root_dir and split it into three parts (train, validation, test).
+        The function splits in a deterministic way.
+        :param root_dir: Directory of the dataset
+        :param train_ratio: Value in [0,1] defining the ratio of training samples
+        :param valid_ratio: Value in [0,1] defining the ratio of validation samples
+        :return: Three datasets (train, validation, test)
+        """
+        assert os.path.isdir(root_dir), "The provided path '{}' is not a directory".format(root_dir)
+
+        page_paths = list(DatasetV2._get_page_paths(root_dir))
+        return get_threefold(DatasetV2, page_paths, train_ratio, valid_ratio)

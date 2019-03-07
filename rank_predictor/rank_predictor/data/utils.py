@@ -5,6 +5,8 @@ import logging
 import numpy as np
 import os
 
+from rank_predictor.data import threefold
+
 Image = np.ndarray
 
 
