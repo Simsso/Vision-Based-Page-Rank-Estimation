@@ -138,7 +138,7 @@ The use of the FIFO queue leads to breadth-first search in our graph in oppositi
 
 \subsubsection{Screenshot-Datamodule}
 \label{datacrawler_screenshot_datamodule}
-The Screenshot-Datamodule is responsible for visiting a website by a given URL and taking a screenshot upon successful loading. The entrypoint of the Datamodule is \texttt{process(url)}-method in \texttt{ScreenshotDatamodule}-class. Upon completion, the Datamodule returns an instance of \texttt{Screenshot}, which contains a screenshot and information about width and height of the screenshot.
+The Screenshot-Datamodule is responsible for visiting a website by a given URL and taking a screenshot upon successful loading as specified in section \ref{DatasetVersion1}. The entrypoint of the Datamodule is \texttt{process(url)}-method in \texttt{ScreenshotDatamodule}-class. Upon completion, the Datamodule returns an instance of \texttt{Screenshot}, which contains a screenshot and information about width and height of the screenshot.
 
 In general the Screenshot-Datamodule addresses three difficult problems with the help of \texttt{CEF 3}: 
 
@@ -164,7 +164,7 @@ In each invocation of \texttt{OnPaint()} following information are passed as par
 
 \begin{itemize}
 \item Reference to the current browser instance.
-\item Reference to the buffer, where image information about the website.
+\item Reference to the buffer, where image information are kept about the website.
 \item Information about the height and width of the given website.
 \end{itemize}
 
@@ -173,7 +173,7 @@ The buffer is an array of respectively one byte encoded single characters, where
 On each invocation we allocate total of $4 * \texttt{width} * \texttt{heights}$ bytes in the memory and copy the content of our buffer into it. Once we detect the website has finished loading, we can access the latest painting of \texttt{OnPaint()} from the memory.
 
 \paragraph{Detection}
-In our current implementation the browser instance calls \texttt{OnPaint()}-method to update the view port, whenever a change occurs on the website. In practice this means that our implementation will return screenshots of partially loaded websites. The simple solution to wait a given time $t$ and take the most recent screenshot is not an option. This static approach would lead to high analysis time per website and violate the scalability requirement (\ref{scalability}). We have to detect, when a given website has finished loading to reduce our analysis time per website.
+In our current implementation the browser instance calls \texttt{OnPaint()}-method to update the view port, whenever a change occurs on the website. In practice this means that our implementation might return screenshots of partially loaded websites, if we access to the buffer at a bad time. The simple solution to wait a given time $t$ and take the most recent screenshot is not an option. This static approach would lead to high analysis time per website and violate the scalability requirement (\ref{scalability}). We have to detect, when a given website has finished loading to reduce our analysis time per website.
 
 In general, there are multiple states during the loading of a website, which can be interpreted that a given website has finished loading. Before we discuss our approaches to tackle this complex problem, we define our understanding when a website has finished loading:
 
@@ -194,7 +194,7 @@ Based on our assumption we have developed two algorithms for this problem:
 	\item Detection based on \texttt{OnLoadingStateChange()}-method of \texttt{CEF 3} and hard coded waiting time.
 \end{itemize}
 
-Our algorithm based on calculation of change matrices, assumes that the number of changed pixels per screenshot will dramatically reduce over time. In other words, given the screenshots $I_{t}, I_{t+1}, I_{t+2}\in \{0, ... , 255\}^{width\times height \times 4}$ taken at times $t$, $t+1$,  and $t+2$ respectively, the total number of changed pixels  $|\Delta_{t,t+1}|$ between $I_{t}$ and $I_{t+1}$ will be less than $|\Delta_{t+1,t+2}|$. Furthermore, we assume that the $|\Delta|$ will converge for $t \rightarrow \infty$ meaning that the website has finished loading. Figure \ref{plot_assumption_number_changes} illustrates our assumption exemplary.
+Our algorithm based on calculation of change matrices, assumes that the number of changed pixels per screenshot will dramatically reduce over time. In other words, given the screenshots $I_{t}, I_{t+1}, I_{t+2}\in \{0, ... , 255\}^{width\times height \times 4}$ taken at times $t$, $t+1$,  and $t+2$ respectively, the total number of changed pixels  $|\Delta_{t,t+1}|$ between $I_{t}$ and $I_{t+1}$ will be less than $|\Delta_{t+1,t+2}|$. Furthermore, we assume that the $|\Delta|$ will converge for $t \rightarrow \infty$ meaning that the website has finished loading. The blue line in figure \ref{plot_assumption_number_changes} illustrates our assumption exemplary.
 
 In order to calculate the number of changed pixels between two screenshots $I_{t}$ and $I_{t+1}$, we have introduced the change matrix $C_{t,t+1} \in \{0,1\}^{width\times height}$. Each element $c_{i,j} \in C_{t,t+1}$ represents the change state between the pixels $\mathbf{s}^{t}_{i,j,} \in I_{t}$ and $\mathbf{s}^{t+1}_{i,j,}  \in I_{t+1}$, which in turn are in $\{0, ... , 255\}^{4}$ representing the color space \texttt{BGRA}.
 
@@ -220,7 +220,7 @@ Furthermore, we have observed that for websites such as \texttt{timodenk.com} th
 
 \begin{figure}
 \centering
-\label{plot_assumption_number_changes}
+
 \begin{tikzpicture}
 \begin{axis}[
 title={Assumption on number of changes},
@@ -248,14 +248,14 @@ coordinates {
 	(0,1500000)(5,1000000)(10,690000)(15,700000)(20,400000)(25,150000)(30,300000)(35,50000)(40,300000)(45,10000)(50,100000)
 };
 \end{axis}
-
 \end{tikzpicture}
 \caption{The figure illustrates exemplary in blue our assumption regarding the number of total changes $|| C_{t,t+1}||$ from $I_{t}$ to $I_{t+1}$. It shows that the number of total changes dramatically reduce and converge for $t \rightarrow \infty$. The red line illustrates the actual measured number of changes for \texttt{nationalgeographic.com} with the resolution $1920$ in width and $1080$ in height. }
+\label{plot_assumption_number_changes}
 \end{figure}
 
-Our second algorithm implements \texttt{OnLoadingStateChange()}-method of \texttt{CefLoadHandler}, which will be invoked upon a website has been loaded successfully. During invocation the parameter \texttt{isLoading} is passed, which is true if the given website has been loaded and false if not. However, this variable does not indicate that the given website has been painted successfully. It only indicates the browsers is ready to paint the given website. Therefore we have implemented a timer, which will start upon \texttt{isLoading} is true, run for a user-defined time and return a screenshot.
+Our second algorithm implements \texttt{OnLoadingStateChange()}-method of \texttt{CefLoadHandler}, which will be invoked upon a website has been loaded successfully. During invocation the parameter \texttt{isLoading} is passed, which is true if the given website has been loaded and false if not. However, this variable does not indicate that the given website has been painted successfully. It only indicates the browsers is ready to paint the given website. Therefore we have implemented a timer, which will start upon \texttt{isLoading} is true, run for a user-defined time and return the content of the buffer.
 
-In addition both algorithms implement a thread, which starts a timer upon the loading of a website. This timer represents a hard timeout for the Screenshot-Datamodule and will run for a user-defined time. After timeout it will ultimately return a screenshort. Thus, guaranteeing us an upper barrier for the Screenshot-Datamodule.
+In addition both algorithms implement a thread, which starts a timer upon the loading of a website. This timer represents a hard timeout for the Screenshot-Datamodule and will run for a user-defined time. After timeout it will ultimately return a screenshort. Thus, guaranteeing us to return the buffer  in any circumstances.
 
 \begin{table}[]
 	\centering
@@ -268,12 +268,44 @@ In addition both algorithms implement a thread, which starts a timer upon the lo
 \label{table_compare_algorithm_screenshot}
 \end{table}
 
-We have evaluated both approaches using the top 100 website in \texttt{Open PageRank} (\ref{OpenPageRank}). Our results are described in table \ref{table_compare_algorithm_screenshot}. They show that the algorithm based on \texttt{OnLoadingStateChange()} outperforms the algorithm based on change matrices, which ultimately lead to our decision to use \texttt{OnLoadStateChange()} as our preferred detection algorithm.
+We have manually evaluated both approaches using the top 100 website in \texttt{Open PageRank} (\ref{OpenPageRank}). Our results are described in table \ref{table_compare_algorithm_screenshot}. They show that the algorithm based on \texttt{OnLoadingStateChange()} outperforms the algorithm based on change matrices. This ultimately leads to our decision to use \texttt{OnLoadStateChange()} as our preferred detection algorithm.
+
 \subsubsection{MobileScreenshot-Datamodule}
 \label{datacrawler_mobilescreenshot_datamodule}
+The MobileScreenshot-Datamodule is responsible for visiting a website by a given URL and taking a screenshot upon successful loading. The \texttt{process(url)}-method is the entrypoint for the Datamodule. In contrast to the Screenshot-Datamodule, the visited website has to be in mobile resolution and mobile view leading to a screenshot taken from a mobile device (\ref{DatasetVersion2}).
 
+In total there are two ways to request a mobile view for a website:
 
+\begin{itemize}
+	\item Visit the website with mobile device resolution e.g $375$ in width and $667$ in height
+	\item Declare the \textit{user-agent} as a mobile device e.g  \texttt{Mozilla/5.0 (iPhone CPU)}
+\end{itemize}
 
+While the resolution represents the size of the view port in which the given website is being displayed, the user-agent represents the identification of the browser. It is a request header containing a characteristic string that allows the communication partner to identify application type, operating system, software vendor and version of the requesting browser instance. The request header is being send on every HTTP method such as \texttt{GET}. The \texttt{CEF 3} uses a desktop user-agent per default as figure \ref{compare_resolution} shows.
+
+Our initial assumption, that requesting a website with mobile resolution would lead to a mobile view, was right for a majority of the websites. But figure \ref{compare_resolution_useragent} shows that there are exceptions such as \texttt{youtube.com}, where it is not enough to scale down the resolution. Hence, we consider in our implementation to use a mobile resolution and user-agent. While we reuse most of the implementation of the Screenshot-Datamodule (\ref{datacrawler_screenshot_datamodule}) such as the loading, rendering and detection, we extend and change the implementation at specific points to support mobile view.
+
+First we adjust the resolution of the browser instance in \texttt{GetViewRect()} to mobile resolution, which is given by the mobile screenshot requirement described in dataset version 2 (\ref{DatasetVersion2}). Second, we intercept all outgoing requests from the browser instance and add the required mobile user-agent header. This is done by providing a custom implementation of the interface \texttt{CefRequestHandler} having the primary goal to handle browser requests. In \texttt{CefRequestHandler} we implement the \texttt{OnBeforeResourceLoad()}, which is invoked every time before a request is send. During invocation the outgoing request \texttt{CefRequest} is passed as parameter, which allows us to modify the request for our needs. The request contains beside the body, target URL, HTTP method also a key-value store representing the header section of the request. Upon every invocation we modify the key-value store and overwrite the key \texttt{User-Agent} with the value \texttt{Mozilla/5.0 (iPhone [...]) Chrome/71 [...] Mobile [...]}. The latter represents the Chrome browser on the mobile device \texttt{Apple iPhone}. 
+
+The interception and modification led us to successfully emulate a mobile device from our Datacrawler, allowing us to take screenshots from a mobile device.
+
+\begin{figure}
+	\centering
+	\begin{subfigure}{.6\textwidth}
+		\centering
+		\includegraphics[width=.5\linewidth]{resources/screenshot_resolution}
+		\caption{}
+		\label{compare_resolution}
+	\end{subfigure}%
+	\begin{subfigure}{.6\textwidth}
+		\centering
+		\includegraphics[width=.5\linewidth]{resources/screenshot_resolutionanduseragent}
+		\caption{}
+		\label{compare_useragent}
+	\end{subfigure}
+	\caption{This figure shows two screenshots taken from the website \texttt{youtube.com}. The figures (a) and (b) were taken with a browser instance having the resolution $375 \times 667$. In addition, we changed the user-agent of the figure (b) to represent a mobile device and use the default user-agent of \textit{CEF 3}. The usage of the mobile user-agent clearly shows that the website is being displayed for mobile devices in figure (b), whereas in figure (a) not.}
+	\label{compare_resolution_useragent}
+\end{figure}
 \subsubsection{URL-Datamodule}
 \label{datacrawler_url_datamodule}
 
