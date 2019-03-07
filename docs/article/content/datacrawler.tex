@@ -306,8 +306,31 @@ The interception and modification led us to successfully emulate a mobile device
 	\caption{This figure shows two screenshots taken from the website \texttt{youtube.com}. The figures (a) and (b) were taken with a browser instance having the resolution $375 \times 667$. In addition, we changed the user-agent of the figure (b) to represent a mobile device and use the default user-agent of \textit{CEF 3}. The usage of the mobile user-agent clearly shows that the website is being displayed for mobile devices in figure (b), whereas in figure (a) not.}
 	\label{compare_resolution_useragent}
 \end{figure}
+
 \subsubsection{URL-Datamodule}
 \label{datacrawler_url_datamodule}
+The URL-Datamodule represents one of the most complex Datamodules in the Datacrawler. It is responsible for returning a set of valid URLs for a given website, server and client errors occurred during loading, title, loading time and download size of the website. While calculating and returning so many attributes in a single Datamodule is contrary to the principles of the Datamodule-System (\ref{datacrawler_datamodulesystem}), we had to do the trade-off in order to (1) reduce overall development and (2) analysis time. The latter arises from the fact that for every single attribute we have to create a new browser instance and reload the entire website, which takes a tremendous amount of computing resources and time. Thus, complexity URL-Datamodule arises by calculating multiple attributes at once and the usage of different processes and their communication based on \textit{IPC}.
+
+In general, the URL-Datamodule is executed by invoking the \texttt{process(url)}-method. Upon successful completion it returns an instance of \texttt{URLCollection}, which is added to \texttt{NodeElement} and contains previous mentioned attributes. Similar to other Datamodules, we implement \texttt{CefClient} and other interfaces with our custom implementation and start a browser instance for the given URL. In the following, we will profoundly discuss the implementation by discussing each attribute calculation solely.
+
+\paragraph{URLs}
+The URL-Datamodule has to return valid URLs. This attribute is specified as following in the specification of dataset version 2 (\ref{DatasetVersion2}):
+
+\begin{center}
+	\textit{Each edge $a$ represents a possible navigation from web page $v_1$ to $v_2$ [...] and has the same Fully Qualified Domain Name.}
+\end{center}
+
+According to the specification a given URL is only valid if it is a possible navigation and has the same FQDN. Possible navigation means that only URLs found as a \texttt{href}-attribute in \texttt{<a>}-tags in the \texttt{HTML}-code of the website can be considered as valid. This follows from the fact that in \texttt{HTML} \texttt{<a>}-tag is the only tag, which allows the user to navigate to other pages from the current viewed page. While possible navigation describes where to find valid URLs, equality in FQDN describes which URLs to choose from a set of URLs.
+For example the FQDN for the URL \texttt{http://web.samedguener.com/index.html} is \texttt{web.samedguener.com}. While the URL \texttt{http://web.samedguener.com/contact.html} found on the website would be valid with \texttt{web.samedguener.com} as FQDN, \texttt{http://samedguener.com/} would not since \texttt{samedguener.com} is the FQDN.
+
+While it would be possible to access the URLs by downloading the \texttt{HTML}-code of the visited page, it would take a very long time and be tedious work to parse the code and build the DOM to access the URLs. 
+\paragraph{Loading Time}
+
+\paragraph{Client and Server Errors}
+
+\paragraph{Title}
+
+\paragraph{Download Size}
 
 \subsubsection{Generating the Graph}
 \label{datacrawler_graph}
