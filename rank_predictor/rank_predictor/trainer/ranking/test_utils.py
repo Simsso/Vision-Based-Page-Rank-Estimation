@@ -6,6 +6,13 @@ from rank_predictor.trainer.ranking.utils import compute_batch_accuracy, compute
 
 
 class TestUtils(TestCase):
+
+    def setUp(self) -> None:
+        super().setUp()
+
+    def tearDown(self) -> None:
+        super().tearDown()
+
     def _feed_multi_batch_accuracy(self, target_ranks_list: List[List[Union[float, int]]],
                                    model_outputs_list: List[List[float]], accuracy_target: float,
                                    correct_ctr_target: int) -> None:
@@ -30,12 +37,6 @@ class TestUtils(TestCase):
 
         self.assertTrue(np.isclose(accuracy, accuracy_target))
         self.assertTrue(correct_ctr == correct_ctr_target)
-
-    def setUp(self) -> None:
-        super().setUp()
-
-    def tearDown(self) -> None:
-        super().tearDown()
 
     def test_batch_accuracy_all_correct(self) -> None:
         n = 5

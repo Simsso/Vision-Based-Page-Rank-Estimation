@@ -30,15 +30,27 @@ class Graph:
         self._check_integrity()
 
     def _check_integrity(self) -> None:
+        """
+        Validates the internal state of the graph and raises a ValueError if it is inconsistent.
+        """
         self._check_node_edge_integrity()
         self._check_ordered_references_integrity()
 
     def _check_node_edge_integrity(self) -> None:
+        """
+        Checks whether the nodes corresponding to edges of this graph are also contained in the set of nodes.
+        Put differently, edges must only connect nodes of this graph.
+        """
         for edge in self.edges:
             if edge.receiver not in self.nodes or edge.sender not in self.nodes:
                 raise ValueError("Edges must only connect nodes that are contained in the graph")
 
     def _check_ordered_references_integrity(self) -> None:
+        """
+        The graph stores a list (ordered) and a set of both nodes and edges, for the sake of easier comparison with
+        other graphs. This method validates whether lists and sets are 'aligned' with each other, i.e. contain exactly
+        the same elements.
+        """
         if len(self.ordered_edges) != len(self.edges):
             raise ValueError("Number of ordered edges must be equal to the number of edges in the hash set")
 
@@ -96,6 +108,4 @@ class Graph:
         return True
 
     def __repr__(self) -> str:
-        return self.attr.__repr__()
-
-
+        return "graph({})".format(self.attr.__repr__())

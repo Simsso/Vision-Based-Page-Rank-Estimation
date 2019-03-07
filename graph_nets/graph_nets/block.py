@@ -90,9 +90,20 @@ OptLinearConfig = Optional[LinearConfig]
 
 
 class LinearIndependentGNBlock(nn.Module):
+    """
+    Graph network block that applies independent linear updates to edges, nodes, and global states.
+    Independent means that neighborhood information is disregarded, linear is a linear layer (matmul).
+    """
 
     def __init__(self, e_config: OptLinearConfig = None, v_config: OptLinearConfig = None,
                  u_config: OptLinearConfig = None) -> None:
+        """
+        For all three parameters, the identity mapping will be used if None is being passed.
+        :param e_config: Configuration of the linear layer that is applied to edges
+        :param v_config: Configuration of the linear layer that is applied to nodes
+        :param u_config: Configuration of the linear layer that is applied to the global state
+        """
+
         super().__init__()
 
         phi_e = IdentityEdgeUpdate() if e_config is None else IndependentEdgeUpdate(nn.Linear(*e_config))
@@ -103,10 +114,7 @@ class LinearIndependentGNBlock(nn.Module):
             phi_e, phi_v, phi_u,
             rho_ev=ConstantAggregation(),
             rho_vu=ConstantAggregation(),
-            rho_eu=ConstantAggregation()
-        )
+            rho_eu=ConstantAggregation())
 
     def forward(self, g: Graph) -> Graph:
         return self.block(g)
-
-

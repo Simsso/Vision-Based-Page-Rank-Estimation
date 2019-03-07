@@ -24,7 +24,7 @@ class NodeUpdate(nn.Module):
         """
         Node update function phi^(v). Converts v into v' given the aggregated, updated edge attributes of all adjacent
         edges and the global state u.
-        :param aggr_e: Aggregated, updated edges
+        :param aggr_e: Aggregated, updated local(!) edges
         :param v: Node attribute
         :param u: Global state
         :return: New node attribute v'

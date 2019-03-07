@@ -17,7 +17,7 @@ class Node:
         self.sending_edges: Set[Edge] = set()  # outgoing
 
     def __repr__(self) -> str:
-        return self.attr.__repr__()
+        return "node({})".format(self.attr.__repr__())
 
     @staticmethod
     def from_vals(vals: List[any]) -> List['Node']:
@@ -29,5 +29,3 @@ class Node:
         Equality check for two nodes. Does not compare receiving and sending edges, i.e. it disregards the context.
         """
         return n1.attr == n2.attr
-
-

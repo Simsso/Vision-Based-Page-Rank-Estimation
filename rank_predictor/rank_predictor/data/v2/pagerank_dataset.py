@@ -82,7 +82,7 @@ class DatasetV2(Dataset):
 
                 edges.add(edge)
 
-        g = Graph(nodes=set(nodes.values()), edges=edges, attr=Attribute(None))
+        g = Graph(nodes=list(nodes.values()), edges=list(edges), attr=Attribute(None))
 
         return g
 

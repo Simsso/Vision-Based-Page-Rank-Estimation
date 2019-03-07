@@ -1,5 +1,5 @@
 from typing import Optional, Dict
-from graph_nets.data_structures import Attribute
+from graph_nets import Attribute
 
 
 class PageAttributeVal:
