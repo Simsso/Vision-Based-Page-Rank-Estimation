@@ -26,5 +26,5 @@ opt = torch.optim.Adam(net.parameters(), lr=1e-4)
 # loss
 loss = ProbabilisticLoss()
 
-training_run = TrainingRun(net, opt, loss, data, batch_size=24, device=device)
+training_run = TrainingRun(net, opt, loss, data, batch_size=1, device=device)
 training_run(50)

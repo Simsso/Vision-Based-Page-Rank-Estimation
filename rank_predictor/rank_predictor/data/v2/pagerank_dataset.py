@@ -4,11 +4,10 @@ import json
 import os
 from typing import Set, Union, Dict, Tuple, List
 from torch.utils.data import Dataset
-
 from rank_predictor.data import threefold
 from rank_predictor.data.threefold import get_threefold
 from rank_predictor.data.utils import Image, load_image, folder_to_rank
-from rank_predictor.data.v2.attributes import PageAttributeVal, LinkAttribute
+from rank_predictor.data.v2.attributes import PageAttribute, LinkAttribute
 from graph_nets import Attribute, Edge, Graph, Node
 
 
@@ -50,14 +49,14 @@ class DatasetV2(Dataset):
             pages_json: List = json.load(json_file)
 
         # read screenshot paths
-        imgs = DatasetV2.load_images(os.path.join(path, 'image'))
+        # imgs = DatasetV2.load_images(os.path.join(path, 'image'))
 
-        assert len(pages_json) == len(imgs), "Number of pages and number of screenshots mismatch in '{}'.".format(path)
+        # assert len(pages_json) == len(imgs), "Number of pages and number of screenshots mismatch in '{}'.".format(path)
 
         # extract nodes
         nodes = {}
         for page_json in pages_json:
-            node_attribute = PageAttributeVal.from_json(page_json)
+            node_attribute = PageAttribute.from_json(page_json)
             url = page_json['base_url']
             if url in nodes:
                 logging.debug("Found two nodes with the same URL.")
@@ -87,9 +86,7 @@ class DatasetV2(Dataset):
 
                 edges.add(edge)
 
-        g = Graph(nodes=list(nodes.values()), edges=list(edges), attr=Attribute(None))
-
-        return g
+        return Graph(nodes=list(nodes.values()), edges=list(edges), attr=Attribute(None)).asdict()
 
     @staticmethod
     def load_images(path: str) -> List[Tuple[Image, Image]]:

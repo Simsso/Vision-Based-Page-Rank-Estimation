@@ -14,12 +14,13 @@ class Attribute:
 
     def asdict(self) -> Dict:
         return {
-            'val': self.val
+            'val': self.val if self.val is not None else 'None'
         }
 
     @staticmethod
     def from_dict(d: Dict) -> 'Attribute':
-        return Attribute(d['val'])
+        val = d['val'] if d['val'] is not 'None' else None
+        return Attribute(val)
 
     def __eq__(self, o: object) -> bool:
         if not isinstance(o, Attribute):

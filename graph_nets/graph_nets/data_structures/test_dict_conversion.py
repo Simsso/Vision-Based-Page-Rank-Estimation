@@ -1,5 +1,4 @@
 from unittest import TestCase
-
 from graph_nets import Node, Edge, Attribute, Graph
 
 
