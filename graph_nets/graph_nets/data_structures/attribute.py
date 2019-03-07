@@ -1,4 +1,6 @@
 from copy import deepcopy
+from typing import Dict
+
 import torch
 
 
@@ -9,6 +11,15 @@ class Attribute:
 
     def __init__(self, val: any = None) -> None:
         self.val = val
+
+    def asdict(self) -> Dict:
+        return {
+            'val': self.val
+        }
+
+    @staticmethod
+    def from_dict(d: Dict) -> 'Attribute':
+        return Attribute(d['val'])
 
     def __eq__(self, o: object) -> bool:
         if not isinstance(o, Attribute):

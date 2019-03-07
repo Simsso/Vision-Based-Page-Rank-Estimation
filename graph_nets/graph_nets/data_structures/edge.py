@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Dict
 from .attribute import Attribute
 from .node import Node
 
@@ -24,6 +24,21 @@ class Edge:
 
         sender.sending_edges.add(self)
         receiver.receiving_edges.add(self)
+
+    def asdict(self) -> Dict:
+        return {
+            'attr': self.attr.asdict(),
+            'sender_hash': hash(self.sender),
+            'receiver_hash': hash(self.receiver)
+        }
+
+    @staticmethod
+    def from_dict(d: Dict, nodes: Dict[str, Node]) -> 'Edge':
+        return Edge(
+            sender=nodes[d['sender_hash']],
+            receiver=nodes[d['receiver_hash']],
+            attr=Attribute.from_dict(d['attr'])
+        )
 
     def __repr__(self) -> str:
         return "edge({})".format(self.attr.__repr__())

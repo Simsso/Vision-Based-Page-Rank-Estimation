@@ -1,4 +1,4 @@
-from typing import Optional, Callable, List
+from typing import Optional, Callable, List, Dict
 from graph_nets.data_structures.utils import lists_equal
 from . import Attribute
 from graph_nets.data_structures.node import Node
@@ -90,6 +90,21 @@ class Graph:
                     continue
                 e = Edge(n1, n2, attribute_generator(n1, n2))
                 self.add_edge(e)
+
+    def asdict(self) -> Dict:
+        return {
+            'attr': self.attr.asdict(),
+            'nodes': {hash(n): n.asdict() for n in self.ordered_nodes},
+            'edges': [e.asdict() for e in self.ordered_edges]
+        }
+
+    @staticmethod
+    def from_dict(d: Dict) -> 'Graph':
+        nodes_dict = {k: Node.from_dict(node_dict) for k, node_dict in d['nodes'].items()}
+        nodes = list(nodes_dict.values())
+        edges = [Edge.from_dict(e, nodes_dict) for e in d['edges']]
+        attr = Attribute.from_dict(d['attr'])
+        return Graph(nodes, edges, attr)
 
     def __eq__(self, g2: object) -> bool:
         if not isinstance(g2, Graph):

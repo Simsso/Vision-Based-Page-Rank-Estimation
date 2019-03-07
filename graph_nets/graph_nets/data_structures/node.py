@@ -1,4 +1,4 @@
-from typing import Set, Optional, List
+from typing import Set, Optional, List, Dict
 from .attribute import Attribute
 
 
@@ -15,6 +15,15 @@ class Node:
         from .edge import Edge
         self.receiving_edges: Set[Edge] = set()  # incoming
         self.sending_edges: Set[Edge] = set()  # outgoing
+
+    def asdict(self) -> Dict:
+        return {
+            'attr': self.attr.asdict()
+        }
+
+    @staticmethod
+    def from_dict(d: Dict) -> 'Node':
+        return Node(Attribute.from_dict(d['attr']))
 
     def __repr__(self) -> str:
         return "node({})".format(self.attr.__repr__())
