@@ -49,11 +49,10 @@ class TrainingRun:
     def __call__(self, epochs: int) -> None:
         for epoch in range(epochs):
             logging.info("Starting epoch #{}".format(epoch + 1))
-            for batch in self.data_loader.train:
-                if self.step_ctr % 1000 == 0:
+            for batch in tqdm(self.data_loader.train):
+                if self.step_ctr % 500 == 0:
                     logging.info("Running validation")
-                    self.net.eval()
-                    # self._run_valid(self.data_loader.train, 'train')
+                    self._run_valid(self.data_loader.train, 'train')
 
                 self.step_ctr += 1
                 self._train_step(batch)
@@ -80,7 +79,6 @@ class GNTrainingRun(TrainingRun):
         model_outs, logranks = [], []
 
         for sample in batch:
-            rank: int = sample['rank']
             logrank: float = sample['logrank']
             graph: Graph = sample['graph']
 
@@ -105,7 +103,32 @@ class GNTrainingRun(TrainingRun):
         self.writer.add_histogram('batch_model_target_train', logranks, self.step_ctr)
 
     def _run_valid(self, dataset: Dataset, name: str) -> None:
-        pass
+        self.net.eval()
+
+        # accumulators
+        model_outs, logranks = [], []
+
+        for batch in dataset:
+            for sample in batch:
+                logrank: float = sample['logrank']
+                graph: Graph = sample['graph']
+
+                # forward pass
+                with torch.no_grad():
+                    model_out: torch.Tensor = self.net.forward(graph)
+
+                    model_outs.append(model_out)
+                    logranks.append(logrank)
+
+        model_outs = torch.cat(model_outs)
+        logranks = torch.Tensor(logranks)
+
+        loss = self.loss_fn(model_outs, logranks, w=(1-logranks))
+
+        accuracy, _ = compute_batch_accuracy(target_ranks=logranks, model_outputs=model_outs)
+
+        self.writer.add_scalar('loss_{}'.format(name), loss, self.step_ctr)
+        self.writer.add_scalar('accuracy_{}'.format(name), accuracy, self.step_ctr)
 
 
 class VanillaTrainingRun(TrainingRun):
@@ -131,10 +154,12 @@ class VanillaTrainingRun(TrainingRun):
         self.writer.add_histogram('batch_model_target_train', logranks, self.step_ctr)
 
     def _run_valid(self, dataset: Dataset, name: str) -> None:
+        self.net.eval()
+
         # accumulators
         loss_sum, model_out_batches, rank_batches = 0., [], []
 
-        for batch in tqdm(dataset):
+        for batch in dataset:
             imgs: torch.Tensor = batch['img'].to(self.device)
             logranks: torch.Tensor = batch['logrank'].to(self.device).float()
             rank_batches.append(logranks)
