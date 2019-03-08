@@ -5,7 +5,7 @@ from typing import Dict, List
 from torchvision.transforms import ToPILImage, Resize, Normalize, Compose, ToTensor
 from math import log
 from rank_predictor.data.threefold import get_threefold
-from rank_predictor.data.utils import filename_to_rank, load_image
+from rank_predictor.data.utils import filename_to_rank, load_image, rank_to_logrank
 from rank_predictor.data import threefold
 from rank_predictor.data.v1.transforms import ImageTransform
 
@@ -50,7 +50,7 @@ class DatasetV1(Dataset):
             'img': img,
             'rank': rank,
             'label': self.rank_to_label(rank),
-            'logrank': self.rank_to_logrank(rank),
+            'logrank': rank_to_logrank(DatasetV1.max_rank, rank),
         }
 
         # apply pre-processing
@@ -85,24 +85,10 @@ class DatasetV1(Dataset):
         return 2
 
     @staticmethod
-    def rank_to_logrank(rank: int, b: float = 1.) -> float:
-        """
-        Maps a rank from {1, ..., max_rank} to [0,1] in a logarithmic fashion.
-        :param rank: The rank to map, in {1, ..., max_rank}
-        :param b: Base makes the weighting steeper b --> 0, more linear b --> 10, or inverted b > 10
-        :return: Scalar in [0,1]
-        """
-
-        max_rank = DatasetV1.max_rank
-        assert 0 < rank <= max_rank, "Rank '{}' is out of range.".format(rank)
-
-        return pow(log(rank*max_rank) / log(max_rank) - 1., b)
-
-    @staticmethod
     def from_path(root_dir: str):
         assert os.path.isdir(root_dir), "The provided path '{}' is not a directory".format(root_dir)
 
-        img_paths = sorted(glob.glob(os.path.join(root_dir, '*.png')))
+        img_paths = sorted(glob(os.path.join(root_dir, '*.png')))
 
         return DatasetV1(img_paths)
 

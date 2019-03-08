@@ -48,6 +48,6 @@ class Edge:
         """
         Compares two edges, i.e. content and adjacent nodes (value-wise).
         """
-        return e1.attr == e2.attr and \
-               Node.eq_attr(e1.sender, e2.sender) and \
-               Node.eq_attr(e1.receiver, e2.receiver)
+        return (e1.attr == e2.attr and
+                Node.eq_attr(e1.sender, e2.sender) and
+                Node.eq_attr(e1.receiver, e2.receiver))

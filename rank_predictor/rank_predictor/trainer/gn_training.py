@@ -5,7 +5,7 @@ import torch
 
 from rank_predictor.model.graph_baseline import GraphBaseline
 from rank_predictor.trainer.ranking.probabilistic_loss import ProbabilisticLoss
-from rank_predictor.trainer.training_run import TrainingRun
+from rank_predictor.trainer.training_run import GNTrainingRun
 
 logging.basicConfig(level=logging.INFO)
 use_cuda = torch.cuda.is_available()
@@ -26,5 +26,5 @@ opt = torch.optim.Adam(net.parameters(), lr=1e-4)
 # loss
 loss = ProbabilisticLoss()
 
-training_run = TrainingRun(net, opt, loss, data, batch_size=1, device=device)
+training_run = GNTrainingRun(net, opt, loss, data, batch_size=2, device=device)
 training_run(50)

@@ -1,3 +1,4 @@
+from math import log
 from typing import List
 
 from skimage import io
@@ -47,3 +48,17 @@ def load_image(path: str) -> np.ndarray:
     except ValueError:
         logging.error("The image '{}' could not be loaded.".format(img_path))
         raise
+
+
+def rank_to_logrank(max_rank: int, rank: int, b: float = 1.) -> float:
+    """
+    Maps a rank from {1, ..., max_rank} to [0,1] in a logarithmic fashion.
+    :param max_rank: The maximum value that `rank` may take
+    :param rank: The rank to map, in {1, ..., max_rank}
+    :param b: Base makes the weighting steeper b --> 0, more linear b --> 10, or inverted b > 10
+    :return: Scalar in [0,1]
+    """
+
+    assert 0 < rank <= max_rank, "Rank '{}' is out of range.".format(rank)
+
+    return pow(log(rank*max_rank) / log(max_rank) - 1., b)

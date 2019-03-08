@@ -6,7 +6,7 @@ from typing import Set, Union, Dict, Tuple, List
 from torch.utils.data import Dataset
 from rank_predictor.data import threefold
 from rank_predictor.data.threefold import get_threefold
-from rank_predictor.data.utils import Image, load_image, folder_to_rank
+from rank_predictor.data.utils import Image, load_image, folder_to_rank, rank_to_logrank
 from rank_predictor.data.v2.attributes import PageAttribute, LinkAttribute
 from graph_nets import Attribute, Edge, Graph, Node
 
@@ -17,6 +17,7 @@ class DatasetV2(Dataset):
     Each sample is a dictionary with
      * 'rank' being a tensor indicating the page rank
      * 'graph' being the graph representation of the page
+     * 'logrank' being the logarithmically scaled rank (e.g. 80,001 and 90,000 are closer together than 1 and 10,000)
     """
 
     max_rank = 10 ** 5
@@ -32,6 +33,7 @@ class DatasetV2(Dataset):
 
         sample = {
             'rank': rank,
+            'logrank': rank_to_logrank(DatasetV2.max_rank, rank),
             'graph': self.load_graph(page_path)
         }
         return sample
@@ -89,7 +91,7 @@ class DatasetV2(Dataset):
 
                 edges.add(edge)
 
-        return Graph(nodes=list(nodes.values()), edges=list(edges), attr=Attribute(None)).asdict()
+        return Graph(nodes=list(nodes.values()), edges=list(edges), attr=Attribute(None))
 
     @staticmethod
     def load_images(path: str) -> List[Tuple[Image, Image]]:

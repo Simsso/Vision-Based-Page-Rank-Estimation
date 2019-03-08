@@ -1,13 +1,12 @@
 import logging
 import multiprocessing
-from typing import Dict
-
+from typing import Dict, Callable, Union, List
+from graph_nets import Graph
 import torch
 from torch import nn, optim
 from tensorboardX import SummaryWriter
 from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm
-
 from rank_predictor.trainer.ranking.utils import compute_batch_accuracy, compute_multi_batch_accuracy
 from rank_predictor.data import threefold
 
@@ -19,7 +18,8 @@ class TrainingRun:
                  loss_fn,
                  data: threefold.Data,
                  batch_size: int,
-                 device) -> None:
+                 device,
+                 collate_fn: Callable = None) -> None:
         self.net = net
         self.opt = opt
         self.loss_fn = loss_fn
@@ -35,9 +35,9 @@ class TrainingRun:
 
         # create data loader from dataset
         self.data_loader: threefold.Data[DataLoader] = threefold.Data(
-            train=DataLoader(data.train, batch_size, shuffle=True, num_workers=worker_count),
-            valid=DataLoader(data.valid, batch_size, shuffle=False, num_workers=worker_count),
-            test=DataLoader(data.test, batch_size, shuffle=False, num_workers=worker_count),
+            train=DataLoader(data.train, batch_size, shuffle=True, num_workers=worker_count, collate_fn=collate_fn),
+            valid=DataLoader(data.valid, batch_size, shuffle=False, num_workers=worker_count, collate_fn=collate_fn),
+            test=DataLoader(data.test, batch_size, shuffle=False, num_workers=worker_count, collate_fn=collate_fn),
         )
 
         self.loss_log = []
@@ -55,30 +55,58 @@ class TrainingRun:
                     self.net.eval()
                     # self._run_valid(self.data_loader.train, 'train')
 
-                self.net.train()
-                loss = self._train_step(batch)
-                loss.backward()
-                self.opt.step()
+                self.step_ctr += 1
+                self._train_step(batch)
 
-    def _train_step(self, batch: Dict[str, torch.Tensor]) -> torch.Tensor:
+    def _train_step(self, batch: Dict[str, torch.Tensor]) -> None:
         raise NotImplementedError
 
     def _run_valid(self, dataset: Dataset, name: str) -> None:
         raise NotImplementedError
 
 
+class GNTrainingRun(TrainingRun):
+
+    def __init__(self, net: nn.Module, opt: optim.Adam, loss_fn, data: threefold.Data, batch_size: int, device) -> None:
+        def collate_fn(batch):
+            return batch
+
+        super().__init__(net, opt, loss_fn, data, batch_size, device, collate_fn)
+
+    def _train_step(self, batch: List[Dict[str, Union[int, Graph]]]) -> None:
+        self.net.train()
+        self.opt.zero_grad()
+
+        for sample in batch:
+            rank: int = sample['rank']
+            logrank: float = sample['logrank']
+            graph: Graph = sample['graph']
+
+            model_out: torch.Tensor = self.net.forward(graph)
+
+        #loss = self.loss_fn(model_out, logranks, w=(1-logranks))
+        #loss.backward()
+
+        #self.opt.step()
+
+    def _run_valid(self, dataset: Dataset, name: str) -> None:
+        pass
+
+
 class VanillaTrainingRun(TrainingRun):
 
-    def _train_step(self, batch: Dict[str, torch.Tensor]) -> torch.Tensor:
+    def _train_step(self, batch: Dict[str, torch.Tensor]) -> None:
+        self.net.train()
+        self.opt.zero_grad()
+
         inputs = batch['img'].to(self.device)
         logranks = batch['logrank'].to(self.device).float()
-
-        self.step_ctr += 1
-        self.opt.zero_grad()
 
         model_out: torch.Tensor = self.net.forward(inputs)
 
         loss = self.loss_fn(model_out, logranks, w=(1-logranks))
+        loss.backward()
+        self.opt.step()
 
         accuracy, _ = compute_batch_accuracy(target_ranks=logranks, model_outputs=model_out)
 
@@ -86,8 +114,6 @@ class VanillaTrainingRun(TrainingRun):
         self.writer.add_scalar('batch_accuracy_train', accuracy, self.step_ctr)
         self.writer.add_histogram('batch_model_out_train', model_out, self.step_ctr)
         self.writer.add_histogram('batch_model_target_train', logranks, self.step_ctr)
-
-        return loss
 
     def _run_valid(self, dataset: Dataset, name: str) -> None:
         # accumulators
