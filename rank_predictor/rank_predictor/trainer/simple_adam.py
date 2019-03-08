@@ -4,7 +4,7 @@ import torch
 from rank_predictor.data.v1.pagerank_dataset import DatasetV1
 from rank_predictor.model.screenshot_feature_extractor import DesktopScreenshotFeatureExtractor
 from torch import optim
-from rank_predictor.trainer.training_run import TrainingRun
+from rank_predictor.trainer.training_run import VanillaTrainingRun
 from rank_predictor.trainer.ranking.probabilistic_loss import ProbabilisticLoss
 
 logging.basicConfig(level=logging.INFO)
@@ -25,5 +25,5 @@ opt = optim.Adam(net.parameters(), lr=2e-4)
 # loss
 loss = ProbabilisticLoss()
 
-training_run = TrainingRun(net, opt, loss, dataset_v1, batch_size=24, device=device)
+training_run = VanillaTrainingRun(net, opt, loss, dataset_v1, batch_size=24, device=device)
 training_run(50)

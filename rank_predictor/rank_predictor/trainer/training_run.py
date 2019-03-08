@@ -1,5 +1,6 @@
 import logging
 import multiprocessing
+from typing import Dict
 
 import torch
 from torch import nn, optim
@@ -50,15 +51,27 @@ class TrainingRun:
             logging.info("Starting epoch #{}".format(epoch + 1))
             for batch in self.data_loader.train:
                 if self.step_ctr % 1000 == 0:
-                    self._run_valid(self.data_loader.valid, 'valid')
+                    logging.info("Running validation")
+                    self.net.eval()
                     # self._run_valid(self.data_loader.train, 'train')
 
-                imgs = batch['img'].to(self.device)
-                logranks = batch['logrank'].to(self.device).float()
-                self._train_step(imgs, logranks)
+                self.net.train()
+                loss = self._train_step(batch)
+                loss.backward()
+                self.opt.step()
 
-    def _train_step(self, inputs: torch.Tensor, logranks: torch.Tensor) -> None:
-        self.net.train()
+    def _train_step(self, batch: Dict[str, torch.Tensor]) -> torch.Tensor:
+        raise NotImplementedError
+
+    def _run_valid(self, dataset: Dataset, name: str) -> None:
+        raise NotImplementedError
+
+
+class VanillaTrainingRun(TrainingRun):
+
+    def _train_step(self, batch: Dict[str, torch.Tensor]) -> torch.Tensor:
+        inputs = batch['img'].to(self.device)
+        logranks = batch['logrank'].to(self.device).float()
 
         self.step_ctr += 1
         self.opt.zero_grad()
@@ -66,8 +79,6 @@ class TrainingRun:
         model_out: torch.Tensor = self.net.forward(inputs)
 
         loss = self.loss_fn(model_out, logranks, w=(1-logranks))
-        loss.backward()
-        self.opt.step()
 
         accuracy, _ = compute_batch_accuracy(target_ranks=logranks, model_outputs=model_out)
 
@@ -76,11 +87,9 @@ class TrainingRun:
         self.writer.add_histogram('batch_model_out_train', model_out, self.step_ctr)
         self.writer.add_histogram('batch_model_target_train', logranks, self.step_ctr)
 
+        return loss
+
     def _run_valid(self, dataset: Dataset, name: str) -> None:
-        logging.info("Running validation on {}".format(name))
-
-        self.net.eval()
-
         # accumulators
         loss_sum, model_out_batches, rank_batches = 0., [], []
 
