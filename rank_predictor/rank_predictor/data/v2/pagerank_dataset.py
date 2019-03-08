@@ -49,14 +49,17 @@ class DatasetV2(Dataset):
             pages_json: List = json.load(json_file)
 
         # read screenshot paths
-        # imgs = DatasetV2.load_images(os.path.join(path, 'image'))
+        imgs = DatasetV2.load_images(os.path.join(path, 'image'))
 
-        # assert len(pages_json) == len(imgs), "Number of pages and number of screenshots mismatch in '{}'.".format(path)
+        assert len(pages_json) == len(imgs), "Number of pages and number of screenshots mismatch in '{}'.".format(path)
 
         # extract nodes
         nodes = {}
         for page_json in pages_json:
-            node_attribute = PageAttribute.from_json(page_json)
+            desktop_img, mobile_img = imgs[page_json['id']-1]
+
+            node_attribute = PageAttribute.from_json(page_json, desktop_img, mobile_img)
+
             url = page_json['base_url']
             if url in nodes:
                 logging.debug("Found two nodes with the same URL.")
