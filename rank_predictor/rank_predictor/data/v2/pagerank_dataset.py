@@ -1,12 +1,14 @@
 import logging
+import torch
 from glob import glob
 import json
 import os
 from typing import Set, Union, Dict, Tuple, List
 from torch.utils.data import Dataset
+from torchvision.transforms import ToPILImage, Resize, ToTensor, Normalize, Compose
 from rank_predictor.data import threefold
 from rank_predictor.data.threefold import get_threefold
-from rank_predictor.data.utils import Image, load_image, folder_to_rank, rank_to_logrank
+from rank_predictor.data.utils import load_image, folder_to_rank, rank_to_logrank
 from rank_predictor.data.v2.attributes import PageAttribute, LinkAttribute
 from graph_nets import Attribute, Edge, Graph, Node
 
@@ -25,6 +27,13 @@ class DatasetV2(Dataset):
     def __init__(self, page_paths: Set[str]) -> None:
         super(DatasetV2).__init__()
 
+        self.desktop_img_transform = Compose([
+            ToPILImage(),
+            Resize((1920 // 4, 1080 // 4)),
+            ToTensor(),
+            Normalize((.5, .5, .5, .5), (.5, .5, .5, .5)),
+        ])
+
         self.page_paths = sorted(list(page_paths))
 
     def __getitem__(self, index) -> Dict[str, Union[int, Graph]]:
@@ -41,8 +50,7 @@ class DatasetV2(Dataset):
     def __len__(self) -> int:
         return len(self.page_paths)
 
-    @staticmethod
-    def load_graph(path: str) -> Graph:
+    def load_graph(self, path: str) -> Graph:
         # read JSON from page description file
         json_file_path = glob(os.path.join(path, '*.json'))
         assert len(json_file_path) == 1, "Number of json files in '{}' must be exactly one.".format(path)
@@ -51,7 +59,7 @@ class DatasetV2(Dataset):
             pages_json: List = json.load(json_file)
 
         # read screenshot paths
-        imgs = DatasetV2.load_images(os.path.join(path, 'image'))
+        imgs = self.load_images(os.path.join(path, 'image'))
 
         assert len(pages_json) == len(imgs), "Number of pages and number of screenshots mismatch in '{}'.".format(path)
 
@@ -93,8 +101,7 @@ class DatasetV2(Dataset):
 
         return Graph(nodes=list(nodes.values()), edges=list(edges), attr=Attribute(None))
 
-    @staticmethod
-    def load_images(path: str) -> List[Tuple[Image, Image]]:
+    def load_images(self, path: str) -> List[Tuple[torch.Tensor, torch.Tensor]]:
         file_extension = '.jpg'
         mobile_postfix = '_mobile'
         image_mobile_paths = set(glob(os.path.join(path, '*{}{}'.format(mobile_postfix, file_extension))))
@@ -114,7 +121,11 @@ class DatasetV2(Dataset):
             img_no = int(desktop_name)
 
             assert img_no not in image_numbers, "Found two images mapping to the same number."
-            images.append((img_no, (load_image(desktop_p), load_image(mobile_p))))
+
+            desktop_img = self.desktop_img_transform(load_image(desktop_p))
+            mobile_img = load_image(mobile_p)
+
+            images.append((img_no, (desktop_img, mobile_img)))
             image_numbers.add(img_no)
 
         images.sort(key=lambda x: x[0])

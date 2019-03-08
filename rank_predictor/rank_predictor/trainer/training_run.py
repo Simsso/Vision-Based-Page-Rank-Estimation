@@ -44,7 +44,7 @@ class TrainingRun:
 
         self.net.to(device)
 
-        self.writer = SummaryWriter('logs/prob_loss_weighted_nosig_4c_correct')
+        self.writer = SummaryWriter('logs/gn_desktop_avg')
 
     def __call__(self, epochs: int) -> None:
         for epoch in range(epochs):
@@ -77,6 +77,8 @@ class GNTrainingRun(TrainingRun):
         self.net.train()
         self.opt.zero_grad()
 
+        model_outs, logranks = [], []
+
         for sample in batch:
             rank: int = sample['rank']
             logrank: float = sample['logrank']
@@ -84,10 +86,23 @@ class GNTrainingRun(TrainingRun):
 
             model_out: torch.Tensor = self.net.forward(graph)
 
-        #loss = self.loss_fn(model_out, logranks, w=(1-logranks))
-        #loss.backward()
+            model_outs.append(model_out)
+            logranks.append(logrank)
 
-        #self.opt.step()
+        model_outs = torch.cat(model_outs)
+        logranks = torch.Tensor(logranks)
+
+        loss = self.loss_fn(model_outs, logranks, w=(1-logranks))
+        loss.backward()  # TODO: double-check that gradients of all samples will be taken into account
+
+        self.opt.step()
+
+        accuracy, _ = compute_batch_accuracy(target_ranks=logranks, model_outputs=model_outs)
+
+        self.writer.add_scalar('batch_loss_train', loss, self.step_ctr)
+        self.writer.add_scalar('batch_accuracy_train', accuracy, self.step_ctr)
+        self.writer.add_histogram('batch_model_out_train', model_outs, self.step_ctr)
+        self.writer.add_histogram('batch_model_target_train', logranks, self.step_ctr)
 
     def _run_valid(self, dataset: Dataset, name: str) -> None:
         pass

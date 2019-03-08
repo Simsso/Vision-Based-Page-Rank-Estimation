@@ -1,12 +1,10 @@
 from math import log
 from typing import List
-
 from skimage import io
 import logging
 import numpy as np
 import os
 
-from rank_predictor.data import threefold
 
 Image = np.ndarray
 

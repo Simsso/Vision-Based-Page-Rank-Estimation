@@ -2,13 +2,12 @@ import logging
 import os
 from rank_predictor.data.v2.pagerank_dataset import DatasetV2
 import torch
-
 from rank_predictor.model.graph_baseline import GraphBaseline
 from rank_predictor.trainer.ranking.probabilistic_loss import ProbabilisticLoss
 from rank_predictor.trainer.training_run import GNTrainingRun
 
 logging.basicConfig(level=logging.INFO)
-use_cuda = torch.cuda.is_available()
+use_cuda = torch.cuda.is_available() and False  # TODO: control via parameter
 device = torch.device('cuda' if use_cuda else 'cpu')
 
 # dataset
@@ -26,5 +25,5 @@ opt = torch.optim.Adam(net.parameters(), lr=1e-4)
 # loss
 loss = ProbabilisticLoss()
 
-training_run = GNTrainingRun(net, opt, loss, data, batch_size=2, device=device)
+training_run = GNTrainingRun(net, opt, loss, data, batch_size=4, device=device)
 training_run(50)

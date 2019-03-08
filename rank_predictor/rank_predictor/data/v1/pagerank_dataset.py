@@ -3,11 +3,10 @@ import os
 from torch.utils.data import Dataset
 from typing import Dict, List
 from torchvision.transforms import ToPILImage, Resize, Normalize, Compose, ToTensor
-from math import log
 from rank_predictor.data.threefold import get_threefold
 from rank_predictor.data.utils import filename_to_rank, load_image, rank_to_logrank
 from rank_predictor.data import threefold
-from rank_predictor.data.v1.transforms import ImageTransform
+from data.v1.transforms import ImageTransform
 
 
 class DatasetV1(Dataset):
