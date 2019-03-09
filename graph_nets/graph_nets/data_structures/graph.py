@@ -1,3 +1,4 @@
+import torch
 from typing import Optional, Callable, List, Dict
 from graph_nets.data_structures.utils import lists_equal
 from . import Attribute
@@ -75,7 +76,8 @@ class Graph:
         self.ordered_edges.append(new_edge)
         self._check_integrity()
 
-    def add_all_edges(self, reflexive: bool = True, attribute_generator: Optional[Callable[[Node, Node], Attribute]] = None) -> None:
+    def add_all_edges(self, reflexive: bool = True,
+                      attribute_generator: Optional[Callable[[Node, Node], Attribute]] = None) -> None:
         """
         Modifies the graph in-place, such that it is fully connected, adding n^n edges, where n is the number of nodes.
         :param reflexive: Whether to connect nodes to themselves
@@ -90,6 +92,17 @@ class Graph:
                     continue
                 e = Edge(n1, n2, attribute_generator(n1, n2))
                 self.add_edge(e)
+
+    def to(self, device: torch.device) -> 'Graph':
+        """
+        Moves torch values of this object to the specified device (e.g. GPU).
+        """
+        self.attr.to(device)
+        for edge in self.edges:
+            edge.to(device)
+        for node in self.nodes:
+            node.to(device)
+        return self
 
     def asdict(self) -> Dict:
         return {
@@ -124,3 +137,9 @@ class Graph:
 
     def __repr__(self) -> str:
         return "graph({})".format(self.attr.__repr__())
+
+    def __del__(self) -> None:
+        """
+        Ensures garbage collection of CUDA tensors that this graph contains.
+        """
+        self.to(device=torch.device('cpu'))

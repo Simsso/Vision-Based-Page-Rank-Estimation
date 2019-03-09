@@ -6,7 +6,6 @@ import torch
 from torch import nn, optim
 from tensorboardX import SummaryWriter
 from torch.utils.data import Dataset, DataLoader
-from tqdm import tqdm
 from rank_predictor.trainer.ranking.utils import compute_batch_accuracy, compute_multi_batch_accuracy
 from rank_predictor.data import threefold
 
@@ -28,7 +27,7 @@ class TrainingRun:
         self.batch_size = batch_size
 
         cpu_count = multiprocessing.cpu_count()
-        worker_count = max(cpu_count - 1, 1)
+        worker_count = 1  # max(cpu_count - 1, 1)
         logging.info("Using {} workers for the data pipeline".format(worker_count))
 
         self.data = data
@@ -36,7 +35,7 @@ class TrainingRun:
         # create data loader from dataset
         self.data_loader: threefold.Data[DataLoader] = threefold.Data(
             train=DataLoader(data.train, batch_size, shuffle=True, num_workers=worker_count, collate_fn=collate_fn),
-            valid=DataLoader(data.valid, batch_size, shuffle=False, num_workers=worker_count, collate_fn=collate_fn),
+            valid=DataLoader(data.valid, 1, shuffle=True, num_workers=worker_count, collate_fn=collate_fn),
             test=DataLoader(data.test, batch_size, shuffle=False, num_workers=worker_count, collate_fn=collate_fn),
         )
 
@@ -44,15 +43,15 @@ class TrainingRun:
 
         self.net.to(device)
 
-        self.writer = SummaryWriter('logs/gn_desktop_avg')
+        self.writer = SummaryWriter('logs/gn_desktop_avg6')
 
     def __call__(self, epochs: int) -> None:
         for epoch in range(epochs):
             logging.info("Starting epoch #{}".format(epoch + 1))
-            for batch in tqdm(self.data_loader.train):
+            for batch in self.data_loader.train:
                 if self.step_ctr % 500 == 0:
-                    logging.info("Running validation")
-                    self._run_valid(self.data_loader.train, 'train')
+                    with torch.no_grad():
+                        self._run_valid(self.data_loader.valid, 'valid')
 
                 self.step_ctr += 1
                 self._train_step(batch)
@@ -73,6 +72,7 @@ class GNTrainingRun(TrainingRun):
         super().__init__(net, opt, loss_fn, data, batch_size, device, collate_fn)
 
     def _train_step(self, batch: List[Dict[str, Union[int, Graph]]]) -> None:
+        logging.info("Running training step #{}".format(self.step_ctr))
         self.net.train()
         self.opt.zero_grad()
 
@@ -81,15 +81,29 @@ class GNTrainingRun(TrainingRun):
         for sample in batch:
             logrank: float = sample['logrank']
             graph: Graph = sample['graph']
+            graph.to(self.device)
 
-            model_out: torch.Tensor = self.net.forward(graph)
+            try:
+                model_out: torch.Tensor = self.net.forward(graph)
+            except RuntimeError:
+                logging.warning("Skipping step because of runtime error")
+                self.step_ctr -= 1
+
+                # free GPU memory
+                self.opt.zero_grad()
+                self.net.cpu()
+                torch.cuda.empty_cache()
+                self.net.cuda(self.device)
+
+                return
 
             model_outs.append(model_out)
             logranks.append(logrank)
 
-        model_outs = torch.cat(model_outs)
-        logranks = torch.Tensor(logranks)
+        model_outs = torch.cat(model_outs).to(self.device)
+        logranks = torch.Tensor(logranks).to(self.device).float()
 
+        logging.info("Performing backward pass")
         loss = self.loss_fn(model_outs, logranks, w=(1-logranks))
         loss.backward()  # TODO: double-check that gradients of all samples will be taken into account
 
@@ -103,6 +117,7 @@ class GNTrainingRun(TrainingRun):
         self.writer.add_histogram('batch_model_target_train', logranks, self.step_ctr)
 
     def _run_valid(self, dataset: Dataset, name: str) -> None:
+        self.opt.zero_grad()
         self.net.eval()
 
         # accumulators
@@ -112,16 +127,16 @@ class GNTrainingRun(TrainingRun):
             for sample in batch:
                 logrank: float = sample['logrank']
                 graph: Graph = sample['graph']
+                graph.to(self.device)
+                model_out: torch.Tensor = self.net.forward(graph)
 
-                # forward pass
-                with torch.no_grad():
-                    model_out: torch.Tensor = self.net.forward(graph)
+                model_outs.append(model_out)
+                logranks.append(logrank)
 
-                    model_outs.append(model_out)
-                    logranks.append(logrank)
+        logging.info("Computing loss and accuracy")
 
-        model_outs = torch.cat(model_outs)
-        logranks = torch.Tensor(logranks)
+        model_outs = torch.cat(model_outs).to(device='cpu')
+        logranks = torch.Tensor(logranks).to(device='cpu')
 
         loss = self.loss_fn(model_outs, logranks, w=(1-logranks))
 
@@ -169,8 +184,8 @@ class VanillaTrainingRun(TrainingRun):
                 model_out: torch.Tensor = self.net.forward(imgs)
                 model_out_batches.append(model_out)
 
-            loss = self.loss_fn(model_out, logranks, w=(1-logranks))
-            loss_sum += loss
+                loss = self.loss_fn(model_out, logranks, w=(1-logranks))
+                loss_sum += loss
 
         n = len(dataset)
         loss = loss_sum / n

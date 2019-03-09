@@ -1,6 +1,5 @@
 from copy import deepcopy
 from typing import Dict
-
 import torch
 
 
@@ -11,6 +10,18 @@ class Attribute:
 
     def __init__(self, val: any = None) -> None:
         self.val = val
+
+    def to(self, device: torch.device) -> 'Attribute':
+        """
+        Moves torch values of this object to the specified device (e.g. GPU).
+        """
+        if isinstance(self.val, dict):
+            for key, val in self.val.items():
+                if isinstance(val, torch.Tensor):
+                    self.val[key] = val.to(device)
+        elif isinstance(self.val, torch.Tensor):
+            self.val = self.val.to(device)
+        return self
 
     def asdict(self) -> Dict:
         return {

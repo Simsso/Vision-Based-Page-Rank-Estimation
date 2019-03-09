@@ -1,3 +1,4 @@
+import torch
 from typing import Optional, Dict
 from .attribute import Attribute
 from .node import Node
@@ -24,6 +25,13 @@ class Edge:
 
         sender.sending_edges.add(self)
         receiver.receiving_edges.add(self)
+
+    def to(self, device: torch.device) -> 'Edge':
+        """
+        Moves torch values of this object to the specified device (e.g. GPU).
+        """
+        self.attr.to(device)
+        return self
 
     def asdict(self) -> Dict:
         return {
