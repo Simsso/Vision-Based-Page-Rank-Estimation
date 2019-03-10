@@ -1,11 +1,11 @@
 import logging
 import multiprocessing
 from typing import Dict, Callable, Union, List
-
+import sacred
 from tqdm import tqdm
-
 from graph_nets import Graph
 import torch
+import numpy as np
 from torch import nn, optim
 from tensorboardX import SummaryWriter
 from torch.utils.data import Dataset, DataLoader
@@ -14,14 +14,9 @@ from rank_predictor.data import threefold
 
 
 class TrainingRun:
-    def __init__(self,
-                 net: nn.Module,
-                 opt: optim.Adam,
-                 loss_fn,
-                 data: threefold.Data,
-                 batch_size: int,
-                 device,
-                 collate_fn: Callable = None) -> None:
+    def __init__(self, ex: sacred.Experiment, name: str, net: nn.Module, opt: optim.Adam, loss_fn: Callable,
+                 data: threefold.Data, batch_size: int, device: torch.device, collate_fn: Callable = None) -> None:
+        self.ex = ex
         self.net = net
         self.opt = opt
         self.loss_fn = loss_fn
@@ -46,7 +41,7 @@ class TrainingRun:
 
         self.net.to(device)
 
-        self.writer = SummaryWriter('logs/gn_desktop_avg')
+        self.writer = SummaryWriter('logs/{}'.format(name))
 
     def __call__(self, epochs: int) -> None:
         for epoch in range(epochs):
@@ -64,14 +59,17 @@ class TrainingRun:
     def _run_valid(self, dataset: Dataset, name: str, approx: bool = False) -> None:
         raise NotImplementedError
 
+    def log_scalar(self, name: str, val: Union[np.ndarray, torch.Tensor]):
+        pass
+
 
 class GNTrainingRun(TrainingRun):
 
-    def __init__(self, net: nn.Module, opt: optim.Adam, loss_fn, data: threefold.Data, batch_size: int, device) -> None:
+    def __init__(self, ex: sacred.Experiment, name: str, net: nn.Module, opt: optim.Adam, loss_fn, data: threefold.Data, batch_size: int, device) -> None:
         def collate_fn(batch):
             return batch
 
-        super().__init__(net, opt, loss_fn, data, batch_size, device, collate_fn)
+        super().__init__(ex, name, net, opt, loss_fn, data, batch_size, device, collate_fn)
 
     def _train_step(self, batch: List[Dict[str, Union[int, Graph]]]) -> None:
         self.net.train()
@@ -169,7 +167,7 @@ class VanillaTrainingRun(TrainingRun):
         self.writer.add_histogram('batch_model_out_train', model_out, self.step_ctr)
         self.writer.add_histogram('batch_model_target_train', logranks, self.step_ctr)
 
-    def _run_valid(self, dataset: Dataset, name: str) -> None:
+    def _run_valid(self, dataset: Dataset, name: str, approx: bool = False) -> None:
         self.net.eval()
 
         with torch.no_grad():
