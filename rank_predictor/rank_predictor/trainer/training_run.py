@@ -2,7 +2,6 @@ import logging
 import multiprocessing
 from typing import Dict, Callable, Union, List
 import sacred
-from tqdm import tqdm
 from graph_nets import Graph
 import torch
 import numpy as np
@@ -50,8 +49,9 @@ class TrainingRun:
         """
         for epoch in range(epochs):
             logging.info("Starting epoch #{}".format(epoch + 1))
-            for batch in tqdm(self.data_loader.train):
+            for batch in self.data_loader.train:
                 if self.step_ctr % 2500 == 0:
+                    logging.info("Running approx. validation at step #{}".format(self.step_ctr))
                     self._run_valid(self.data_loader.valid, 'valid', approx=True)
 
                 self.step_ctr += 1
