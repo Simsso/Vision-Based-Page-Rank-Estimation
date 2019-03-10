@@ -60,7 +60,13 @@ class TrainingRun:
         raise NotImplementedError
 
     def log_scalar(self, name: str, val: Union[np.ndarray, torch.Tensor]):
-        pass
+        # tensorboard logging
+        self.writer.add_scalar(name, val, self.step_ctr)
+
+        # sacred logging
+        if isinstance(val, torch.Tensor):
+            val = float(val.detach().numpy())
+        self.ex.log_scalar(name, val, self.step_ctr)
 
 
 class GNTrainingRun(TrainingRun):
@@ -109,8 +115,8 @@ class GNTrainingRun(TrainingRun):
 
         accuracy, _ = compute_batch_accuracy(target_ranks=logranks, model_outputs=model_outs)
 
-        self.writer.add_scalar('batch_loss_train', loss, self.step_ctr)
-        self.writer.add_scalar('batch_accuracy_train', accuracy, self.step_ctr)
+        self.log_scalar('batch_loss_train', loss)
+        self.log_scalar('batch_accuracy_train', accuracy)
         self.writer.add_histogram('batch_model_out_train', model_outs, self.step_ctr)
         self.writer.add_histogram('batch_model_target_train', logranks, self.step_ctr)
 
@@ -123,7 +129,7 @@ class GNTrainingRun(TrainingRun):
             model_outs, logranks = [], []
 
             for batch in dataset:
-                if approx and len(model_outs) >= 500:
+                if approx and len(model_outs) >= 10:
                     break
                 for sample in batch:
                     logrank: float = sample['logrank']
@@ -141,8 +147,8 @@ class GNTrainingRun(TrainingRun):
 
             accuracy, _ = compute_batch_accuracy(target_ranks=logranks, model_outputs=model_outs)
 
-            self.writer.add_scalar('loss_{}'.format(name), loss, self.step_ctr)
-            self.writer.add_scalar('accuracy_{}'.format(name), accuracy, self.step_ctr)
+            self.log_scalar('loss_{}'.format(name), loss)
+            self.log_scalar('accuracy_{}'.format(name), accuracy,)
 
 
 class VanillaTrainingRun(TrainingRun):
@@ -162,8 +168,8 @@ class VanillaTrainingRun(TrainingRun):
 
         accuracy, _ = compute_batch_accuracy(target_ranks=logranks, model_outputs=model_out)
 
-        self.writer.add_scalar('batch_loss_train', loss, self.step_ctr)
-        self.writer.add_scalar('batch_accuracy_train', accuracy, self.step_ctr)
+        self.log_scalar('batch_loss_train', loss)
+        self.log_scalar('batch_accuracy_train', accuracy)
         self.writer.add_histogram('batch_model_out_train', model_out, self.step_ctr)
         self.writer.add_histogram('batch_model_target_train', logranks, self.step_ctr)
 
@@ -192,5 +198,5 @@ class VanillaTrainingRun(TrainingRun):
 
             accuracy, _ = compute_multi_batch_accuracy(rank_batches, model_out_batches)
 
-            self.writer.add_scalar('loss_{}'.format(name), loss, self.step_ctr)
-            self.writer.add_scalar('accuracy_{}'.format(name), accuracy, self.step_ctr)
+            self.log_scalar('loss_{}'.format(name), loss)
+            self.log_scalar('accuracy_{}'.format(name), accuracy)

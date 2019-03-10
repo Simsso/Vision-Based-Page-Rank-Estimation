@@ -1,9 +1,6 @@
 import logging
 import os
-
 from sacred.observers import MongoObserver
-from sacred.stflow import LogFileWriter
-
 from rank_predictor.data.v2.pagerank_dataset import DatasetV2
 import torch
 from rank_predictor.model.graph_baseline import GraphBaseline
@@ -11,7 +8,7 @@ from rank_predictor.trainer.ranking.probabilistic_loss import ProbabilisticLoss
 from rank_predictor.trainer.training_run import GNTrainingRun
 from sacred import Experiment
 
-name = 'v2/test_training2'
+name = 'v2/test_training4'
 ex = Experiment(name)
 
 ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred'))
