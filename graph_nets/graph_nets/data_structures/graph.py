@@ -142,4 +142,7 @@ class Graph:
         """
         Ensures garbage collection of CUDA tensors that this graph contains.
         """
-        self.to(device=torch.device('cpu'))
+        try:
+            self.to(device=torch.device('cpu'))
+        except AttributeError:
+            pass

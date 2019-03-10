@@ -1,6 +1,9 @@
 import logging
 import multiprocessing
 from typing import Dict, Callable, Union, List
+
+from tqdm import tqdm
+
 from graph_nets import Graph
 import torch
 from torch import nn, optim
@@ -43,15 +46,14 @@ class TrainingRun:
 
         self.net.to(device)
 
-        self.writer = SummaryWriter('logs/gn_desktop_avg6')
+        self.writer = SummaryWriter('logs/gn_desktop_avg')
 
     def __call__(self, epochs: int) -> None:
         for epoch in range(epochs):
             logging.info("Starting epoch #{}".format(epoch + 1))
-            for batch in self.data_loader.train:
+            for batch in tqdm(self.data_loader.train):
                 if self.step_ctr % 500 == 0:
-                    with torch.no_grad():
-                        self._run_valid(self.data_loader.valid, 'valid')
+                    self._run_valid(self.data_loader.valid, 'valid', approx=True)
 
                 self.step_ctr += 1
                 self._train_step(batch)
@@ -59,7 +61,7 @@ class TrainingRun:
     def _train_step(self, batch: Dict[str, torch.Tensor]) -> None:
         raise NotImplementedError
 
-    def _run_valid(self, dataset: Dataset, name: str) -> None:
+    def _run_valid(self, dataset: Dataset, name: str, approx: bool = False) -> None:
         raise NotImplementedError
 
 
@@ -72,7 +74,6 @@ class GNTrainingRun(TrainingRun):
         super().__init__(net, opt, loss_fn, data, batch_size, device, collate_fn)
 
     def _train_step(self, batch: List[Dict[str, Union[int, Graph]]]) -> None:
-        logging.info("Running training step #{}".format(self.step_ctr))
         self.net.train()
         self.opt.zero_grad()
 
@@ -103,7 +104,6 @@ class GNTrainingRun(TrainingRun):
         model_outs = torch.cat(model_outs).to(self.device)
         logranks = torch.Tensor(logranks).to(self.device).float()
 
-        logging.info("Performing backward pass")
         loss = self.loss_fn(model_outs, logranks, w=(1-logranks))
         loss.backward()  # TODO: double-check that gradients of all samples will be taken into account
 
@@ -116,34 +116,35 @@ class GNTrainingRun(TrainingRun):
         self.writer.add_histogram('batch_model_out_train', model_outs, self.step_ctr)
         self.writer.add_histogram('batch_model_target_train', logranks, self.step_ctr)
 
-    def _run_valid(self, dataset: Dataset, name: str) -> None:
+    def _run_valid(self, dataset: Dataset, name: str, approx: bool = False) -> None:
         self.opt.zero_grad()
         self.net.eval()
 
-        # accumulators
-        model_outs, logranks = [], []
+        with torch.no_grad():
+            # accumulators
+            model_outs, logranks = [], []
 
-        for batch in dataset:
-            for sample in batch:
-                logrank: float = sample['logrank']
-                graph: Graph = sample['graph']
-                graph.to(self.device)
-                model_out: torch.Tensor = self.net.forward(graph)
+            for batch in dataset:
+                if approx and len(model_outs) >= 500:
+                    break
+                for sample in batch:
+                    logrank: float = sample['logrank']
+                    graph: Graph = sample['graph']
+                    graph.to(self.device)
+                    model_out: torch.Tensor = self.net.forward(graph)
 
-                model_outs.append(model_out)
-                logranks.append(logrank)
+                    model_outs.append(model_out)
+                    logranks.append(logrank)
 
-        logging.info("Computing loss and accuracy")
+            model_outs = torch.cat(model_outs).to(device='cpu')
+            logranks = torch.Tensor(logranks).to(device='cpu')
 
-        model_outs = torch.cat(model_outs).to(device='cpu')
-        logranks = torch.Tensor(logranks).to(device='cpu')
+            loss = self.loss_fn(model_outs, logranks, w=(1-logranks))
 
-        loss = self.loss_fn(model_outs, logranks, w=(1-logranks))
+            accuracy, _ = compute_batch_accuracy(target_ranks=logranks, model_outputs=model_outs)
 
-        accuracy, _ = compute_batch_accuracy(target_ranks=logranks, model_outputs=model_outs)
-
-        self.writer.add_scalar('loss_{}'.format(name), loss, self.step_ctr)
-        self.writer.add_scalar('accuracy_{}'.format(name), accuracy, self.step_ctr)
+            self.writer.add_scalar('loss_{}'.format(name), loss, self.step_ctr)
+            self.writer.add_scalar('accuracy_{}'.format(name), accuracy, self.step_ctr)
 
 
 class VanillaTrainingRun(TrainingRun):
@@ -171,26 +172,27 @@ class VanillaTrainingRun(TrainingRun):
     def _run_valid(self, dataset: Dataset, name: str) -> None:
         self.net.eval()
 
-        # accumulators
-        loss_sum, model_out_batches, rank_batches = 0., [], []
+        with torch.no_grad():
+            # accumulators
+            loss_sum, model_out_batches, rank_batches = 0., [], []
 
-        for batch in dataset:
-            imgs: torch.Tensor = batch['img'].to(self.device)
-            logranks: torch.Tensor = batch['logrank'].to(self.device).float()
-            rank_batches.append(logranks)
+            for batch in dataset:
+                imgs: torch.Tensor = batch['img'].to(self.device)
+                logranks: torch.Tensor = batch['logrank'].to(self.device).float()
+                rank_batches.append(logranks)
 
-            # forward pass
-            with torch.no_grad():
-                model_out: torch.Tensor = self.net.forward(imgs)
-                model_out_batches.append(model_out)
+                # forward pass
+                with torch.no_grad():
+                    model_out: torch.Tensor = self.net.forward(imgs)
+                    model_out_batches.append(model_out)
 
-                loss = self.loss_fn(model_out, logranks, w=(1-logranks))
-                loss_sum += loss
+                    loss = self.loss_fn(model_out, logranks, w=(1-logranks))
+                    loss_sum += loss
 
-        n = len(dataset)
-        loss = loss_sum / n
+            n = len(dataset)
+            loss = loss_sum / n
 
-        accuracy, _ = compute_multi_batch_accuracy(rank_batches, model_out_batches)
+            accuracy, _ = compute_multi_batch_accuracy(rank_batches, model_out_batches)
 
-        self.writer.add_scalar('loss_{}'.format(name), loss, self.step_ctr)
-        self.writer.add_scalar('accuracy_{}'.format(name), accuracy, self.step_ctr)
+            self.writer.add_scalar('loss_{}'.format(name), loss, self.step_ctr)
+            self.writer.add_scalar('accuracy_{}'.format(name), accuracy, self.step_ctr)
