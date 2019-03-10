@@ -51,7 +51,7 @@ class TrainingRun:
         for epoch in range(epochs):
             logging.info("Starting epoch #{}".format(epoch + 1))
             for batch in tqdm(self.data_loader.train):
-                if self.step_ctr % 500 == 0:
+                if self.step_ctr % 2500 == 0:
                     self._run_valid(self.data_loader.valid, 'valid', approx=True)
 
                 self.step_ctr += 1
@@ -70,7 +70,7 @@ class TrainingRun:
 
         # sacred logging
         if isinstance(val, torch.Tensor):
-            val = float(val.detach().numpy())
+            val = float(val.cpu().detach().numpy())
         self.ex.log_scalar(name, val, self.step_ctr)
 
 
@@ -134,7 +134,7 @@ class GNTrainingRun(TrainingRun):
             model_outs, logranks = [], []
 
             for batch in dataset:
-                if approx and len(model_outs) >= 500:
+                if approx and len(model_outs) >= 2000:
                     break
                 for sample in batch:
                     logrank: float = sample['logrank']
@@ -155,7 +155,7 @@ class GNTrainingRun(TrainingRun):
             self.log_scalar('loss_{}'.format(name), loss)
             self.log_scalar('accuracy_{}'.format(name), accuracy,)
 
-            return float(accuracy.detach().numpy())
+        return float(accuracy.cpu().detach().numpy())
 
 
 class VanillaTrainingRun(TrainingRun):
