@@ -321,9 +321,21 @@ The URL-Datamodule has to return valid URLs. This attribute is specified as foll
 \end{center}
 
 According to the specification a given URL is only valid if it is a possible navigation and has the same FQDN. Possible navigation means that only URLs found as a \texttt{href}-attribute in \texttt{<a>}-tags in the \texttt{HTML}-code of the website can be considered as valid. This follows from the fact that in \texttt{HTML} \texttt{<a>}-tag is the only tag, which allows the user to navigate to other pages from the current viewed page. While possible navigation describes where to find valid URLs, equality in FQDN describes which URLs to choose from a set of URLs.
-For example the FQDN for the URL \texttt{http://web.samedguener.com/index.html} is \texttt{web.samedguener.com}. While the URL \texttt{http://web.samedguener.com/contact.html} found on the website would be valid with \texttt{web.samedguener.com} as FQDN, \texttt{http://samedguener.com/} would not since \texttt{samedguener.com} is the FQDN.
+For example the FQDN for the URL \texttt{http://web.samedguener.com/index.html} is \texttt{web.samedguener.com}. While the URL \texttt{http://web.samedguener.com/contact.html} found on the website is a valid with \texttt{web.samedguener.com} as FQDN, \texttt{http://samedguener.com/} is not with \texttt{samedguener.com} as the FQDN.
 
-While it would be possible to access the URLs by downloading the \texttt{HTML}-code of the visited page, it would take a very long time and be tedious work to parse the code and build the DOM to access the URLs. 
+In general all browsers have similar steps to render a website: They download the source code of the requested webpage, parse and build the DOM. The DOM is build and represented as a tree, where nodes are \texttt{HTML}-tags and children of a node represent nested \texttt{HTML}-tags. In \texttt{CEF 3}, we are able to directly access the DOM after a website has finished rendering. The \texttt{isLoading}-parameter of \texttt{OnLoadingStateChange()}-method in \texttt{CefLoadHandler} is used for detection. It is true if the given website has finished rendering and false if not. Furthermore the DOM can be accessed by implementing \texttt{Visit()}-method of \texttt{CefDOMVisitor}. While \texttt{CefLoadHandler} runs in the browser-process, \texttt{CefDOMVisitor} has to run in the render-process, due to the nature of DOM being build in the render-process. Leading to the problem that \texttt{CefDOMVisitor} can only be created and run in the render-process. Therefore, we implement \texttt{OnMessageReceived()} of \texttt{CefRenderProcessHandler} to create an instance of \texttt{CefDOMVisitor}, which runs in the render-process. In \texttt{CefRenderProcessHandler} the default behaviour of the render-process can be extended or overriden. \texttt{OnMessageReceived()}-method is invoked if the render-process receives any IPC-message from any other process. 
+
+Having all important components together, this leads to the following workflow of the URL-Datamodule:
+
+\begin{enumerate}
+	\item Return in \texttt{CefApp} our custom implementation of \texttt{CefRenderProcessHandler} and initialize \texttt{CEF 3}.
+	\item Create and start a browser with custom \texttt{CefClient} implementation returning custom \texttt{CefLoadHandler} implementation.
+	\item Upon successful \texttt{OnLoadingStateChange()} in \texttt{CefLoadHandler}, send an IPC-message to the render process ultimately invoking \texttt{OnMessageReceived()} in \texttt{CefRenderHandler}
+	\item Create instance of custom implemented \texttt{CefDOMVisitor} and execute application logic.
+	
+	
+\end{enumerate}  
+
 \paragraph{Loading Time}
 
 \paragraph{Client and Server Errors}
