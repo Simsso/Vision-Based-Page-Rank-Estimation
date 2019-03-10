@@ -43,7 +43,11 @@ class TrainingRun:
 
         self.writer = SummaryWriter('logs/{}'.format(name))
 
-    def __call__(self, epochs: int) -> None:
+    def __call__(self, epochs: int) -> float:
+        """
+        :param epochs: Number of epochs to train for.
+        :return: Final validation accuracy
+        """
         for epoch in range(epochs):
             logging.info("Starting epoch #{}".format(epoch + 1))
             for batch in tqdm(self.data_loader.train):
@@ -52,11 +56,12 @@ class TrainingRun:
 
                 self.step_ctr += 1
                 self._train_step(batch)
+        return self._run_valid(self.data_loader.valid, 'valid', approx=False)
 
     def _train_step(self, batch: Dict[str, torch.Tensor]) -> None:
         raise NotImplementedError
 
-    def _run_valid(self, dataset: Dataset, name: str, approx: bool = False) -> None:
+    def _run_valid(self, dataset: Dataset, name: str, approx: bool = False) -> float:
         raise NotImplementedError
 
     def log_scalar(self, name: str, val: Union[np.ndarray, torch.Tensor]):
@@ -120,7 +125,7 @@ class GNTrainingRun(TrainingRun):
         self.writer.add_histogram('batch_model_out_train', model_outs, self.step_ctr)
         self.writer.add_histogram('batch_model_target_train', logranks, self.step_ctr)
 
-    def _run_valid(self, dataset: Dataset, name: str, approx: bool = False) -> None:
+    def _run_valid(self, dataset: Dataset, name: str, approx: bool = False) -> float:
         self.opt.zero_grad()
         self.net.eval()
 
@@ -129,7 +134,7 @@ class GNTrainingRun(TrainingRun):
             model_outs, logranks = [], []
 
             for batch in dataset:
-                if approx and len(model_outs) >= 10:
+                if approx and len(model_outs) >= 500:
                     break
                 for sample in batch:
                     logrank: float = sample['logrank']
@@ -149,6 +154,8 @@ class GNTrainingRun(TrainingRun):
 
             self.log_scalar('loss_{}'.format(name), loss)
             self.log_scalar('accuracy_{}'.format(name), accuracy,)
+
+            return float(accuracy.detach().numpy())
 
 
 class VanillaTrainingRun(TrainingRun):
@@ -173,7 +180,7 @@ class VanillaTrainingRun(TrainingRun):
         self.writer.add_histogram('batch_model_out_train', model_out, self.step_ctr)
         self.writer.add_histogram('batch_model_target_train', logranks, self.step_ctr)
 
-    def _run_valid(self, dataset: Dataset, name: str, approx: bool = False) -> None:
+    def _run_valid(self, dataset: Dataset, name: str, approx: bool = False) -> float:
         self.net.eval()
 
         with torch.no_grad():
@@ -200,3 +207,5 @@ class VanillaTrainingRun(TrainingRun):
 
             self.log_scalar('loss_{}'.format(name), loss)
             self.log_scalar('accuracy_{}'.format(name), accuracy)
+
+            return float(accuracy.detach().numpy())

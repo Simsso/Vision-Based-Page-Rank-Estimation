@@ -20,20 +20,26 @@ def run_config():
     batch_size = 3
     epochs = 10
     optimizer = 'adam'
+    train_ratio, valid_ratio = .85, .1
+    model_name = 'GraphBaseline'
 
 
 @ex.main
-def train(learning_rate: float, batch_size: int, epochs: int, optimizer: str):
+def train(learning_rate: float, batch_size: int, epochs: int, optimizer: str, train_ratio: float, valid_ratio: float,
+          model_name: str) -> str:
     logging.basicConfig(level=logging.INFO)
     use_cuda = torch.cuda.is_available()
     device = torch.device('cuda' if use_cuda else 'cpu')
 
     # dataset
     dataset_dir = os.path.expanduser(os.getenv('dataset_v2_path'))
-    data = DatasetV2.get_threefold(dataset_dir, train_ratio=0.85, valid_ratio=0.1)
+    data = DatasetV2.get_threefold(dataset_dir, train_ratio, valid_ratio)
 
     # model with weights
-    net = GraphBaseline()
+    if model_name == 'GraphBaseline':
+        net = GraphBaseline()
+    else:
+        raise ValueError("Unknown model name '{}'".format(model_name))
     if device == 'cuda':
         net.cuda()
 
@@ -47,7 +53,9 @@ def train(learning_rate: float, batch_size: int, epochs: int, optimizer: str):
     loss = ProbabilisticLoss()
 
     training_run = GNTrainingRun(ex, name, net, opt, loss, data, batch_size, device)
-    training_run(epochs)
+    val_acc = training_run(epochs)
+
+    return "Val acc: {:.4f}}".format(val_acc)
 
 
 if __name__ == '__main__':
