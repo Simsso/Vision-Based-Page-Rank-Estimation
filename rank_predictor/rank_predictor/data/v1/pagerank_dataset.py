@@ -6,7 +6,7 @@ from torchvision.transforms import ToPILImage, Resize, Normalize, Compose, ToTen
 from rank_predictor.data.threefold import get_threefold
 from rank_predictor.data.utils import filename_to_rank, load_image, rank_to_logrank
 from rank_predictor.data import threefold
-from data.v1.transforms import ImageTransform
+from rank_predictor.data.v1.transforms import ImageTransform
 
 
 class DatasetV1(Dataset):

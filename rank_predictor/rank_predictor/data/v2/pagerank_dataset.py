@@ -6,11 +6,14 @@ import os
 from typing import Set, Union, Dict, Tuple, List
 from torch.utils.data import Dataset
 from torchvision.transforms import ToPILImage, Resize, ToTensor, Normalize, Compose
+
+from graph_nets.data_structures.attribute import Attribute
+from graph_nets.data_structures.graph import Graph
+from graph_nets.data_structures.node import Node
 from rank_predictor.data import threefold
 from rank_predictor.data.threefold import get_threefold
 from rank_predictor.data.utils import load_image, folder_to_rank, rank_to_logrank
 from rank_predictor.data.v2.attributes import PageAttribute, LinkAttribute
-from graph_nets import Attribute, Edge, Graph, Node
 
 
 class DatasetV2(Dataset):

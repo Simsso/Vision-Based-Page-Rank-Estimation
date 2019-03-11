@@ -1,5 +1,9 @@
 from unittest import TestCase
-from graph_nets import Node, Attribute, Graph, Edge
+
+from graph_nets.data_structures.attribute import Attribute
+from graph_nets.data_structures.edge import Edge
+from graph_nets.data_structures.graph import Graph
+from graph_nets.data_structures.node import Node
 
 
 class TestGraph(TestCase):

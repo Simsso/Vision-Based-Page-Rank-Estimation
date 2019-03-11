@@ -1,9 +1,11 @@
 from copy import deepcopy
 from typing import Optional, Tuple
 from torch import nn
-from graph_nets import Aggregation, EdgeUpdate, Graph, GlobalStateUpdate, NodeUpdate, IndependentEdgeUpdate, \
-    IdentityNodeUpdate, IdentityGlobalStateUpdate, IdentityEdgeUpdate, IndependentNodeUpdate, \
-    IndependentGlobalStateUpdate, ConstantAggregation
+from graph_nets.data_structures.graph import Graph
+from graph_nets.functions.aggregation import Aggregation, ConstantAggregation
+from graph_nets.functions.update import EdgeUpdate, NodeUpdate, GlobalStateUpdate, IdentityEdgeUpdate, \
+    IdentityGlobalStateUpdate, IndependentEdgeUpdate, IdentityNodeUpdate, IndependentGlobalStateUpdate, \
+    IndependentNodeUpdate
 
 
 class GNBlock(nn.Module):

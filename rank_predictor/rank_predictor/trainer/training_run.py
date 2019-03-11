@@ -2,12 +2,12 @@ import logging
 import multiprocessing
 from typing import Dict, Callable, Union, List
 import sacred
-from graph_nets import Graph
 import torch
 import numpy as np
 from torch import nn, optim
 from tensorboardX import SummaryWriter
 from torch.utils.data import Dataset, DataLoader
+from graph_nets.data_structures.graph import Graph
 from rank_predictor.trainer.ranking.utils import compute_batch_accuracy, compute_multi_batch_accuracy
 from rank_predictor.data import threefold
 

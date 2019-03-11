@@ -1,6 +1,6 @@
 from typing import Callable
 from torch import nn
-from graph_nets import Attribute
+from graph_nets.data_structures.attribute import Attribute
 
 
 class EdgeUpdate(nn.Module):

@@ -1,10 +1,12 @@
 from copy import deepcopy
 from unittest import TestCase
 import numpy as np
-import torch
 from torch import Tensor
 from torch.nn import MSELoss, L1Loss
-from graph_nets import Graph, Node, Edge, Attribute
+from graph_nets.data_structures.attribute import Attribute
+from graph_nets.data_structures.edge import Edge
+from graph_nets.data_structures.graph import Graph
+from graph_nets.data_structures.node import Node
 from graph_nets.functions.loss import GraphLoss
 
 

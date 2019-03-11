@@ -1,6 +1,8 @@
 from typing import Optional, Dict
-from graph_nets import Attribute, torch
 import numpy as np
+import torch
+
+from graph_nets.data_structures.attribute import Attribute
 
 
 class PageAttribute(Attribute):

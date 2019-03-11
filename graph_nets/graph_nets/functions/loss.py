@@ -2,7 +2,9 @@ import torch
 from typing import Callable, Optional, List, Union
 from torch import Tensor
 from torch.nn import MSELoss
-from graph_nets import Graph, Attribute
+
+from graph_nets.data_structures.attribute import Attribute
+from graph_nets.data_structures.graph import Graph
 from graph_nets.utils import tensors_stackable
 
 LossFn = Union[Callable[[Tensor, Tensor], Tensor], MSELoss]

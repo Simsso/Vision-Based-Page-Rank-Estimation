@@ -5,9 +5,15 @@ from copy import deepcopy
 import torch
 from torch import optim
 from torch.nn import MSELoss
-from graph_nets import Graph, Node, Attribute, Edge, GNBlock, EdgeUpdate, NodeUpdate, GlobalStateUpdate, \
-    ScalarSumAggregation, LinearIndependentGNBlock
+
+from graph_nets.block import GNBlock, LinearIndependentGNBlock
+from graph_nets.data_structures.attribute import Attribute
+from graph_nets.data_structures.edge import Edge
+from graph_nets.data_structures.graph import Graph
+from graph_nets.data_structures.node import Node
+from graph_nets.functions.aggregation import ScalarSumAggregation
 from graph_nets.functions.loss import GraphLoss
+from graph_nets.functions.update import EdgeUpdate, NodeUpdate, GlobalStateUpdate
 
 
 class SenderIdentityEdgeUpdate(EdgeUpdate):

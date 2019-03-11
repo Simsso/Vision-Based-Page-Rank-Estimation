@@ -1,9 +1,10 @@
 import torch
 from typing import Optional, Callable, List, Dict
+
+from graph_nets.data_structures.attribute import Attribute
+from graph_nets.data_structures.edge import Edge
 from graph_nets.data_structures.utils import lists_equal
-from . import Attribute
 from graph_nets.data_structures.node import Node
-from . import Edge
 
 
 class Graph:

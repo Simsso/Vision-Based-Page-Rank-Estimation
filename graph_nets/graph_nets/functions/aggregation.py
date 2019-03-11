@@ -1,9 +1,7 @@
 import torch
 from typing import List, Optional
-
 from torch import nn
-
-from graph_nets import Attribute
+from graph_nets.data_structures.attribute import Attribute
 
 
 class Aggregation(nn.Module):

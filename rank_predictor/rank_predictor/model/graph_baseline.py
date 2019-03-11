@@ -1,8 +1,11 @@
 import torch
 from typing import Dict
 from torch import nn
-from graph_nets import Graph, GNBlock, IdentityEdgeUpdate, IndependentNodeUpdate, Attribute, GlobalStateUpdate, \
-    ConstantAggregation, AvgAggregation
+from graph_nets.block import GNBlock
+from graph_nets.data_structures.attribute import Attribute
+from graph_nets.data_structures.graph import Graph
+from graph_nets.functions.aggregation import ConstantAggregation, AvgAggregation
+from graph_nets.functions.update import GlobalStateUpdate, IdentityEdgeUpdate, IndependentNodeUpdate
 from rank_predictor.model.screenshot_feature_extractor import DesktopScreenshotFeatureExtractor
 
 

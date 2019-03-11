@@ -2,7 +2,9 @@ import numpy as np
 from typing import List
 from unittest import TestCase
 import torch
-from graph_nets import SumAggregation, Attribute, Aggregation, AvgAggregation
+
+from graph_nets.data_structures.attribute import Attribute
+from graph_nets.functions.aggregation import Aggregation, SumAggregation, AvgAggregation
 
 
 def _feed(aggr: Aggregation, in_val: List[List[float]], out_target: List[float]) -> bool:

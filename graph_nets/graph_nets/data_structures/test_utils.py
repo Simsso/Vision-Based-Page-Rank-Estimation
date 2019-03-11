@@ -1,5 +1,7 @@
 from unittest import TestCase
-from graph_nets import Attribute, Node
+
+from graph_nets.data_structures.attribute import Attribute
+from graph_nets.data_structures.node import Node
 from graph_nets.data_structures.utils import sets_equal, lists_equal
 
 
