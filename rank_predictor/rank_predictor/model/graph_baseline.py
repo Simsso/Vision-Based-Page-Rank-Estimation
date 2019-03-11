@@ -1,6 +1,5 @@
 import torch
 from typing import Dict
-
 from torch import nn
 from graph_nets import Graph, GNBlock, IdentityEdgeUpdate, IndependentNodeUpdate, Attribute, GlobalStateUpdate, \
     ConstantAggregation, AvgAggregation
@@ -36,7 +35,5 @@ class GraphBaseline(nn.Module):
             rho_eu=ConstantAggregation())
 
     def forward(self, g: Graph) -> Graph:
-
         g_out: Graph = self.graph_block(g)
-
         return g_out.attr.val

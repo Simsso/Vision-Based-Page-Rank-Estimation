@@ -1,11 +1,10 @@
 import logging
 import multiprocessing
 from typing import Dict, Callable, Union, List
-
-from tqdm import tqdm
-
+import sacred
 from graph_nets import Graph
 import torch
+import numpy as np
 from torch import nn, optim
 from tensorboardX import SummaryWriter
 from torch.utils.data import Dataset, DataLoader
@@ -14,14 +13,9 @@ from rank_predictor.data import threefold
 
 
 class TrainingRun:
-    def __init__(self,
-                 net: nn.Module,
-                 opt: optim.Adam,
-                 loss_fn,
-                 data: threefold.Data,
-                 batch_size: int,
-                 device,
-                 collate_fn: Callable = None) -> None:
+    def __init__(self, ex: sacred.Experiment, name: str, net: nn.Module, opt: optim.Adam, loss_fn: Callable,
+                 data: threefold.Data, batch_size: int, device: torch.device, collate_fn: Callable = None) -> None:
+        self.ex = ex
         self.net = net
         self.opt = opt
         self.loss_fn = loss_fn
@@ -46,32 +40,47 @@ class TrainingRun:
 
         self.net.to(device)
 
-        self.writer = SummaryWriter('logs/gn_desktop_avg')
+        self.writer = SummaryWriter('logs/{}'.format(name))
 
-    def __call__(self, epochs: int) -> None:
+    def __call__(self, epochs: int) -> float:
+        """
+        :param epochs: Number of epochs to train for.
+        :return: Final validation accuracy
+        """
         for epoch in range(epochs):
             logging.info("Starting epoch #{}".format(epoch + 1))
-            for batch in tqdm(self.data_loader.train):
-                if self.step_ctr % 500 == 0:
+            for batch in self.data_loader.train:
+                if self.step_ctr % 2500 == 0:
+                    logging.info("Running approx. validation at step #{}".format(self.step_ctr))
                     self._run_valid(self.data_loader.valid, 'valid', approx=True)
 
                 self.step_ctr += 1
                 self._train_step(batch)
+        return self._run_valid(self.data_loader.valid, 'valid', approx=False)
 
     def _train_step(self, batch: Dict[str, torch.Tensor]) -> None:
         raise NotImplementedError
 
-    def _run_valid(self, dataset: Dataset, name: str, approx: bool = False) -> None:
+    def _run_valid(self, dataset: Dataset, name: str, approx: bool = False) -> float:
         raise NotImplementedError
+
+    def log_scalar(self, name: str, val: Union[np.ndarray, torch.Tensor]):
+        # tensorboard logging
+        self.writer.add_scalar(name, val, self.step_ctr)
+
+        # sacred logging
+        if isinstance(val, torch.Tensor):
+            val = float(val.cpu().detach().numpy())
+        self.ex.log_scalar(name, val, self.step_ctr)
 
 
 class GNTrainingRun(TrainingRun):
 
-    def __init__(self, net: nn.Module, opt: optim.Adam, loss_fn, data: threefold.Data, batch_size: int, device) -> None:
+    def __init__(self, ex: sacred.Experiment, name: str, net: nn.Module, opt: optim.Adam, loss_fn, data: threefold.Data, batch_size: int, device) -> None:
         def collate_fn(batch):
             return batch
 
-        super().__init__(net, opt, loss_fn, data, batch_size, device, collate_fn)
+        super().__init__(ex, name, net, opt, loss_fn, data, batch_size, device, collate_fn)
 
     def _train_step(self, batch: List[Dict[str, Union[int, Graph]]]) -> None:
         self.net.train()
@@ -111,12 +120,12 @@ class GNTrainingRun(TrainingRun):
 
         accuracy, _ = compute_batch_accuracy(target_ranks=logranks, model_outputs=model_outs)
 
-        self.writer.add_scalar('batch_loss_train', loss, self.step_ctr)
-        self.writer.add_scalar('batch_accuracy_train', accuracy, self.step_ctr)
+        self.log_scalar('batch_loss_train', loss)
+        self.log_scalar('batch_accuracy_train', accuracy)
         self.writer.add_histogram('batch_model_out_train', model_outs, self.step_ctr)
         self.writer.add_histogram('batch_model_target_train', logranks, self.step_ctr)
 
-    def _run_valid(self, dataset: Dataset, name: str, approx: bool = False) -> None:
+    def _run_valid(self, dataset: Dataset, name: str, approx: bool = False) -> float:
         self.opt.zero_grad()
         self.net.eval()
 
@@ -125,7 +134,7 @@ class GNTrainingRun(TrainingRun):
             model_outs, logranks = [], []
 
             for batch in dataset:
-                if approx and len(model_outs) >= 500:
+                if approx and len(model_outs) >= 2000:
                     break
                 for sample in batch:
                     logrank: float = sample['logrank']
@@ -143,8 +152,10 @@ class GNTrainingRun(TrainingRun):
 
             accuracy, _ = compute_batch_accuracy(target_ranks=logranks, model_outputs=model_outs)
 
-            self.writer.add_scalar('loss_{}'.format(name), loss, self.step_ctr)
-            self.writer.add_scalar('accuracy_{}'.format(name), accuracy, self.step_ctr)
+            self.log_scalar('loss_{}'.format(name), loss)
+            self.log_scalar('accuracy_{}'.format(name), accuracy,)
+
+        return float(accuracy.cpu().detach().numpy())
 
 
 class VanillaTrainingRun(TrainingRun):
@@ -164,12 +175,12 @@ class VanillaTrainingRun(TrainingRun):
 
         accuracy, _ = compute_batch_accuracy(target_ranks=logranks, model_outputs=model_out)
 
-        self.writer.add_scalar('batch_loss_train', loss, self.step_ctr)
-        self.writer.add_scalar('batch_accuracy_train', accuracy, self.step_ctr)
+        self.log_scalar('batch_loss_train', loss)
+        self.log_scalar('batch_accuracy_train', accuracy)
         self.writer.add_histogram('batch_model_out_train', model_out, self.step_ctr)
         self.writer.add_histogram('batch_model_target_train', logranks, self.step_ctr)
 
-    def _run_valid(self, dataset: Dataset, name: str) -> None:
+    def _run_valid(self, dataset: Dataset, name: str, approx: bool = False) -> float:
         self.net.eval()
 
         with torch.no_grad():
@@ -194,5 +205,7 @@ class VanillaTrainingRun(TrainingRun):
 
             accuracy, _ = compute_multi_batch_accuracy(rank_batches, model_out_batches)
 
-            self.writer.add_scalar('loss_{}'.format(name), loss, self.step_ctr)
-            self.writer.add_scalar('accuracy_{}'.format(name), accuracy, self.step_ctr)
+            self.log_scalar('loss_{}'.format(name), loss)
+            self.log_scalar('accuracy_{}'.format(name), accuracy)
+
+            return float(accuracy.detach().numpy())
