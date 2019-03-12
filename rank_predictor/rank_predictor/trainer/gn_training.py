@@ -8,7 +8,7 @@ from rank_predictor.trainer.ranking.probabilistic_loss import ProbabilisticLoss
 from rank_predictor.trainer.training_run import GNTrainingRun
 from sacred import Experiment
 
-name = 'v2/baseline_02'
+name = 'v2/baseline_05'
 ex = Experiment(name)
 
 ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred'))
@@ -16,9 +16,9 @@ ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred')
 
 @ex.config
 def run_config():
-    learning_rate: float = 4e-4
-    batch_size = 3
-    epochs = 4
+    learning_rate: float = 1e-5
+    batch_size = 2
+    epochs = 2
     optimizer = 'adam'
     train_ratio, valid_ratio = .85, .1
     model_name = 'GraphBaseline'

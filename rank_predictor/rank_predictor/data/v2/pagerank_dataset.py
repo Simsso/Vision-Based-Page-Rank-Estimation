@@ -8,6 +8,7 @@ from torch.utils.data import Dataset
 from torchvision.transforms import ToPILImage, Resize, ToTensor, Normalize, Compose
 
 from graph_nets.data_structures.attribute import Attribute
+from graph_nets.data_structures.edge import Edge
 from graph_nets.data_structures.graph import Graph
 from graph_nets.data_structures.node import Node
 from rank_predictor.data import threefold
