@@ -8,7 +8,7 @@ from rank_predictor.trainer.ranking.probabilistic_loss import ProbabilisticLoss
 from rank_predictor.trainer.training_run import GNTrainingRun
 from sacred import Experiment
 
-name = 'v2/baseline_05'
+name = 'v2/baseline_07'
 ex = Experiment(name)
 
 ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred'))
@@ -24,18 +24,19 @@ def run_config():
     model_name = 'GraphBaseline'
     loss = 'ProbabilisticLoss'
     weighting = 'c_ij = c_ij * w'
+    logrank_b = 2.
 
 
 @ex.main
 def train(learning_rate: float, batch_size: int, epochs: int, optimizer: str, train_ratio: float, valid_ratio: float,
-          model_name: str, loss: str) -> str:
+          model_name: str, loss: str, logrank_b: float) -> str:
     logging.basicConfig(level=logging.INFO)
     use_cuda = torch.cuda.is_available()
     device = torch.device('cuda' if use_cuda else 'cpu')
 
     # dataset
     dataset_dir = os.path.expanduser(os.getenv('dataset_v2_path'))
-    data = DatasetV2.get_threefold(dataset_dir, train_ratio, valid_ratio)
+    data = DatasetV2.get_threefold(dataset_dir, train_ratio, valid_ratio, logrank_b)
 
     # model with weights
     if model_name == 'GraphBaseline':

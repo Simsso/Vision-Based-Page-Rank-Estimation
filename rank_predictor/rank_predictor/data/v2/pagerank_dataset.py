@@ -28,7 +28,7 @@ class DatasetV2(Dataset):
 
     max_rank = 10 ** 5
 
-    def __init__(self, page_paths: Set[str]) -> None:
+    def __init__(self, page_paths: Set[str], logrank_b: float) -> None:
         super(DatasetV2).__init__()
 
         self.desktop_img_transform = Compose([
@@ -39,6 +39,7 @@ class DatasetV2(Dataset):
         ])
 
         self.page_paths = sorted(list(page_paths))
+        self.logrank_b = logrank_b
 
     def __getitem__(self, index) -> Dict[str, Union[int, Graph]]:
         page_path = self.page_paths[index]
@@ -46,7 +47,7 @@ class DatasetV2(Dataset):
 
         sample = {
             'rank': rank,
-            'logrank': rank_to_logrank(DatasetV2.max_rank, rank),
+            'logrank': rank_to_logrank(DatasetV2.max_rank, rank, self.logrank_b),
             'graph': self.load_graph(page_path)
         }
         return sample
@@ -153,16 +154,17 @@ class DatasetV2(Dataset):
         return DatasetV2(page_paths)
 
     @staticmethod
-    def get_threefold(root_dir: str, train_ratio: float, valid_ratio: float) -> threefold.Data:
+    def get_threefold(root_dir: str, train_ratio: float, valid_ratio: float, logrank_b: float) -> threefold.Data:
         """
         Load dataset from root_dir and split it into three parts (train, validation, test).
         The function splits in a deterministic way.
         :param root_dir: Directory of the dataset
         :param train_ratio: Value in [0,1] defining the ratio of training samples
         :param valid_ratio: Value in [0,1] defining the ratio of validation samples
+        :param logrank_b: Logrank base (makes the weighting steeper b --> 0, more linear b --> 10, or inverted b > 10)
         :return: Three datasets (train, validation, test)
         """
         assert os.path.isdir(root_dir), "The provided path '{}' is not a directory".format(root_dir)
 
         page_paths = list(DatasetV2._get_page_paths(root_dir))
-        return get_threefold(DatasetV2, page_paths, train_ratio, valid_ratio)
+        return get_threefold(DatasetV2, page_paths, train_ratio, valid_ratio, logrank_b)
