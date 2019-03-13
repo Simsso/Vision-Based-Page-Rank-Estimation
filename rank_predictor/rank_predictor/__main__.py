@@ -1,1 +1,1 @@
-import rank_predictor.trainer.simple_adam
+import rank_predictor.trainer.gn_training
