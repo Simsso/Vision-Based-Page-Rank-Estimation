@@ -326,21 +326,20 @@ For example the FQDN for the URL \texttt{http://web.samedguener.com/index.html} 
 In general, all browsers have a common process to render a website: They download the source code of the requested webpage, parse and build the DOM. The DOM is built and represented as a tree, where nodes are \texttt{HTML}-tags and children of a node represent nested \texttt{HTML}-tags. In \texttt{CEF 3}, we are able to directly access the DOM after a website has finished rendering. 
 
 While \texttt{isLoading}-parameter of \texttt{OnLoadingStateChange()}-method in \texttt{CefLoadHandler} is used for detecting if a given website has finished rendering, the DOM itself can be accessed by implementing \texttt{Visit()}-method of \texttt{CefDOMVisitor}.
-Due to the nature of the DOM being built in the render-process, \texttt{CefDOMVisitor} has to be run in the render-process conversely to \texttt{CefLoadHandler} and all other implementations running in the browser-process.
-
-
-While \texttt{CefLoadHandler} runs in the browser-process, \texttt{CefDOMVisitor} has to run in the render-process, due to the nature of DOM being build in the render-process. This leads to the problem that \texttt{CefDOMVisitor} can only be created and run in the render-process. Therefore, we implement \texttt{OnMessageReceived()} of \texttt{CefRenderProcessHandler} to create an instance of \texttt{CefDOMVisitor}, which runs in the render-process. \texttt{CefRenderProcessHandler} is responsible for handling render-process-specific implementations. The user can change the default behaviour by implementing this interface. The \texttt{OnMessageReceived()}-method is invoked if the render-process receives any IPC-message from any other process. 
+Due to the nature of the DOM being built in the render-process, \texttt{CefDOMVisitor} has to be run in the render-process conversely to \texttt{CefLoadHandler} and all other implementations running in the browser-process. Therefore, we implement \texttt{OnMessageReceived()} of \texttt{CefRenderProcessHandler} respectively running the the render-process to run an instance of \texttt{CefDOMVisitor}. \texttt{CefRenderProcessHandler} is responsible for handling render-process-specific implementations. The user can change the default behaviour by implementing this interface. Moreover, we implement also \texttt{OnMessageReceived()}-method in \texttt{CefClient} to receive IPC-messages from the render-process. The \texttt{OnMessageReceived()}-method is invoked if the render-process receives any IPC-message from any other process.
 
 Having all important components together, this leads to the following workflow of the URL-Datamodule:
 
 \begin{enumerate}
-	\item Custom implementation of \texttt{CefRenderProcessHandler} is passed to \texttt{CefApp} and afterwards \texttt{CEF 3} is initialized.
-	\item In URL-Datamodule create and start a browser with custom \texttt{CefClient} implementation returning custom \texttt{CefLoadHandler} implementation.
+	\item Custom implementation of \texttt{CefRenderProcessHandler} is passed to \texttt{CefApp} during \texttt{CEF 3} initialization.
+	\item In URL-Datamodule a browser instance is created and started with custom \texttt{CefClient} implementation returning the \texttt{CefLoadHandler} implementation.
 	\item Upon successful \texttt{OnLoadingStateChange()} in \texttt{CefLoadHandler}, send an IPC-message to the render process ultimately invoking \texttt{OnMessageReceived()} in \texttt{CefRenderHandler}
 	\item Create instance of custom implemented \texttt{CefDOMVisitor} and execute application logic.
-	\item Upon successful URL gathering, send IPC-message with results to browser-process invoking ultimately \texttt{OnMessageReceived()} in \texttt{CefClient}. Then, return results as Datamodule.
+	\label{point_implement_cefdomvisitor}
+	\item Upon successful URL gathering, send an IPC-message with collected URLs to browser-process invoking ultimately \texttt{OnMessageReceived()} in \texttt{CefClient}. Then, return the results as Datamodule to the Datacrawler.
 \end{enumerate}  
 
+During the execution of \texttt{OnMessageReceived()} in \texttt{CefRenderProcessHandler} we use the passed browser instance to execute our implementation of \texttt{CefDOMLoader} against it (\ref{point_implement_cefdomvisitor}). The main application logic is then executed in \texttt{Visit(CefDOMDocument)}-method of \texttt{CefDOMVisitor}. The passed argument \texttt{CefDOMDocument} represents the DOM of the current visited website.
 \paragraph{Loading Time}
 
 \paragraph{Client and Server Errors}
