@@ -17,6 +17,10 @@
   },
   "homepage": "https://github.com/Simsso/Pagerank-Estimation-Deep-Graph-Networks#readme",
   "dependencies": {
-    "express": "^4.16.4"
+    "body-parser": "^1.18.3",
+    "dotenv": "^7.0.0",
+    "express": "^4.16.4",
+    "lowdb": "^1.0.0",
+    "uuid": "^3.3.2"
   }
 }
