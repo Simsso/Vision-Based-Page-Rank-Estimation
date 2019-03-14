@@ -3,9 +3,11 @@ const Router = express.Router;
 const fs = require('fs');
 const path = require('path');
 const DatasetV1 = require('../dataset/v1');
+const getRankDomainMap = require('../dataset/domains')
 
 async function dataModule() {
-    const datav1 = await DatasetV1.fromPath(process.env.DATASET_V1_PATH);
+    const rankDomainMap = await getRankDomainMap(process.env.DOMAIN_LIST);
+    const datav1 = await DatasetV1.fromPath(process.env.DATASET_V1_PATH, rankDomainMap);
 
     const router = Router();
 

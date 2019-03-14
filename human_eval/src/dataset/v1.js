@@ -2,9 +2,10 @@ const fs = require('fs');
 
 
 class DatasetV1 {
-    constructor(rootDir, listOfFiles) {
+    constructor(rootDir, listOfFiles, rankDomainMap) {
         this.rootDir = rootDir;
         this.listOfFiles = listOfFiles;
+        this.rankDomainMap = rankDomainMap;
     }
 
     getSample(idx) {
@@ -12,7 +13,8 @@ class DatasetV1 {
         const rank = parseInt(fileName.split('.')[0], 10);
         return {
             file: fileName,
-            rank: rank
+            rank: rank,
+            domain: this.rankDomainMap[rank]
         };
     }
 
@@ -33,13 +35,13 @@ class DatasetV1 {
     }
 }
 
-DatasetV1.fromPath = async function(path,) {
+DatasetV1.fromPath = async function(path, rankDomainMap) {
     return new Promise((resolve, reject) => {
         fs.readdir(path, (err, listOfFiles) => {
             if (err) return reject(err);
 
             listOfFiles = listOfFiles.filter(s => s.endsWith('.jpg') || s.endsWith('.jpeg'));
-            dataset = new DatasetV1(path, listOfFiles);
+            dataset = new DatasetV1(path, listOfFiles, rankDomainMap);
 
             return resolve(dataset);
         });

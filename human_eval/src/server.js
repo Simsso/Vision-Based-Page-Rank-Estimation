@@ -1,10 +1,13 @@
 require('dotenv').config();
+const express = require('express');
+const Router = express.Router;
+const bodyParser = require('body-parser');
+const morgan = require('morgan');
+const path = require('path');
 
 async function main() {
-    const express = require('express');
     const app = express();
-    const bodyParser = require('body-parser');
-    const morgan = require('morgan');
+    const api = Router();
 
     // logging
     app.use(morgan('combined'));
@@ -15,12 +18,14 @@ async function main() {
     // parse application/json
     app.use(bodyParser.json());
 
-    app.get('/', (req, res) => {
-        res.json({ status: 'OK' });
-    });
+    api.get('/status', (req, res) => res.json({ status: 'OK' }));
 
     const dataRouter = await require('./api/data')();
-    app.use('/data', dataRouter);
+    api.use('/data', dataRouter);
+
+    app.use('/api/v1', api);
+
+    app.use('/', express.static('ui'));  // serve UI
 
     const port = process.env.PORT
     app.listen(port, () => console.log('Service running on port ' + port))
