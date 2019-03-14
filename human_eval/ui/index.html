@@ -2,8 +2,40 @@
 <html lang="en">
 <head>
     <title>Pagerank Dataset Human Evaluation Tool</title>
+    <style type="text/css">
+        img.pagepreview {
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-    <p>Hi there!</p>
+    <h1>Pagerank Dataset Human Evaluation Tool</h1>
+
+    <h2 id="score"></h2>
+
+    <p>Status: <span id="statusindicator">pending</span></p>
+
+    <p><button id="nexttuple">Next Tuple</button></p>
+
+    <p>Click on the page with the higher rank!</p>
+
+    <h2>Page 1</h2>
+    <p>
+        <span id="page0rank"></span><br>
+        <img id="page0img" data-id="0" class="pagepreview"><br>
+        <a id="page0url"></a>
+    </p>
+
+    <h2>Page 2</h2>
+    <p>
+        <span id="page1rank"></span><br>
+        <img id="page1img" data-id="1" class="pagepreview"><br>
+        <a id="page1url"></a>
+    </p>
+
+    <script src="pubsub.js"></script>
+    <script src="ui.js"></script>
+    <script src="api.js"></script>
+    <script src="main.js"></script>
 </body>
 </html>

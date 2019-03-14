@@ -28,7 +28,7 @@ async function main() {
     app.use('/', express.static('ui'));  // serve UI
 
     const port = process.env.PORT
-    app.listen(port, () => console.log('Service running on port ' + port))
+    app.listen(port, '0.0.0.0', () => console.log('Service running on port ' + port))
 }
 
 (async () => {
