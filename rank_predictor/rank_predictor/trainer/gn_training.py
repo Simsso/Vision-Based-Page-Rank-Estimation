@@ -4,11 +4,12 @@ from sacred.observers import MongoObserver
 from rank_predictor.data.v2.pagerank_dataset import DatasetV2
 import torch
 from rank_predictor.model.graph_baseline import GraphBaseline
+from rank_predictor.model.graph_connected import GraphConnected
 from rank_predictor.trainer.ranking.probabilistic_loss import ProbabilisticLoss
 from rank_predictor.trainer.training_run import GNTrainingRun
 from sacred import Experiment
 
-name = 'v2/baseline_08'
+name = 'v2/connected_01'
 ex = Experiment(name)
 
 ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred'))
@@ -16,12 +17,12 @@ ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred')
 
 @ex.config
 def run_config():
-    learning_rate: float = 1e-5
+    learning_rate: float = 5e-6
     batch_size = 2
-    epochs = 2
+    epochs = 8
     optimizer = 'adam'
     train_ratio, valid_ratio = .85, .1
-    model_name = 'GraphBaseline'
+    model_name = 'GraphConnected'
     loss = 'ProbabilisticLoss'
     weighting = 'c_ij = c_ij'
     logrank_b = 1.5
@@ -41,6 +42,8 @@ def train(learning_rate: float, batch_size: int, epochs: int, optimizer: str, tr
     # model with weights
     if model_name == 'GraphBaseline':
         net = GraphBaseline()
+    elif model_name == 'GraphConnected':
+        net = GraphConnected()
     else:
         raise ValueError("Unknown model name '{}'".format(model_name))
     if device == 'cuda':

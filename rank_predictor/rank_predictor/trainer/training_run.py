@@ -53,6 +53,7 @@ class TrainingRun:
                 if self.step_ctr % 2500 == 0:
                     logging.info("Running approx. validation at step #{}".format(self.step_ctr))
                     self._run_valid(self.data_loader.valid, 'valid', approx=True)
+                    self._run_valid(self.data_loader.train, 'train', approx=True)
 
                 self.step_ctr += 1
                 self._train_step(batch)

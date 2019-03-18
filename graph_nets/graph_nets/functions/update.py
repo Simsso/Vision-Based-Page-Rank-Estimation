@@ -100,3 +100,9 @@ class IdentityNodeUpdate(NodeUpdate):
 class IdentityGlobalStateUpdate(GlobalStateUpdate):
     def forward(self, aggr_e: Attribute, aggr_v: Attribute, u: Attribute) -> Attribute:
         return u
+
+
+class NodeAggregationGlobalStateUpdate(GlobalStateUpdate):
+
+    def forward(self, aggr_e: Attribute, aggr_v: Attribute, u: Attribute) -> Attribute:
+        return aggr_v

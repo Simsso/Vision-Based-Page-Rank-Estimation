@@ -10,10 +10,13 @@ from graph_nets.functions.update import EdgeUpdate, NodeUpdate, GlobalStateUpdat
 
 class GNBlock(nn.Module):
 
-    def __init__(self, phi_e: EdgeUpdate, phi_v: NodeUpdate, phi_u: GlobalStateUpdate, rho_ev: Aggregation,
-                 rho_vu: Aggregation, rho_eu: Aggregation) -> None:
+    def __init__(self, phi_e: Optional[EdgeUpdate] = None, phi_v: Optional[NodeUpdate] = None,
+                 phi_u: Optional[GlobalStateUpdate] = None, rho_ev: Optional[Aggregation] = None,
+                 rho_vu: Optional[Aggregation] = None, rho_eu: Optional[Aggregation] = None) -> None:
         """
         Graph network block initialization function.
+        All functions are optional. For update functions, the identity update will be used as default. For aggregation
+        function, the constant aggregation will be used (i.e. no aggregation happens).
         :param phi_e: Edge update function
         :param phi_v: Node update function
         :param phi_u: Global state update function
@@ -23,6 +26,15 @@ class GNBlock(nn.Module):
         """
 
         super().__init__()
+
+        # default values
+        phi_e = phi_e if phi_e else IdentityEdgeUpdate()
+        phi_v = phi_v if phi_v else IdentityNodeUpdate()
+        phi_u = phi_u if phi_u else IdentityGlobalStateUpdate()
+        rho_ev = rho_ev if rho_ev else ConstantAggregation()
+        rho_vu = rho_vu if rho_vu else ConstantAggregation()
+        rho_eu = rho_eu if rho_eu else ConstantAggregation()
+
         self.phi_e, self.phi_v, self.phi_u = phi_e, phi_v, phi_u
         self.rho_ev, self.rho_vu, self.rho_eu = rho_ev, rho_vu, rho_eu
 
