@@ -340,7 +340,7 @@ Having all important components together, this leads to the following workflow o
 	\item Upon successful URL gathering, send an IPC-message with collected URLs to browser-process invoking ultimately \texttt{OnMessageReceived()} in \texttt{CefClient}. Then, return the results as Datamodule to the Datacrawler.
 \end{enumerate}  
 
-During the execution of \texttt{OnMessageReceived()} in \texttt{CefRenderProcessHandler} we use the passed browser instance to execute our implementation of \texttt{CefDOMLoader} against it (\ref{point_implement_cefdomvisitor}). The main application logic is then executed in \texttt{Visit(CefDOMDocument)}-method of \texttt{CefDOMVisitor}. The passed argument \texttt{CefDOMDocument} represents the DOM of the current visited website. Since the DOM is organized as a tree, we use the breadth-first search (\ref{datacrawler_breadth_search}) for tree traversal, check each if given node is a \texttt{<a>}-tag and retrieve the URL from the \texttt{href}-attribute. Upon retrieval we filter the URLs having the same FQDN using several regular expressions and create respectively objects of the class \texttt{URL}. In addition, we use regular expression to detect whether the given URL has \texttt{HTTPS} enabled and enrich the \texttt{URL} object with this information. In the end, we return a list of \texttt{URL} objects to the URL-Datamodule.
+During the execution of \texttt{OnMessageReceived()} in \texttt{CefRenderProcessHandler} we use the passed browser instance to execute our implementation of \texttt{CefDOMLoader} against it (\ref{point_implement_cefdomvisitor}). The main application logic is then executed in \texttt{Visit(CefDOMDocument)}-method of \texttt{CefDOMVisitor}. The passed argument \texttt{CefDOMDocument} represents the DOM of the current visited website. Since the DOM is organized as a tree, we use the breadth-first search (\ref{datacrawler_breadth_search}) for tree traversal, check each if given node is a \texttt{<a>}-tag and retrieve the URL from the \texttt{href}-attribute and the URL text if given. Upon retrieval we filter the URLs having the same FQDN using several regular expressions and create respectively objects of the class \texttt{URL}. In addition, we use regular expression to detect whether the given URL has \texttt{HTTPS} enabled and enrich the \texttt{URL} object with this information. In the end, we return a list of \texttt{URL} objects to the URL-Datamodule.
 
 \paragraph{Loading Time}
 \texttt{OnLoadingStateChange()} in \texttt{CefLoadHandler} is invoked if the website transitions between loading states such as from not being loaded into being loaded or from being loaded into finished loading. To track the loading time of the given website, we just stop the time between both transitions and calculate the delta. We return the loading time back to the URL-Datamodule upon \texttt{CefDOMVisitor} has returned the valid URLs.
@@ -363,23 +363,44 @@ As specified in the dataset version 2 (\ref{DatasetVersion2}) the download size 
 As specified in dataset version 2 (\ref{DatasetVersion2}), for each passed domain to the Datacrawler, we have to output a graph with nodes enriched by information from the Datamodules. Before we delve into the concrete implementation of graph generation process, we will profoundly discuss the output format of the graph, which is later consumed by our machine learning model.
 
 \paragraph{Graph Data Format}
-As section \ref{datacrawler_scale} will show, we run for each given domain an independent Datacrawler instance. This means that upon successful completion of the Datacrawler, we will have only printed out exactly one graph belonging to the passed domain. Following this we create an own folder for the computed domain and name the folder after the rank found in the Open PageRank (\ref{OpenPageRank}). The graph itself is represented by a file in the \texttt{json}-format and named after the rank in Open PageRank. While most of the dataset information can be found in the \texttt{json}-file, we save our screenshots for the domain in the folder called \texttt{img}. We differ between normal and mobile screenshots by adding the suffix \texttt{\_mobile} to the name of the mobile screenshots. Furthermore, we number consecutively each image according an internal ID specified for each domain in the \texttt{json}-file.
+As section \ref{datacrawler_scale} will show, we run for each given domain an independent Datacrawler instance. This means that upon successful completion of the Datacrawler, we will have only printed out exactly one graph belonging to the passed domain. Following this, we create an own folder for the computed domain and name the folder after the rank found in the Open PageRank (\ref{OpenPageRank}). The graph itself is represented by a file in the \texttt{json}-format and named after the rank in Open PageRank. While most of the dataset information can be found in the \texttt{json}-file, we save our screenshots for the domain in the folder called \texttt{img}. We differ between normal and mobile screenshots by adding the suffix \texttt{\_mobile} to the name of the mobile screenshots. Furthermore, we number consecutively each image according an internal ID specified for each domain in the \texttt{json}-file.
 
-
+In the \texttt{json}-file consists of an array consisting of nodes represented as \texttt{json}-objects. Each \texttt{json}-object consists mainly of attributes calculated by the URL-Datamodule. Furthermore, each node has an array containing the URLs representing the edges of the given node. We have to emphasize that only URLs has been taken into account, which are also represented as nodes in the graph. Figure \ref{examplecom_graph} exemplary shows the graph for \texttt{example.com}.
+\begin{figure}
+\centering
+\begin{lstlisting}[language=json,firstnumber=1]
+[{
+ "id": 1,
+ "baseUrl": "https://example.com",
+ "client_status" : null,
+ "loading_time": 8822,
+ "server_status": 200,
+ "startNode": true,
+ "size": 1222,
+ "title" "example.com",
+ "urls": [
+  {
+    "url": "https://example.com/2",
+    "url_text": "Second Page"
+  },
+  ...
+  ]
+ },
+ {
+ "id": 2,
+ "baseUrl": "https://example.com/2",
+ "startNode" : false,
+ ...
+ }]
+\end{lstlisting}
+\caption{This figure exemplary illustrates the graph output for the domain \texttt{example.com}. The graph nodes are \texttt{json}-objects in the root array of the \texttt{json}-file. The \texttt{baseUrl}-attribute shows affiliation of the node to the given URL. Futhermore, each \texttt{json}-object consists of attributes mainly calculated in the URL-Datamodule such as client-sided and server-sided error (here: \texttt{client\_status} and \texttt{server\_status}), loading time, size and finally the valid URLs with the URL text. In general, all URLs found in the nodes are represented as nodes in the graph. Finally, each computed URL has an ID assigned, which represents respectively the name of the screenshots for the URL.}
+\label{examplecom_graph}
+\end{figure}
 
 \paragraph{Process of Graph Generation} 
+The process of the graph generation is done in the \texttt{Datacrawler}-class and \texttt{DatacrawlerOutput}-class, which are responsible for the graph calculation and outputting of the graph to the local disk. In general the nodes of the graph are saved in a key-value data structure, where the key is the URL of the computed node and the value represents an object of type \texttt{NodeElement} (\ref{datacrawler_architecture}). \texttt{NodeElement} consists of a simple list of the type \texttt{DataBase} representing attributes calculated by the Datamodules such as screenshots, valid URLs etc.
 
-\subsubsection{Datacrawler Workflow}
-\label{datacrawler_workflow}
-
-In general Datacrawler can be divided mainly into three functional parts:
-
-\begin{enumerate}
-	\item[Initializiation] : The Datacrawler reads the Datamodule configuration from a local file and initializes the Datamodules accordingly.
-	\item[Crawling] : The Datacrawler crawls the passed domain according to the activated Datamodules and calculates attributes for the dataset.
-	\item[Output] : The Datacrawler generates and saves the graph to the disk.
-\end{enumerate}
-
+Upon the invocation of \texttt{process(url)}, the Datacrawler creates the initial \texttt{NodeElement}, runs all registered Datamodules against it and adds the results of the Datamodules to the node. Afterwards retrieved URLs of the current node are accessed and put into a working queue for further computation by the Datacrawler. Then, we recursively repeat the process for all elements in the queue until the graph has reached the limit of 8 nodes as specified in dataset version 2 (\ref{DatasetVersion2}). Before we hand over the graph to \texttt{DatacrawlerOutput} for outputting it to local disk, we have to remove edges from the node which direct to no nodes in the graph. This done by going through all the edges of a node and checking whether the given URL as key is mapped to a node. If it is not mapped to a key, we remove the edge.
 
 \subsection{Scaling the Datacrawler}
 \label{datacrawler_scale}
