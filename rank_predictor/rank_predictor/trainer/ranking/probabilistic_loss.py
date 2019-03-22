@@ -41,14 +41,14 @@ class ProbabilisticLoss:
         p_ij = p_ij + p_ii_vals
 
         # compute model predictions
-        # o_ij = f(x_(1-logranks)i) - f(x_j)
+        # o_ij = f(x_i) - f(x_j)
         o_ij = f - f_t
 
         # compute cost for each prediction
         c_ij = -p_ij * o_ij + torch.log(1 + torch.exp(o_ij))
 
         # weighting of each prediction is w_i * w_j
-        w_ij = w * w_t
+        # w_ij = w * w_t
         c_ij = c_ij * w   # apply weighting
 
         # compute total cost (normalize by n**2)

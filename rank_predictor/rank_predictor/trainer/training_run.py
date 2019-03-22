@@ -77,11 +77,14 @@ class TrainingRun:
 
 class GNTrainingRun(TrainingRun):
 
-    def __init__(self, ex: sacred.Experiment, name: str, net: nn.Module, opt: optim.Adam, loss_fn, data: threefold.Data, batch_size: int, device) -> None:
+    def __init__(self, ex: sacred.Experiment, name: str, net: nn.Module, opt: optim.Adam, loss_fn, data: threefold.Data,
+                 batch_size: int, pairwise_batch_size: int, device) -> None:
         def collate_fn(batch):
             return batch
 
         super().__init__(ex, name, net, opt, loss_fn, data, batch_size, device, collate_fn)
+
+        self.pairwise_batch_size = pairwise_batch_size
 
     def _train_step(self, batch: List[Dict[str, Union[int, Graph]]]) -> None:
         self.net.train()
@@ -99,23 +102,36 @@ class GNTrainingRun(TrainingRun):
             except RuntimeError:
                 logging.warning("Skipping step because of runtime error")
                 self.step_ctr -= 1
-
-                # free GPU memory
-                self.opt.zero_grad()
-                self.net.cpu()
-                torch.cuda.empty_cache()
-                self.net.cuda(self.device)
-
                 return
 
             model_outs.append(model_out)
             logranks.append(logrank)
 
+        # increase the pairwise batch with samples w/o gradient (to save RAM but increase the gradient precision)
+        with torch.no_grad():
+            for pairwise_batch in self.data_loader.train:
+                for sample in pairwise_batch:
+                    if len(model_outs) >= self.pairwise_batch_size:
+                        break
+                    logrank: float = sample['logrank']
+                    graph: Graph = sample['graph']
+                    graph.to(self.device)
+                    model_out: torch.Tensor = self.net.forward(graph)
+
+                    logranks.append(logrank)
+                    model_outs.append(model_out)
+                if len(model_outs) >= self.pairwise_batch_size:
+                    break
+        assert len(model_outs) == self.pairwise_batch_size
+
         model_outs = torch.cat(model_outs).to(self.device)
         logranks = torch.Tensor(logranks).to(self.device).float()
 
         loss = self.loss_fn(model_outs, logranks, w=(1-logranks))
-        loss.backward()  # TODO: double-check that gradients of all samples will be taken into account
+        # TODO: proper loss magnitude normalization
+        loss_backprop = loss * (self.pairwise_batch_size**2)
+        loss_backprop = loss_backprop / (2 * self.batch_size * self.pairwise_batch_size - self.batch_size**2)
+        loss_backprop.backward()
 
         self.opt.step()
 

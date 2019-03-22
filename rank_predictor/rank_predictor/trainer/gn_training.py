@@ -19,7 +19,8 @@ ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred')
 def run_config():
     learning_rate: float = 5e-6
     batch_size = 2
-    epochs = 8
+    pairwise_batch_size = 8
+    epochs = 2
     optimizer = 'adam'
     train_ratio, valid_ratio = .85, .1
     model_name = 'GraphConnected'
@@ -29,8 +30,8 @@ def run_config():
 
 
 @ex.main
-def train(learning_rate: float, batch_size: int, epochs: int, optimizer: str, train_ratio: float, valid_ratio: float,
-          model_name: str, loss: str, logrank_b: float) -> str:
+def train(learning_rate: float, batch_size: int, pairwise_batch_size: int, epochs: int, optimizer: str,
+          train_ratio: float, valid_ratio: float, model_name: str, loss: str, logrank_b: float) -> str:
     logging.basicConfig(level=logging.INFO)
     use_cuda = torch.cuda.is_available()
     device = torch.device('cuda' if use_cuda else 'cpu')
@@ -59,7 +60,7 @@ def train(learning_rate: float, batch_size: int, epochs: int, optimizer: str, tr
     else:
         raise ValueError("Unknown loss '{}'".format(loss))
 
-    training_run = GNTrainingRun(ex, name, net, opt, loss, data, batch_size, device)
+    training_run = GNTrainingRun(ex, name, net, opt, loss, data, batch_size, pairwise_batch_size, device)
     val_acc = training_run(epochs)
 
     return "Val acc: {:.4f}".format(val_acc)
