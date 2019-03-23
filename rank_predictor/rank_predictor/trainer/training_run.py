@@ -103,6 +103,7 @@ class GNTrainingRun(TrainingRun):
             logranks.append(logrank)
 
         # increase the pairwise batch with samples w/o gradient (to save RAM but increase the gradient precision)
+        # TODO: disable dropout for those samples
         with torch.no_grad():
             for pairwise_batch in self.data_loader.train:
                 for sample in pairwise_batch:

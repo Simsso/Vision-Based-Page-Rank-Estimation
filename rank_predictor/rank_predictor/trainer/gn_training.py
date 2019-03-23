@@ -12,7 +12,7 @@ from rank_predictor.trainer.ranking.probabilistic_loss import ProbabilisticLoss
 from rank_predictor.trainer.training_run import GNTrainingRun
 from sacred import Experiment
 
-name = 'v2/full_01'
+name = 'v2/full_02'
 ex = Experiment(name)
 
 ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred'))
@@ -20,6 +20,7 @@ ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred')
 
 @ex.config
 def run_config():
+    # TODO: dropout 0, layer norm, and weight decay
     learning_rate: float = 5e-6
     batch_size = 2
     pairwise_batch_size = 2
@@ -30,11 +31,14 @@ def run_config():
     loss = 'ProbabilisticLoss'
     weighting = 'c_ij = c_ij'
     logrank_b = 1.5
+    drop_p = 0
+    num_core_blocks = 1
 
 
 @ex.main
 def train(learning_rate: float, batch_size: int, pairwise_batch_size: int, epochs: int, optimizer: str,
-          train_ratio: float, valid_ratio: float, model_name: str, loss: str, logrank_b: float) -> str:
+          train_ratio: float, valid_ratio: float, model_name: str, loss: str, logrank_b: float, drop_p: float,
+          num_core_blocks: int) -> str:
     logging.basicConfig(level=logging.INFO)
     use_cuda = torch.cuda.is_available()
     device = torch.device('cuda' if use_cuda else 'cpu')
@@ -44,14 +48,14 @@ def train(learning_rate: float, batch_size: int, pairwise_batch_size: int, epoch
     data = DatasetV2.get_threefold(dataset_dir, train_ratio, valid_ratio, logrank_b)
 
     # model with weights
-    models = {
-        'GraphBaseline': GraphBaseline,
-        'GraphConnected': GraphConnected,
-        'GraphExtractorFull': GraphExtractorFull,
-    }
-    if model_name not in models:
+    if model_name == 'GraphBaseline':
+        net = GraphBaseline()
+    elif model_name == 'GraphConnected':
+        net = GraphConnected()
+    elif model_name == 'GraphExtractorFull':
+        net = GraphExtractorFull(num_core_blocks, drop_p)
+    else:
         raise ValueError("Unknown model name '{}'".format(model_name))
-    net: nn.Module = models[model_name]()
 
     if device == 'cuda':
         net.cuda()

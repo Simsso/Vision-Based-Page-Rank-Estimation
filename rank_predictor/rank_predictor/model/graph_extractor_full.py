@@ -1,8 +1,6 @@
 import torch
 from typing import Dict
-
 from graph_nets.functions.aggregation import AvgAggregation
-
 from graph_nets.block import GNBlock
 from graph_nets.data_structures.attribute import Attribute
 from graph_nets.functions.update import IndependentNodeUpdate, EdgeUpdate, GlobalStateUpdate, NodeUpdate
@@ -14,12 +12,13 @@ import rank_predictor.model.util as uf
 
 class GraphExtractorFull(nn.Module):
 
-    def __init__(self, num_core_blocks: int = 1):
+    def __init__(self, num_core_blocks: int, drop_p: float):
         super().__init__()
 
         self.num_core_blocks = num_core_blocks
+        self.drop_p = drop_p
 
-        self.screenshot_feature_extractor = ScreenshotsFeatureExtractor()
+        self.screenshot_feature_extractor = ScreenshotsFeatureExtractor(drop_p)
 
         def node_extractor_fn(node: Dict[str, any]) -> Tensor:
             desktop_img: Tensor = node['desktop_img']
@@ -44,9 +43,9 @@ class GraphExtractorFull(nn.Module):
             rho_eu=AvgAggregation()
         )
         self.core = GNBlock(
-            phi_e=CoreEdgeUpdate(),
-            phi_v=CoreNodeUpdate(),
-            phi_u=CoreGlobalStateUpdate(),
+            phi_e=CoreEdgeUpdate(self.drop_p),
+            phi_v=CoreNodeUpdate(self.drop_p),
+            phi_u=CoreGlobalStateUpdate(self.drop_p),
             rho_ev=AvgAggregation(),
             rho_vu=AvgAggregation(),
             rho_eu=AvgAggregation()
@@ -79,44 +78,44 @@ class EncoderGlobalStateUpdate(GlobalStateUpdate):
 
 
 class CoreNodeUpdate(NodeUpdate):
-
-    def __init__(self):
+    def __init__(self, drop_p: float):
         super().__init__()
+        self.drop_p = drop_p
         self.dense = nn.Linear(64*3, 64)
 
     def forward(self, aggr_e: Attribute, v: Attribute, u: Attribute) -> Attribute:
 
         x = torch.cat((aggr_e.val, v.val, u.val))
         x = F.relu(self.dense(x))
-        x = F.dropout(x, p=.25, training=self.training)
+        x = F.dropout(x, p=self.drop_p, training=self.training)
 
         return Attribute(x)
 
 
 class CoreEdgeUpdate(EdgeUpdate):
-
-    def __init__(self):
+    def __init__(self, drop_p: float):
         super().__init__()
+        self.drop_p = drop_p
         self.dense = nn.Linear(64*4, 64)
 
     def forward(self, e: Attribute, v_r: Attribute, v_s: Attribute, u: Attribute) -> Attribute:
         x = torch.cat((e.val, v_r.val, v_s.val, u.val))
         x = F.relu(self.dense(x))
-        x = F.dropout(x, p=.25, training=self.training)
+        x = F.dropout(x, p=self.drop_p, training=self.training)
 
         return Attribute(x)
 
 
 class CoreGlobalStateUpdate(GlobalStateUpdate):
-
-    def __init__(self):
+    def __init__(self, drop_p: float):
         super().__init__()
+        self.drop_p = drop_p
         self.dense = nn.Linear(64*3, 64)
 
     def forward(self, aggr_e: Attribute, aggr_v: Attribute, u: Attribute) -> Attribute:
         x = torch.cat((aggr_e.val, aggr_v.val, u.val))
         x = F.relu(self.dense(x))
-        x = F.dropout(x, p=.25, training=self.training)
+        x = F.dropout(x, p=self.drop_p, training=self.training)
 
         return Attribute(x)
 
@@ -132,8 +131,9 @@ class DecoderGlobalStateUpdate(GlobalStateUpdate):
 
 
 class ScreenshotsFeatureExtractor(nn.Module):
-    def __init__(self):
+    def __init__(self, drop_p: float):
         super().__init__()
+        self.drop_p = drop_p
 
         self.conv1a_d = nn.Conv2d(3, 32, kernel_size=(3, 3))
         self.conv1b_d = nn.Conv2d(32, 32, kernel_size=(3, 3))
@@ -161,54 +161,54 @@ class ScreenshotsFeatureExtractor(nn.Module):
         xd = F.relu(self.conv1a_d(xd))
         xd = F.relu(self.conv1b_d(xd))
         xd = F.max_pool2d(xd, (2, 2))
-        xd = F.dropout2d(xd, p=.25, training=self.training)
+        xd = F.dropout2d(xd, p=self.drop_p, training=self.training)
 
         xd = F.relu(self.conv2a(xd))
         xd = F.relu(self.conv2b(xd))
         xd = F.max_pool2d(xd, (3, 3))
-        xd = F.dropout2d(xd, p=.25, training=self.training)
+        xd = F.dropout2d(xd, p=self.drop_p, training=self.training)
 
         xd = F.relu(self.conv3a(xd))
         xd = F.relu(self.conv3b(xd))
         xd = F.max_pool2d(xd, (3, 3))
-        xd = F.dropout2d(xd, p=.25, training=self.training)
+        xd = F.dropout2d(xd, p=self.drop_p, training=self.training)
 
         xd = F.relu(self.conv4a(xd))
         xd = F.relu(self.conv4b(xd))
         xd = F.max_pool2d(xd, (3, 3))
-        xd = F.dropout2d(xd, p=.25, training=self.training)
+        xd = F.dropout2d(xd, p=self.drop_p, training=self.training)
 
         xd = uf.global_avg_pool(xd)
         xd = uf.flatten(xd)
         xd = F.relu(self.dense1(xd))
-        xd = F.dropout(xd, p=.3, training=self.training)
+        xd = F.dropout(xd, p=self.drop_p, training=self.training)
 
         xd = self.dense2_d(xd)
 
         xm = F.relu(self.conv1a_m(xm))
         xm = F.relu(self.conv1b_m(xm))
         xm = F.max_pool2d(xm, (2, 2))
-        xm = F.dropout2d(xm, p=.25, training=self.training)
+        xm = F.dropout2d(xm, p=self.drop_p, training=self.training)
 
         xm = F.relu(self.conv2a(xm))
         xm = F.relu(self.conv2b(xm))
         xm = F.max_pool2d(xm, (3, 3))
-        xm = F.dropout2d(xm, p=.25, training=self.training)
+        xm = F.dropout2d(xm, p=self.drop_p, training=self.training)
 
         xm = F.relu(self.conv3a(xm))
         xm = F.relu(self.conv3b(xm))
         xm = F.max_pool2d(xm, (3, 3))
-        xm = F.dropout2d(xm, p=.25, training=self.training)
+        xm = F.dropout2d(xm, p=self.drop_p, training=self.training)
 
         xm = F.relu(self.conv4a(xm))
         xm = F.relu(self.conv4b(xm))
         xm = F.max_pool2d(xm, (3, 3))
-        xm = F.dropout2d(xm, p=.25, training=self.training)
+        xm = F.dropout2d(xm, p=self.drop_p, training=self.training)
 
         xm = uf.global_avg_pool(xm)
         xm = uf.flatten(xm)
         xm = F.relu(self.dense1(xm))
-        xm = F.dropout(xm, p=.3, training=self.training)
+        xm = F.dropout(xm, p=self.drop_p, training=self.training)
 
         xm = self.dense2_m(xm)
 
