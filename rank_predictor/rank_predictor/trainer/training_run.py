@@ -24,7 +24,7 @@ class TrainingRun:
         self.batch_size = batch_size
 
         cpu_count = multiprocessing.cpu_count()
-        worker_count = 1  # max(cpu_count - 1, 1)
+        worker_count = 0  # max(cpu_count - 1, 1)
         logging.info("Using {} workers for the data pipeline".format(worker_count))
 
         self.data = data

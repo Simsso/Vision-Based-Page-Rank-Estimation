@@ -33,7 +33,14 @@ class DatasetV2(Dataset):
 
         self.desktop_img_transform = Compose([
             ToPILImage(),
-            Resize((1920 // 4, 1080 // 4)),
+            # Resize((1920 // 4, 1080 // 4)),
+            ToTensor(),
+            Normalize((.5, .5, .5, .5), (.5, .5, .5, .5)),
+        ])
+
+        self.mobile_img_transform = Compose([
+            ToPILImage(),
+            # Resize((333, 187)),
             ToTensor(),
             Normalize((.5, .5, .5, .5), (.5, .5, .5, .5)),
         ])
@@ -128,7 +135,7 @@ class DatasetV2(Dataset):
             assert img_no not in image_numbers, "Found two images mapping to the same number."
 
             desktop_img = self.desktop_img_transform(load_image(desktop_p))
-            mobile_img = load_image(mobile_p)
+            mobile_img = self.mobile_img_transform(load_image(mobile_p))
 
             images.append((img_no, (desktop_img, mobile_img)))
             image_numbers.add(img_no)

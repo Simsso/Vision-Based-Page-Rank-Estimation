@@ -81,6 +81,14 @@ class Graph:
         self.ordered_edges.append(new_edge)
         self._check_integrity()
 
+    def add_reflexive_edges(self, attribute_generator: Optional[Callable[[Node], Attribute]] = None):
+        if attribute_generator is None:
+            attribute_generator = lambda _: Attribute()
+
+        for n in self.nodes:
+            e = Edge(n, n, attribute_generator(n))
+            self.add_edge(e)
+
     def add_all_edges(self, reflexive: bool = True,
                       attribute_generator: Optional[Callable[[Node, Node], Attribute]] = None) -> None:
         """
