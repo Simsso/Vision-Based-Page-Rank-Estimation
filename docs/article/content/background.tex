@@ -10,19 +10,13 @@ Description of GCP, K8s, infrastructure background
 \subsection{Learning to Rank}
 \label{sec:learningtorank}
 
-The problem of \textit{learning to rank} is defined as xxx
-
-The book \textit{Learning to Rank for Information Retrieval} by \cite{liu2009learningtorank} enumerates three distinguishable approaches to phrasing and solving ranking problems. They are referred to as pointwise, pairwise, and listwise and shall be explained briefly in the following.
+\textit{Learning to rank} is the application of machine learning to the creation of models that can rank. Ranking, in its most general form, is the ordering of a collection of documents. The book \textit{Learning to Rank for Information Retrieval} by \cite{liu2009learningtorank} enumerates three distinguishable approaches to phrasing and solving ranking problems. They are referred to as pointwise, pairwise, and listwise, and shall be explained briefly in the following. The second part of this section deals with ranking metrics.
 
 The \textbf{pointwise approach} deals with models that determine the rank of a single sample. It can be subdivided into the three subcategories (1) regression based, (2) classification based, and (3) ordinal regression based. For (1), the problem is considered a regression problem, where the rank of a sample is interpreted as a point on the real number line which the model seeks to predict correctly. With (2), the ranks are discrete and considered classes, for a given input, the model predicts a class which can be mapped to a rank. Ranks can also be grouped into bins, such that an entire range of adjacent ranks corresponds to a single class. While the classes in (2) do not have an ordering that is necessarily apparent to the model, the third subcategory (3) takes the ordinal relationship of ranks into account. The goal is to find a scoring functions such that thresholds can be found to distinguish the outputs into the different, ordered categories.
 
+A possible loss function for pointwise training is to interpret the scaled and rounded model output $y$ as the predicted rank of an input. A loss function could simply penalize divergence from the target output $\hat{y}$, e.g. in a quadratic fashion, $(y-\hat{y})^2$.
+
 Opposed to the pointwise approach, the \textbf{pairwise approach} does not seek to predict the rank of a single sample. Instead the focus is on predicting the relative order between two given samples, i.e. whether the first sample $x_i$ has a greater or a lower rank than the second one $x_j$. This problem can be considered a binary classification task on a tuple input $(x_i,x_j)$, where the first class means $x_i\triangleright x_j$ ($x_i$ has a higher rank than $x_j$) and the second class means $x_i\triangleleft x_j$.
-
-The \textbf{listwise approach} deals with models that take an entire list of samples as their input with the goal of ordering them. This can be either done by mapping them to real values and \todo{penalizing wrong ordering}{Look into the relevance/meaning of IR}, or mapping the samples discretely to a permutation.
-
-The parameters of neural networks are often being learned by iteratively applying small updates based on the gradient of a defined loss function. The loss function measures the reciprocal performance of the model on a given task. In the ranking domain, loss functions for the three different approaches (pointwise, pairwise, listwise) can be defined. In the following we put focus on the pairwise case as it is more relevant for our own work.
-
-A possible loss function for pointwise training is to interpret the scaled and rounded model output $y$ as the predicted rank of an input. A loss function could simply penalize divergence from the target output $\hat{y}$ in a linear fashion, e.g. $\lvert y-\hat{y}\rvert$.
 
 \cite{Burges:learningtorankwithsgd} propose a probabilistic cost function for pairwise training, that is elements are being ranked relative to each other. 
 They represent the ground truth as a matrix $\bm{\overline{P}}\in[0,1]^{m\times m}$, where $\overline{P}_{i,j}$ is the probability of sample $x_i$ to have a higher rank than $x_j$. 
@@ -32,11 +26,11 @@ The model itself is a function $f:\mathbb{R}^d\rightarrow\mathbb{R}$ mapping a s
 \end{align}
 This formulation has some favorable properties: It allows for uncertainty in the relative ordering of items in that the $\bm{\overline{P}}$ is a probability and could be e.g. $\overline{P}_{i,j}=\frac{1}{2}$ if the relative ranking of two items was unknown. Furthermore, the loss asymptotes to a linear functions. According to the authors, this is likely to be more robus with noisy labels than a quadratic cost.
 
-Check what's going on here: \cite{unbiasedlearningtorank}
+The \textbf{listwise approach} deals with models that take an entire list of samples as their input with the goal of ordering them. This can be either done by mapping them to real values and penalizing wrong ordering, or mapping the samples discretely to a permutation.
 
-\cite{tfranking} gives some guidance. \\
-Evaluation metrics, look into Mean Reciprocal Rank (MRR) and Normalized Discounted Cumulative Gain (NDCG)
- 
+In real world applications, the training of ranking models can be much more complicated. For example, updating a ranking model based on what users click leads to wrong updates because the feedback from users is biased. \cite{unbiasedlearningtorank} deal with that problem and propose \textit{unbiased learning to rank}. This is, however, beyond the scope of this work because we do not deal with direct user feedback.
+
+Once a model has produced a ranking, it must be evaluated. Since the magnitude of a loss function is ofter rather less meaningful, other measures, so called \textbf{ranking metrics}, have been defined. \cite{tfranking} name four, namely \textit{Mean Reciprocal Rank (MRR)}, average of positions of examples weighted by their relevance values (\textit{ARP}), \textit{Discounted Cumulative Gain (DCG)}, and \textit{Normalized DCG (NDCG)}. They also make the important point that ``in ranking, it is preferable to have fewer errors at higher ranked positions than at the lower ranked positions, which is reflected in many metrics''.
 
 \subsection{Graph Networks}
 \label{sec:graphnetworks}
