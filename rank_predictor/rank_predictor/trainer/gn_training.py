@@ -22,7 +22,7 @@ ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred')
 def run_config():
     learning_rate: float = 5e-6
     batch_size = 2
-    pairwise_batch_size = 10
+    pairwise_batch_size = 2
     epochs = 5
     optimizer = 'adam'
     train_ratio, valid_ratio = .85, .1

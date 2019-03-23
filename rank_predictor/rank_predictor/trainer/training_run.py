@@ -97,12 +97,7 @@ class GNTrainingRun(TrainingRun):
             graph: Graph = sample['graph']
             graph.to(self.device)
 
-            try:
-                model_out: torch.Tensor = self.net.forward(graph)
-            except RuntimeError:
-                logging.warning("Skipping step because of runtime error")
-                self.step_ctr -= 1
-                return
+            model_out: torch.Tensor = self.net.forward(graph)
 
             model_outs.append(model_out)
             logranks.append(logrank)
@@ -129,9 +124,9 @@ class GNTrainingRun(TrainingRun):
 
         loss = self.loss_fn(model_outs, logranks, w=(1-logranks))
         # TODO: proper loss magnitude normalization
-        loss_backprop = loss * (self.pairwise_batch_size**2)
-        loss_backprop = loss_backprop / (2 * self.batch_size * self.pairwise_batch_size - self.batch_size**2)
-        loss_backprop.backward()
+        # loss_backprop = loss * (self.pairwise_batch_size**2)
+        # loss_backprop = loss_backprop / (2 * self.batch_size * self.pairwise_batch_size - self.batch_size**2)
+        loss.backward()
 
         self.opt.step()
 
@@ -151,7 +146,7 @@ class GNTrainingRun(TrainingRun):
             model_outs, logranks = [], []
 
             for batch in dataset:
-                if approx and len(model_outs) >= 2000:
+                if approx and len(model_outs) >= 1000:
                     break
                 for sample in batch:
                     logrank: float = sample['logrank']

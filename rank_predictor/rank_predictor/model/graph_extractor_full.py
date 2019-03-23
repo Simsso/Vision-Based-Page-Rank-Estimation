@@ -31,7 +31,7 @@ class GraphExtractorFull(nn.Module):
                 mobile_img.unsqueeze(0)
             )
 
-            x = torch.cat((x1, x2), dim=0)
+            x = torch.cat((x1, x2), dim=1).view(-1)
 
             return x
 
@@ -43,27 +43,37 @@ class GraphExtractorFull(nn.Module):
             phi_u=EncoderGlobalStateUpdate(),
             rho_eu=AvgAggregation()
         )
-        self.core = GNBlock()
-        self.decoder = GNBlock()
+        self.core = GNBlock(
+            phi_e=CoreEdgeUpdate(),
+            phi_v=CoreNodeUpdate(),
+            phi_u=CoreGlobalStateUpdate(),
+            rho_ev=AvgAggregation(),
+            rho_vu=AvgAggregation(),
+            rho_eu=AvgAggregation()
+        )
+        self.decoder = GNBlock(
+            phi_u=DecoderGlobalStateUpdate())
 
     def forward(self, g: Graph) -> Graph:
         g: Graph = self.extraction_block(g)
+
         g.add_reflexive_edges()  # ensure that average aggregations have at least one value to work with
         g: Graph = self.encoder(g)
+
         for _ in range(self.num_core_blocks):
             g: Graph = self.core(g)
+
         g: Graph = self.decoder(g)
-        return g
+
+        return g.attr.val  # global state u
 
 
 class EncoderEdgeUpdate(EdgeUpdate):
-
     def forward(self, e: Attribute, v_r: Attribute, v_s: Attribute, u: Attribute) -> Attribute:
         return v_s
 
 
 class EncoderGlobalStateUpdate(GlobalStateUpdate):
-
     def forward(self, aggr_e: Attribute, aggr_v: Attribute, u: Attribute) -> Attribute:
         return aggr_e
 
@@ -78,7 +88,7 @@ class CoreNodeUpdate(NodeUpdate):
 
         x = torch.cat((aggr_e.val, v.val, u.val))
         x = F.relu(self.dense(x))
-        x = F.dropout2d(x, p=.25, training=self.training)
+        x = F.dropout(x, p=.25, training=self.training)
 
         return Attribute(x)
 
@@ -90,10 +100,9 @@ class CoreEdgeUpdate(EdgeUpdate):
         self.dense = nn.Linear(64*4, 64)
 
     def forward(self, e: Attribute, v_r: Attribute, v_s: Attribute, u: Attribute) -> Attribute:
-
         x = torch.cat((e.val, v_r.val, v_s.val, u.val))
         x = F.relu(self.dense(x))
-        x = F.dropout2d(x, p=.25, training=self.training)
+        x = F.dropout(x, p=.25, training=self.training)
 
         return Attribute(x)
 
@@ -105,10 +114,9 @@ class CoreGlobalStateUpdate(GlobalStateUpdate):
         self.dense = nn.Linear(64*3, 64)
 
     def forward(self, aggr_e: Attribute, aggr_v: Attribute, u: Attribute) -> Attribute:
-
         x = torch.cat((aggr_e.val, aggr_v.val, u.val))
         x = F.relu(self.dense(x))
-        x = F.dropout2d(x, p=.25, training=self.training)
+        x = F.dropout(x, p=.25, training=self.training)
 
         return Attribute(x)
 
