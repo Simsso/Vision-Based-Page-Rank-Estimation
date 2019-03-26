@@ -4,14 +4,28 @@ const ui = (() => {
     document.getElementById('nexttuple').addEventListener('click', () => events.emit('NEXT_TUPLE_REQ'));
     [...document.getElementsByClassName('pagepreview')].forEach(prevImg => {
         prevImg.addEventListener('click', event => {
-            const elem = event.toElement;
+            let elem = event.toElement;
+            if (elem.attributes['data-id'] == null) {
+                elem = elem.parentElement;
+            }
             const elemId = parseInt(elem.attributes['data-id'].value, 10);
             events.emit('SELECTION_MADE', elemId);
         });
-    })
+    });
 
     function showImg(id, imgName) {
         document.getElementById(`page${id}img`).src = `api/v1/data/v1/img/${imgName}`;
+    }
+
+    function showImages(id, folder, images) {
+        const wrapperDiv = document.getElementById(`page${id}screenshots`);
+        wrapperDiv.innerHTML = '';  // clear children
+        for (let i = 0; i < images.length; i++) {
+            const img = document.createElement('img');
+            img.setAttribute('src', `api/v1/data/v2/img/${folder}/${images[i]}`);
+            img.setAttribute('alt', 'screenshot');
+            wrapperDiv.appendChild(img);
+        }
     }
 
     function showURL(id, domain) {
@@ -24,15 +38,26 @@ const ui = (() => {
         document.getElementById(`page${id}rank`).innerHTML = rankText;
     }
 
-    function showSample(id, {file, rank, domain}, showRank) {
+    function showSampleV1(id, {file, rank, domain}, showRank) {
         showImg(id, file);
         showURL(id, domain);
         setRankText(id, showRank ? rank : '');
     }
 
-    function showTuple(tuple, showRank) {
-        showSample(0, tuple[0], showRank)
-        showSample(1, tuple[1], showRank)
+    function showTupleV1(tuple, showRank) {
+        showSampleV1(0, tuple[0], showRank)
+        showSampleV1(1, tuple[1], showRank)
+    }
+
+    function showSampleV2(id, {domain, folder, images, rank}, showRank) {
+        showImages(id, folder, images);
+        showURL(id, domain);
+        setRankText(id, showRank ? rank : '');
+    }
+
+    function showTupleV2(tuple, showRank) {
+        showSampleV2(0, tuple[0], showRank)
+        showSampleV2(1, tuple[1], showRank)
     }
 
     function showScore(correctCtr, totalCtr) {
@@ -42,7 +67,8 @@ const ui = (() => {
 
     return {
         setAPIStatus: status => document.getElementById('statusindicator').innerHTML = status ? "API reached" : "API error",
-        showTuple: showTuple,
+        showTupleV1: showTupleV1,
+        showTupleV2: showTupleV2,
         showScore: showScore
     };
 })();

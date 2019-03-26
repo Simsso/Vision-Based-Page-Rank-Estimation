@@ -8,7 +8,7 @@ let selectionMade = false;
 events.on('NEXT_TUPLE_REQ', async () => {
     tuple = await api.nextTuple();
     selectionMade = false;
-    ui.showTuple(tuple, false);
+    ui.showTupleV1(tuple, false);
 });
 
 events.on('SELECTION_MADE', async (elemId) => {
@@ -17,7 +17,7 @@ events.on('SELECTION_MADE', async (elemId) => {
     }
     selectionMade = true;
     const correct = tuple[elemId].rank < tuple[1-elemId].rank;
-    ui.showTuple(tuple, true);
+    ui.showTupleV1(tuple, true);
 
     alert(correct ? "Correct!" : "That was wrong!");
 

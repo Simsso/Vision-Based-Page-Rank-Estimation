@@ -18,8 +18,9 @@ const api = (() => {
         }
     }
 
-    async function nextTuple() {
-        return get('/data/v1/randtuple')
+    async function nextTuple(datasetVersion) {
+        if (datasetVersion == null) datasetVersion = 'v1';
+        return get(`/data/${datasetVersion}/randtuple`);
     }
 
     return {
