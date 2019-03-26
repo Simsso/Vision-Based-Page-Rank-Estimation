@@ -1,7 +1,23 @@
 const ui = (() => {
 
     // register events
+    document.onkeypress = e => {  // hotkeys
+        e = e || window.event;
+        if (e.keyCode === 110) {  // 'n' key
+            events.emit('NEXT_TUPLE_REQ')
+        }
+        else if (e.keyCode === 49) {  // '1' key
+            events.emit('SELECTION_MADE', 0);
+        }
+        else if (e.keyCode === 50) {  // '2' key
+            events.emit('SELECTION_MADE', 1);
+        }
+    };
+
+    // next tuple request
     document.getElementById('nexttuple').addEventListener('click', () => events.emit('NEXT_TUPLE_REQ'));
+
+    // selection made event
     [...document.getElementsByClassName('pagepreview')].forEach(prevImg => {
         prevImg.addEventListener('click', event => {
             let elem = event.toElement;
