@@ -2,7 +2,6 @@ const apiReached = api.status();
 ui.setAPIStatus(apiReached);
 
 let tuple = null;
-let correctCtr = 0, totalCtr = 0;
 let selectionMade = false;
 
 events.on('NEXT_TUPLE_REQ', async () => {
@@ -19,16 +18,28 @@ events.on('SELECTION_MADE', async (elemId) => {
     const correct = tuple[elemId].rank < tuple[1-elemId].rank;
     ui.showTupleV2(tuple, true);
 
-    alert(correct ? "Correct!" : "That was wrong!");
-
     if (correct) {
-        correctCtr += 1;
+        storage.addCorrect();
     }
-    totalCtr += 1;
+    else {
+        storage.addWrong();
+    }
+    updateScore();
 
-    ui.showScore(correctCtr, totalCtr);
+    alert(correct ? "Correct!" : "That was wrong!");
 });
 
+events.on('RESET_SCORE', () => {
+    storage.reset();
+    updateScore();
+});
+
+function updateScore() {
+    let { correctCtr, totalCtr } = storage.get();
+
+    ui.showScore(correctCtr, totalCtr);
+}
+updateScore();
 
 // init
 events.emit('NEXT_TUPLE_REQ');

@@ -29,6 +29,9 @@ const ui = (() => {
         });
     });
 
+    // reset score button
+    document.getElementById('score-reset-link').addEventListener('click', () => events.emit('RESET_SCORE'));
+
     function showImg(id, imgName) {
         document.getElementById(`page${id}img`).src = `api/v1/data/v1/img/${imgName}`;
     }
@@ -77,7 +80,10 @@ const ui = (() => {
     }
 
     function showScore(correctCtr, totalCtr) {
-        const acc = (correctCtr / totalCtr * 100).toFixed(2);
+        let acc = 'unknown';
+        if (totalCtr != 0) {
+            acc = (correctCtr / totalCtr * 100).toFixed(2);
+        }
         document.getElementById('score').innerHTML = `Your accuracy is ${acc}%`;
     }
 
