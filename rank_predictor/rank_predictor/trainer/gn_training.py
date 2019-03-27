@@ -12,7 +12,7 @@ from rank_predictor.trainer.ranking.probabilistic_loss import ProbabilisticLoss
 from rank_predictor.trainer.training_run import GNTrainingRun
 from sacred import Experiment
 
-name = 'v2/full_03'
+name = 'v2/full_04'
 ex = Experiment(name)
 
 ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred'))
@@ -30,7 +30,7 @@ def run_config():
     model_name = 'GraphExtractorFull'
     loss = 'ProbabilisticLoss'
     weighting = 'c_ij = c_ij'
-    logrank_b = 1.5
+    logrank_b = 10
     drop_p = 0
     num_core_blocks = 4
 
