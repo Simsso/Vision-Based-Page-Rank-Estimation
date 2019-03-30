@@ -5,14 +5,8 @@ from graph_nets.block import GNBlock
 from graph_nets.data_structures.attribute import Attribute
 from graph_nets.data_structures.graph import Graph
 from graph_nets.functions.aggregation import ConstantAggregation, AvgAggregation
-from graph_nets.functions.update import GlobalStateUpdate, IdentityEdgeUpdate, IndependentNodeUpdate
+from graph_nets.functions.update import IdentityEdgeUpdate, IndependentNodeUpdate, NodeAggregationGlobalStateUpdate
 from rank_predictor.model.screenshot_feature_extractor import DesktopScreenshotFeatureExtractor
-
-
-class NodeAggregationGlobalStateUpdate(GlobalStateUpdate):
-
-    def forward(self, aggr_e: Attribute, aggr_v: Attribute, u: Attribute) -> Attribute:
-        return aggr_v
 
 
 class GraphBaseline(nn.Module):

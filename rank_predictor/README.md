@@ -8,5 +8,6 @@ It uses the PyTorch framework.
 ### Monitoring
 
 ```bash
+sudo service mongod start
 sacredboard -mu mongodb://localhost:27017/sacred sacred
 ```

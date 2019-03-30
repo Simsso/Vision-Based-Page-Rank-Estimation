@@ -25,7 +25,7 @@ class TestGraphLoss(TestCase):
 
         loss = GraphLoss(e_fn=MSELoss())
         loss_val = loss(g1, g2).detach().numpy()
-        target_loss_val = ((-50.--45.)**2 + (-40.--40.)**2 + (1-1.1)**2) / 3
+        target_loss_val = ((-50.+45.)**2 + (-40.+40.)**2 + (1-1.1)**2) / 3
 
         self.assertTrue(np.isclose(loss_val, target_loss_val))
 
@@ -48,7 +48,7 @@ class TestGraphLoss(TestCase):
 
         # division by 3 because there are three entries per vector
         # division by 4 because there are four edges
-        target_loss_val = ((-50.--45.)**2 + (-10.--11.)**2 + (-40.--40.)**2 + (100.-200.)**2 + (120.-121.)**2 +
+        target_loss_val = ((-50.+45.)**2 + (-10.+11.)**2 + (-40.+40.)**2 + (100.-200.)**2 + (120.-121.)**2 +
                            (1-1.1)**2 + (4.-3.9)**2 + (2-2.1)**2) / 3 / 4
 
         self.assertTrue(np.isclose(loss_val, target_loss_val))

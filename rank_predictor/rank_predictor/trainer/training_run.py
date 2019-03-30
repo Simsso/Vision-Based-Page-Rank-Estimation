@@ -24,7 +24,7 @@ class TrainingRun:
         self.batch_size = batch_size
 
         cpu_count = multiprocessing.cpu_count()
-        worker_count = 1  # max(cpu_count - 1, 1)
+        worker_count = 0  # max(cpu_count - 1, 1)
         logging.info("Using {} workers for the data pipeline".format(worker_count))
 
         self.data = data
@@ -53,6 +53,7 @@ class TrainingRun:
                 if self.step_ctr % 2500 == 0:
                     logging.info("Running approx. validation at step #{}".format(self.step_ctr))
                     self._run_valid(self.data_loader.valid, 'valid', approx=True)
+                    self._run_valid(self.data_loader.train, 'train', approx=True)
 
                 self.step_ctr += 1
                 self._train_step(batch)
@@ -76,11 +77,14 @@ class TrainingRun:
 
 class GNTrainingRun(TrainingRun):
 
-    def __init__(self, ex: sacred.Experiment, name: str, net: nn.Module, opt: optim.Adam, loss_fn, data: threefold.Data, batch_size: int, device) -> None:
+    def __init__(self, ex: sacred.Experiment, name: str, net: nn.Module, opt: optim.Adam, loss_fn, data: threefold.Data,
+                 batch_size: int, pairwise_batch_size: int, device) -> None:
         def collate_fn(batch):
             return batch
 
         super().__init__(ex, name, net, opt, loss_fn, data, batch_size, device, collate_fn)
+
+        self.pairwise_batch_size = pairwise_batch_size
 
     def _train_step(self, batch: List[Dict[str, Union[int, Graph]]]) -> None:
         self.net.train()
@@ -93,28 +97,37 @@ class GNTrainingRun(TrainingRun):
             graph: Graph = sample['graph']
             graph.to(self.device)
 
-            try:
-                model_out: torch.Tensor = self.net.forward(graph)
-            except RuntimeError:
-                logging.warning("Skipping step because of runtime error")
-                self.step_ctr -= 1
-
-                # free GPU memory
-                self.opt.zero_grad()
-                self.net.cpu()
-                torch.cuda.empty_cache()
-                self.net.cuda(self.device)
-
-                return
+            model_out: torch.Tensor = self.net.forward(graph)
 
             model_outs.append(model_out)
             logranks.append(logrank)
+
+        # increase the pairwise batch with samples w/o gradient (to save RAM but increase the gradient precision)
+        # TODO: disable dropout for those samples
+        with torch.no_grad():
+            for pairwise_batch in self.data_loader.train:
+                for sample in pairwise_batch:
+                    if len(model_outs) >= self.pairwise_batch_size:
+                        break
+                    logrank: float = sample['logrank']
+                    graph: Graph = sample['graph']
+                    graph.to(self.device)
+                    model_out: torch.Tensor = self.net.forward(graph)
+
+                    logranks.append(logrank)
+                    model_outs.append(model_out)
+                if len(model_outs) >= self.pairwise_batch_size:
+                    break
+        assert len(model_outs) == self.pairwise_batch_size
 
         model_outs = torch.cat(model_outs).to(self.device)
         logranks = torch.Tensor(logranks).to(self.device).float()
 
         loss = self.loss_fn(model_outs, logranks, w=(1-logranks))
-        loss.backward()  # TODO: double-check that gradients of all samples will be taken into account
+        # TODO: proper loss magnitude normalization
+        # loss_backprop = loss * (self.pairwise_batch_size**2)
+        # loss_backprop = loss_backprop / (2 * self.batch_size * self.pairwise_batch_size - self.batch_size**2)
+        loss.backward()
 
         self.opt.step()
 
@@ -134,7 +147,7 @@ class GNTrainingRun(TrainingRun):
             model_outs, logranks = [], []
 
             for batch in dataset:
-                if approx and len(model_outs) >= 2000:
+                if approx and len(model_outs) >= 1000:
                     break
                 for sample in batch:
                     logrank: float = sample['logrank']

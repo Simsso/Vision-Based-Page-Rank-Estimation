@@ -29,6 +29,8 @@ class Graph:
         self.ordered_nodes = nodes
         self.ordered_edges = edges
 
+        self.device: torch.device = None
+
         self._check_integrity()
 
     def _check_integrity(self) -> None:
@@ -68,14 +70,24 @@ class Graph:
                 raise ValueError("Every node in nodes_ordered must be contained in nodes")
 
     def add_node(self, new_node: Node) -> None:
+        new_node.to(self.device)
         self.nodes.add(new_node)
         self.ordered_nodes.append(new_node)
         self._check_integrity()
 
     def add_edge(self, new_edge: Edge) -> None:
+        new_edge.to(self.device)
         self.edges.add(new_edge)
         self.ordered_edges.append(new_edge)
         self._check_integrity()
+
+    def add_reflexive_edges(self, attribute_generator: Optional[Callable[[Node], Attribute]] = None):
+        if attribute_generator is None:
+            attribute_generator = lambda _: Attribute()
+
+        for n in self.nodes:
+            e = Edge(n, n, attribute_generator(n))
+            self.add_edge(e)
 
     def add_all_edges(self, reflexive: bool = True,
                       attribute_generator: Optional[Callable[[Node, Node], Attribute]] = None) -> None:
@@ -94,10 +106,24 @@ class Graph:
                 e = Edge(n1, n2, attribute_generator(n1, n2))
                 self.add_edge(e)
 
+    def remove_all_edges(self) -> None:
+        """
+        Modifies the graph in-place, such that all edges are gone.
+        Performs an integrity check afterwards.
+        """
+        self.edges = set()
+        self.ordered_edges = []
+        for n in self.nodes:
+            n.receiving_edges = set()
+            n.sending_edges = set()
+
+        self._check_integrity()
+
     def to(self, device: torch.device) -> 'Graph':
         """
         Moves torch values of this object to the specified device (e.g. GPU).
         """
+        self.device = device
         self.attr.to(device)
         for edge in self.edges:
             edge.to(device)
@@ -141,7 +167,8 @@ class Graph:
 
     def __del__(self) -> None:
         """
-        Ensures garbage collection of CUDA tensors that this graph contains.
+        Ensures garbage collection of CUDA tensors that this graph contains. If the tensors are not moved to CPU,
+        they remain on the GPU even after this object is garbage collected.
         """
         try:
             self.to(device=torch.device('cpu'))

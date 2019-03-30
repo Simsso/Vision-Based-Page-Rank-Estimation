@@ -1,14 +1,18 @@
 import logging
 import os
 from sacred.observers import MongoObserver
+from torch import nn
+
 from rank_predictor.data.v2.pagerank_dataset import DatasetV2
 import torch
 from rank_predictor.model.graph_baseline import GraphBaseline
+from rank_predictor.model.graph_connected import GraphConnected
+from rank_predictor.model.graph_extractor_full import GraphExtractorFull
 from rank_predictor.trainer.ranking.probabilistic_loss import ProbabilisticLoss
 from rank_predictor.trainer.training_run import GNTrainingRun
 from sacred import Experiment
 
-name = 'v2/baseline_07'
+name = 'v2/full_03'
 ex = Experiment(name)
 
 ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred'))
@@ -16,20 +20,25 @@ ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred')
 
 @ex.config
 def run_config():
-    learning_rate: float = 1e-5
+    # TODO: dropout 0, layer norm, and weight decay
+    learning_rate: float = 1e-4
     batch_size = 2
-    epochs = 2
+    pairwise_batch_size = 2
+    epochs = 5
     optimizer = 'adam'
     train_ratio, valid_ratio = .85, .1
-    model_name = 'GraphBaseline'
+    model_name = 'GraphExtractorFull'
     loss = 'ProbabilisticLoss'
-    weighting = 'c_ij = c_ij * w'
-    logrank_b = 2.
+    weighting = 'c_ij = c_ij'
+    logrank_b = 1.5
+    drop_p = 0
+    num_core_blocks = 4
 
 
 @ex.main
-def train(learning_rate: float, batch_size: int, epochs: int, optimizer: str, train_ratio: float, valid_ratio: float,
-          model_name: str, loss: str, logrank_b: float) -> str:
+def train(learning_rate: float, batch_size: int, pairwise_batch_size: int, epochs: int, optimizer: str,
+          train_ratio: float, valid_ratio: float, model_name: str, loss: str, logrank_b: float, drop_p: float,
+          num_core_blocks: int) -> str:
     logging.basicConfig(level=logging.INFO)
     use_cuda = torch.cuda.is_available()
     device = torch.device('cuda' if use_cuda else 'cpu')
@@ -41,8 +50,13 @@ def train(learning_rate: float, batch_size: int, epochs: int, optimizer: str, tr
     # model with weights
     if model_name == 'GraphBaseline':
         net = GraphBaseline()
+    elif model_name == 'GraphConnected':
+        net = GraphConnected()
+    elif model_name == 'GraphExtractorFull':
+        net = GraphExtractorFull(num_core_blocks, drop_p)
     else:
         raise ValueError("Unknown model name '{}'".format(model_name))
+
     if device == 'cuda':
         net.cuda()
 
@@ -56,7 +70,7 @@ def train(learning_rate: float, batch_size: int, epochs: int, optimizer: str, tr
     else:
         raise ValueError("Unknown loss '{}'".format(loss))
 
-    training_run = GNTrainingRun(ex, name, net, opt, loss, data, batch_size, device)
+    training_run = GNTrainingRun(ex, name, net, opt, loss, data, batch_size, pairwise_batch_size, device)
     val_acc = training_run(epochs)
 
     return "Val acc: {:.4f}".format(val_acc)
