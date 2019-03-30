@@ -1,3 +1,6 @@
+sacred
+sacredboard
+pymongo
 torchvision
 matplotlib
 numpy
@@ -6,3 +9,4 @@ scikit-image
 tensorboardX
 torch
 tqdm
+graph_nets
