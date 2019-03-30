@@ -24,6 +24,8 @@ class Attribute:
         return self
 
     def asdict(self) -> Dict:
+        if self.val == 'None':
+            raise ValueError("Attribute values must not be 'None', however, None is allowed.")
         return {
             'val': self.val if self.val is not None else 'None'
         }

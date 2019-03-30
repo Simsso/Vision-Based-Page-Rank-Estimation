@@ -167,7 +167,8 @@ class Graph:
 
     def __del__(self) -> None:
         """
-        Ensures garbage collection of CUDA tensors that this graph contains.
+        Ensures garbage collection of CUDA tensors that this graph contains. If the tensors are not moved to CPU,
+        they remain on the GPU even after this object is garbage collected.
         """
         try:
             self.to(device=torch.device('cpu'))
