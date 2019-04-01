@@ -456,7 +456,7 @@ Upon successful computation of the specific dataset, the central storage can be 
 	\caption{This figure illustrates the system design of the Datacrawler Kubernetes Cluster on Google Cloud Platform. It shows that the Datacrawler Kubernetes cluster consists mainly out of three applications: The \texttt{redis}-queue which represents a work queue consisting out of domains as work items to be analysed. The Network File System provisioner which is mainly responsible for providing volume claims for Datacrawler instances from the central storage. Finally, the Datacrawler which is deployed as a container from the internal Docker registry. The Datacrawler itself is executed wrapped by a \texttt{python}-application, which represents the tie between the \texttt{redis}-queue and the Datacrawler. It is resposible for retrieving of work items from the queue, starting the Datacrawler and confirming the work item upon successful analysis.}
 	\label{datacrawler_k8s_architecture}
 \end{figure}
-\subsubsection{Datacrawler as Container}
+\subsubsection{Datacrawler as a Container}
 \label{datacrawler_container}
 
 As discussed in earlier sections, Kubernetes is only able to schedule containers, not directly applications such as our Datacrawler. Simply illustrated a container represents an isolated subsystem of the host system where it is run. In contrast to a virtual machine, a container shares the same hardware and kernel of the host system. The isolation consists of isolating processes from the host system to the container and vice versa. Within a container the user is able to run multiple applications as he would do usual on the host system. 
