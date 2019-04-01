@@ -2,13 +2,13 @@
 \label{Datacrawler}
 The main goal of the datacrawler is to deliver the required datasets as specified in chapter \ref{datasets}. The input to the datacrawler is simply a domain, which is provided by the ground truth. Depending on the configuration the output of the datacrawler can vary from a single screenshot (\ref{DatasetVersion1}) to a complete graph of the given domain (\ref{DatasetVersion2}).
 
-The following section (\ref{datacrawler_requirements}) will profoundly discuss the requirements in functionality for the datacrawler, which will serve as a basis for discussion for the decision between the frameworks \texttt{Puppeeter} and \texttt{Chromium Embedded Framework} (\ref{datacrawler_framework_language}). Afterwards we will give an overview of the architecture (\ref{datacrawler_architecture}) and highlight the idea of \textit{DataModules} in the crawler (\ref{datacrawler_datamodulesystem}). Following that, we will discuss profoundly all developed \textit{DataModules} with their role in the datacrawler (\ref{datacrawler_screenshot_datamodule}, \ref{datacrawler_mobilescreenshot_datamodule}, \ref{datacrawler_url_datamodule}). We will wrap up the internals of the datacrawler by taking a look into the workflow of the datacrawler (\ref{datacrawler_workflow}).
+The following section (\ref{datacrawler_requirements}) will profoundly discuss the requirements in functionality for the datacrawler, which will serve as a basis for discussion for the decision between the frameworks \texttt{Puppeeter} and \texttt{Chromium Embedded Framework} (\ref{datacrawler_framework_language}). Afterwards we will give an overview of the architecture (\ref{datacrawler_architecture}) and highlight the idea of \textit{DataModules} in the crawler (\ref{datacrawler_datamodulesystem}). Following that, we will discuss profoundly all developed \textit{DataModules} with their role in the datacrawler (\ref{datacrawler_screenshot_datamodule}, \ref{datacrawler_mobilescreenshot_datamodule}, \ref{datacrawler_url_datamodule}).
 
 In the last section (\ref{datacrawler_scale}) we will discuss how we successfully designed a sophisticated system to scale-out the datacrawler reducing the total dataset creation time on Google Cloud Platform.  
 
 \subsection{Requirements}
 \label{datacrawler_requirements}
-The requirements in functionality for the datacrawler arise from the dataset specifications (\ref{DatasetVersion1}, \ref{DatasetVersion2}). The next section will derive the requirements from the dataset specifications and discuss them profoundly.
+The requirements in functionality for the datacrawler arise from the dataset specifications (\ref{DatasetVersion1}, \ref{DatasetVersion2}). The next section will derive the requirements browser emulation (\ref{browser_emulation}), information accessibility (\ref{information_accessibility}), modularity (\ref{modularity}) and  scalability (\ref{scalability}) from the dataset specifications and will discuss them profoundly.
 
 \subsubsection{Browser Emulation}
 \label{browser_emulation}
@@ -16,7 +16,7 @@ One of the major requirements for the datacrawler is to find a convenient way of
 
 \subsubsection{Information Accessibility}
 \label{information_accessibility}
-Accessing \textit{low-level} information such as the \textit{HTTP-Request} to change the \textit{user-agent} to generate a mobile screenshot $\tensorsym{M}$ (\ref{datacrawler_mobilescreenshot_datamodule}) or the \textit{Document Object Model (DOM)} (\ref{datacrawler_url_datamodule}) to generate edges $a$ in the graph according to dataset version 2 specification (\ref{DatasetVersion2}) is inevitable. The datacrawler has to be able to manipulate internal data structures and even able to inject own \textit{JavaScript-code} (\ref{datacrawler_screenshot_datamodule}) on the website.
+Accessing \textit{low-level} information such as the \textit{HTTP-Request} to change the \textit{user-agent} to generate a mobile screenshot $\tensorsym{M}$ (\ref{datacrawler_mobilescreenshot_datamodule}) or the \textit{Document Object Model (DOM)} (\ref{datacrawler_url_datamodule}) to generate edges $a$ in the graph is inevitable. The datacrawler has to be able to manipulate internal data structures and even able to inject own \textit{JavaScript-code} (\ref{datacrawler_screenshot_datamodule}) on the website.
 
 \subsubsection{Modularity}
 \label{modularity}
@@ -32,7 +32,7 @@ Both dataset versions require the analysis of at least 100,000 websites. Therefo
 \label{datacrawler_framework_language}
 The previous section has shown some of the intricate requirements for the datacrawler. To answer those requirements in the given time frame, we investigated in frameworks, which would do most of the heavy-lifting for us such as networking, I/O or rendering of the website.
 
-In our research we focused on the evaluation of frameworks, which base on the most common browser \texttt{Google Chrome} \cite{CommonBrowsers}. This section will introduce two frameworks \texttt{Puppeteer} and \texttt{Chromium Embedded Framework} (\texttt{CEF}), compare both and discuss our decision for \texttt{CEF}. Both frameworks are providing an API to instrument the well-known browser \texttt{Chrome}.
+In our research we focused on the evaluation of frameworks, which base on the most common browser \texttt{Google Chrome} (\ref{chrome_chromium}) \cite{CommonBrowsers}. This section will introduce two frameworks \texttt{Puppeteer} and \texttt{Chromium Embedded Framework} (\texttt{CEF}), compare both and discuss our decision for \texttt{CEF}. Both frameworks are providing an API to instrument the well-known browser \texttt{Chrome}.
 
 \subsubsection{Puppeteer}
 \texttt{Puppeteer} is a open-source library for the JavaScript runtime \texttt{Node.js}, which provides a high-level API to control instances of the browsers \texttt{Chrome} or \texttt{Chromium}. One of the main goals of \texttt{Puppeteer} is to grow adoption in automated browser testing \cite{PuppeteerFAQ}.  For this purpose, it wraps the \texttt{Chrome DevTools Protocol} in JavaScript, which allows web developers to instrument, inspect and debug instances of \texttt{Chrome}. Technically, the protocol is HTTP-based and exposed as a RESTful API at the port for debugging by \texttt{Chrome}.
@@ -65,12 +65,30 @@ Through the use of \texttt{Chromium Content API}, \texttt{CEF 3} provides a clos
 \texttt{CEF 3} clearly fulfills the requirement of \textbf{Browser Emulation} (\ref{browser_emulation}) and \textbf{Information Accessibility} (\ref{information_accessibility}). Moreover, \textbf{Modularity} (\ref{modularity}) and \textbf{Scalability} (\ref{scalability}) is also given by using \texttt{C++} and the core functionalities of \texttt{Chromium}.
 
 \subsubsection{Framework Decision}
-Both \texttt{Puppeteer} and \texttt{CEF} fulfill the requirements raised by the dataset specifications. At first glance it seemed a free choice, but after close investigation we found additional points speaking for \texttt{CEF}. In the end we decided to use \texttt{CEF 3} for the datacrawler, due to following additional points:
+Both \texttt{Puppeteer} and \texttt{CEF} fulfill the requirements raised by the dataset specifications as illustrated in table \ref{table_framework_decision}. At first glance it seemed a free choice, but after close investigation we found additional points speaking for \texttt{CEF}. 
+
+\def\checkmark{\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;}
+\begin{table}
+	\centering
+	\begin{tabular}{lll}
+		Requirement & \texttt{CEF}  & \texttt{Puppeeter} \\ \hline \hline
+		Browser Emulation & \checkmark &  \checkmark  \\ \hline
+		Information Accesibility &  \checkmark &  \checkmark  \\ \hline
+		Modularity &  \checkmark &  \checkmark  \\ \hline
+		Scalability &  \checkmark &  \checkmark  \\ \hline
+	\end{tabular}
+	\caption{The table shows that both \texttt{Puppeeter} and \texttt{CEF} satisfy the framework requirements in browser emulation, information accessibility, modularity and scalability.}
+	\label{table_framework_decision}
+\end{table}
+
+In the end we decided to use \texttt{CEF 3} for the datacrawler, due to following additional points:
 \begin{itemize}
 \item Our team has an outstanding expertise in \texttt{C++}, which is the programming language used in both \texttt{CEF 3} and \texttt{Chromium}.
 \item While as \texttt{Puppeteer} is limited to the \texttt{Chrome DevTools Protocol}, \texttt{CEF 3} provides low-level access to the core of \texttt{Chromium}. This ultimately gives us more freedom of control.
 \item \texttt{CEF 3} is integrated into \texttt{Chromium} leading to a faster start-up and execution time Whereas \texttt{Puppeteer} has to start up an instance of \texttt{Chrome} and communicate via a RESTful HTTP API, which represents an addition overhead.
 \end{itemize}
+
+
 \subsection{Datacrawler Architecture}
 \label{datacrawler_architecture}
 One of the major points in the design and implementation of the Datacrawler was to meet the \textbf{Modularity} requirement (\ref{modularity}). This led to the development of the sophisticated \textit{DataModule}-System and introduced the concept of \textit{Datamodules}. The Datamodule-System represents the architecture of the Datacrawler. 
@@ -118,7 +136,7 @@ The class \texttt{Datacrawler} represents the entrypoint of the Datacrawler. It 
 
 Once the \texttt{process(url)}-method has been called with an URL in \texttt{Datacrawler}, we create \texttt{NodeElement} representing the starting node and add it into our graph. Our graph is implemented as a key-value list, whereas the key represents the URL and the value our \texttt{NodeElement}-object. For dataset version 1 (\ref{DatasetVersion1}) we assume to have a single node with a single screenshot. Afterwards we go through the our instantiated Datamodules and execute custom implementation of the method \texttt{process(url)}. At this point an isolated browser instance is created using \texttt{CEF 3}, which executes Datamodule-specific browser implementation. As soon as a Datamodule returns, we add the results to the current \texttt{NodeElement} and add \texttt{NodeElement} to our graph. 
 
-Upon the completion of all Datamodules for a given URL, we add all generated edges of the Datamodule \texttt{URLDatamodule} into a FIFO queue in \texttt{Datacrawler}. In section \ref{datacrawler_url_datamodule} we will discuss how and which URLs we select as edges of a node. Afterwards we repeat the process of creating a new object of \texttt{NodeElement}, executing of Datamodules, adding the results into new \texttt{NodeElement} and URLs to our FIFO queue for the oldest entry. We skip a given URL if there is a key-value pair in our list or if we reach our maximal number of nodes in the graph. \improve{Discuss number of max nodes}
+Upon the completion of all Datamodules for a given URL, we add all generated edges of the Datamodule \texttt{URLDatamodule} into a FIFO queue in \texttt{Datacrawler}. In section \ref{datacrawler_url_datamodule} we will discuss how and which URLs we select as edges of a node. Afterwards we repeat the process of creating a new object of \texttt{NodeElement}, executing of Datamodules, adding the results into new \texttt{NodeElement} and URLs to our FIFO queue for the oldest entry. We skip a given URL if there is a key-value pair in our list or if we reach our maximal number of nodes in the graph.
 
 \begin{figure}
 	\centering
@@ -127,7 +145,7 @@ Upon the completion of all Datamodules for a given URL, we add all generated edg
 	\label{datacrawler_breadth_search}
 \end{figure}
 
-The use of the FIFO queue leads to breadth-first search in our graph in opposition to a deep search, which is implemented using a LIFO queue. The breadth-first search means that we expand all nodes reachable from the edges of our current node and selecting the oldest entry as new node, rather than using the first edge, expanding the reachable node and selecting it as the current node. By using the breadth-first search, we maximize the number of directly reachable nodes from a given node. This leads to a wide and dense rather than deep and sparse graph. \improve{Discuss why we need a dense graph rather than a sparse} Figure \ref{datacrawler_breadth_search} illustrates the breadth search exemplary.
+The use of the FIFO queue leads to breadth-first search in our graph in opposition to a deep search, which is implemented using a LIFO queue. The breadth-first search means that we expand all nodes reachable from the edges of our current node and selecting the oldest entry as new node, rather than using the first edge, expanding the reachable node and selecting it as the current node. By using the breadth-first search, we maximize the number of directly reachable nodes from a given node. This leads to a wide and dense rather than deep and sparse graph. We perform a breadth-first search because we prefer to have connections between those nodes rather than having long strings originating from a root node. That way we capture at least some of the page-internal linking structure. Figure \ref{datacrawler_breadth_search} illustrates the breadth search exemplary.
 
 \begin{figure}
 	\centering
