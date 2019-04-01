@@ -1,6 +1,144 @@
 \section{Background}
-Methods, literature, related work (perhaps as a separate subsection)
-Description of GCP, K8s, infrastructure background
+\label{sec:background}
+
+!!! name the other website ranking paper from 2006 somewhere
+
+\subsection{Learning to Rank}
+\label{sec:learningtorank}
+
+\textit{Learning to rank} is the application of machine learning to the creation of models that can rank. Ranking, in its most general form, is the ordering of a collection of documents. The book \textit{Learning to Rank for Information Retrieval} by \cite{liu2009learningtorank} enumerates three distinguishable approaches to phrasing and solving ranking problems. They are referred to as pointwise, pairwise, and listwise, and shall be explained briefly in the following. The second part of this section deals with ranking metrics.
+
+The \textbf{pointwise approach} deals with models that determine the rank of a single sample. It can be subdivided into the three subcategories (1) regression based, (2) classification based, and (3) ordinal regression based. For (1), the problem is considered a regression problem, where the rank of a sample is interpreted as a point on the real number line which the model seeks to predict correctly. With (2), the ranks are discrete and considered classes, for a given input, the model predicts a class which can be mapped to a rank. Ranks can also be grouped into bins, such that an entire range of adjacent ranks corresponds to a single class. While the classes in (2) do not have an ordering that is necessarily apparent to the model, the third subcategory (3) takes the ordinal relationship of ranks into account. The goal is to find a scoring functions such that thresholds can be found to distinguish the outputs into the different, ordered categories.
+
+A possible loss function for pointwise training is to interpret the scaled and rounded model output $y$ as the predicted rank of an input. A loss function could simply penalize divergence from the target output $\hat{y}$, e.g. in a quadratic fashion, $(y-\hat{y})^2$.
+
+Opposed to the pointwise approach, the \textbf{pairwise approach} does not seek to predict the rank of a single sample. Instead the focus is on predicting the relative order between two given samples, i.e. whether the first sample $x_i$ has a greater or a lower rank than the second one $x_j$. This problem can be considered a binary classification task on a tuple input $(x_i,x_j)$, where the first class means $x_i\triangleright x_j$ ($x_i$ has a higher rank than $x_j$) and the second class means $x_i\triangleleft x_j$.
+
+\cite{Burges:learningtorankwithsgd} propose a probabilistic cost function for pairwise training, that is elements are being ranked relative to each other. 
+They represent the ground truth as a matrix $\bm{\overline{P}}\in[0,1]^{m\times m}$, where $\overline{P}_{i,j}$ is the probability of sample $x_i$ to have a higher rank than $x_j$. 
+The model itself is a function $f:\mathbb{R}^d\rightarrow\mathbb{R}$ mapping a sample $x_i$ to a scalar. The loss for two given samples $x_i$ and $x_j$ is defined as
+\begin{align}
+-\overline{P}_{i,j}\left(f(x_i)-f(x_j)\right)+\log\left(1+e^{f(x_i)-f(x_j)}\right)
+\end{align}
+This formulation has some favorable properties: It allows for uncertainty in the relative ordering of items in that the $\bm{\overline{P}}$ is a probability and could be e.g. $\overline{P}_{i,j}=\frac{1}{2}$ if the relative ranking of two items was unknown. Furthermore, the loss asymptotes to a linear functions. According to the authors, this is likely to be more robus with noisy labels than a quadratic cost.
+
+The \textbf{listwise approach} deals with models that take an entire list of samples as their input with the goal of ordering them. This can be either done by mapping them to real values and penalizing wrong ordering, or mapping the samples discretely to a permutation.
+
+In real world applications, the training of ranking models can be much more complicated. For example, updating a ranking model based on what users click leads to wrong updates because the feedback from users is biased. \cite{unbiasedlearningtorank} deal with that problem and propose \textit{unbiased learning to rank}. This is, however, beyond the scope of this work because we do not deal with direct user feedback.
+
+Once a model has produced a ranking, it must be evaluated. Since the magnitude of a loss function is ofter rather less meaningful, other measures, so called \textbf{ranking metrics}, have been defined. \cite{tfranking} name four, namely \textit{Mean Reciprocal Rank (MRR)}, average of positions of examples weighted by their relevance values (\textit{ARP}), \textit{Discounted Cumulative Gain (DCG)}, and \textit{Normalized DCG (NDCG)}. They also make the important point that ``in ranking, it is preferable to have fewer errors at higher ranked positions than at the lower ranked positions, which is reflected in many metrics''.
+
+\subsection{Graph Networks}
+\label{sec:graphnetworks}
+
+The most basic type of neural network, consisting solely of fully connected layers, converts a vector of fixed size into another vector of fixed size.
+In contast, convolutional neural networks (CNNs) can convert variably-sized input into variably-sized output. In image classification or segmentation tasks, the inputs are often scaled to a fixed size and the convolutional layers serve as feature extractors for a fully-connected classification head.
+Recurrent neural networks can convert a sequence of vectors into another sequence.
+
+While some of those neural network types \textit{can} handle variably-sized inputs, they do not deal with sets very well: Consider for instance an (unordered) set of images and the task to assign a single label to the entire set. All architectures from above could be applied to that task by simply concatenating all the images into one large vector. However, they would implicitly try to assign a semantic meaning to the ordering in which the samples are being presented to them (relational inductive bias). One could augment the dataset by shuffling the samples of a set before concatenating them but that does not solve the underlying problem.
+
+Graph networks are designed to handle graphs and sets naturally. They can deal with any size of graph and do not regard the ordering of nodes. \cite{deepmind:graphnets} have brought several different types of graph networks under a common hood. We follow their notation and will replicate the relevant parts in the following paragraphs. That is the formal definition of a directed, attributed multi-graph with a global attribute, and of graph networks.
+
+Let a graph $G$ be a 3-tuple $G=\left(\bm{u},\mathbb{V},\mathbb{E}\right)$, where $\bm{u}$ is a vector of global attributes.
+$\mathbb{V}=\left\{\bm{v}_i\right\}_{i=1}^{N^{(v)}}$ is a set of $N^{(v)}$ nodes (also referred to as vertices) consisting solely of an attribute vector.
+$\mathbb{E}=\left\{\left(\bm{e}_k,r_k,s_k\right)\right\}_{k=1}^{N^{(e)}}$ is a set of $N^{(e)}$ edges, each of which connects a sender node $\bm{v}_{s_k}$ to a receiver node $\bm{v}_{r_k}$, and contains an attribute vector $\bm{e}_k$.
+
+The attribute vectors ($\bm{u}$, $\bm{v}_i$, and $\bm{e}_k$) can contain any kind of information. In fact they could even be graphs themselves.
+
+Graph networks (GN) are neural networks that contain at least one GN block. \cite{deepmind:graphnets} describe it as follows: A GN block contains three update functions, $\phi$, and three aggregation function, $\rho$,
+\begin{align}
+    \bm{e}'_k=&\phi^e\left(\bm{e}_k,\bm{v}_{r_k},\bm{v}_{s_k},\bm{u}\right)\\
+    \bm{\overline{e}}'_i=&\rho^{e\rightarrow v}\left(\mathbb{E}'_i\right)\\
+    \bm{v}'_i=&\phi^v\left(\bm{\overline{e}}'_i,\bm{v}_i,\bm{u}\right)\\
+    \bm{\overline{e}}'=&\rho^{e\rightarrow u}\left(\mathbb{E}'\right)\\
+    \bm{\overline{v}}'=&\rho^{v\rightarrow u}\left(\mathbb{V}'\right)\\
+    \bm{u}'=&\phi^u\left(\bm{\overline{e}}',\bm{\overline{v}},\bm{u}\right)\,,
+\end{align}
+where $\mathbb{E}'_i=\left\{\left(\bm{e}'_k,r_k,s_k\right)\right\}_{r_k=i,k=1}^{N^{(e)}}$ is the set of all edges pointing to the $i$th node, $\mathbb{V}'=\left\{\bm{v}'_i\right\}_{i=1}^{N^{(v)}}$, and $\mathbb{E}'=\bigcup_i\mathbb{E}'_i$.
+
+\begin{enumerate}
+    \item $\phi^e$ is the \textbf{edge update function} and applied to every edge in the graph. For the $k$th edge it computes a new attribute vector $\bm{e}'_k$ based on the previous state $\bm{e}_k$, the attributes of the two nodes that this edge connected (i.e. $\bm{v}_{r_k}$ and $\bm{v}_{s_k}$), and the global state $\bm{u}$.
+    \item $\rho^{e\rightarrow v}$ is the \textbf{edge aggregation function} and applied once for every node in the graph. It computes an aggregation of all edges pointing to the $i$th node.
+    \item $\phi^v$ is the \textbf{node update function}. It is applied to every node in the graph and computes the new attribute vector $\bm{v}'_i$ based on the aggregation of all edges pointing to the node, the previous state of the node, and the global state.
+    \item $\rho^{e\rightarrow u}$ is the \textbf{global edge aggregation function} which computes an aggregation $\bm{\overline{e}}'$ of all edges in the graph.
+    \item $\rho^{v\rightarrow u}$ is the \textbf{node aggregation function} which compuates an aggregation $\bm{\overline{v}}'$ of all nodes in the graph.
+    \item $\phi^u$ is the \textbf{global attribute update function}. It takes both node and edge aggregation as well as the previous global attribute $\bm{u}$ and computes a new global attribute $\bm{u}'$.
+\end{enumerate}
+
+The functions are being evaluated in a specific sequence, visualized in Figure \ref{fig:fullgraphblock}. GN blocks do not alter the structure of the data, i.e. they convert a graph into another graph. In order to extract a fixed size representation from a GN block, the global attribute can be used.
+
+\begin{figure}
+    \centering
+
+    \begin{tikzpicture}[]
+
+        \draw[dashed] (0,-5) rectangle (6,1);
+        
+        % inputs and outputs
+        \node (in_u) at (-1,0) [draw=none,fill=none]{$\bm{u}$};
+        \node (out_u) at (7,0) [draw=none,fill=none] {$\bm{u}'$};
+        \node (in_V) at (-1,-2) [draw=none,fill=none]{$\mathbb{V}$};
+        \node (out_V) at (7,-2) [draw=none,fill=none]{$\mathbb{V}'$};
+        \node (in_E) at (-1,-4) [draw=none,fill=none]{$\mathbb{E}$};
+        \node (out_E) at (7,-4) [draw=none,fill=none]{$\mathbb{E}'$};
+        
+        % processing
+        \node (phi_u) at (5,0) [draw, circle]{$\phi^u$};
+        \node (phi_v) at (3,-2) [draw, circle]{$\phi^v$};
+        \node (phi_e) at (1,-4) [draw, circle]{$\phi^e$};
+
+        \node (rho_ev) at (2,-3) [draw, process]{$\rho^{e\rightarrow v}$};
+        \node (rho_eu) at (4,-3) [draw, process]{$\rho^{e\rightarrow u}$};
+        \node (rho_vu) at (4,-1) [draw, process]{$\rho^{v\rightarrow u}$};
+
+        % edges
+        \draw[->] (in_u) -- (phi_u);
+        \draw[->] (in_u) -- (phi_v);
+        \draw[->] (in_u) -- (phi_e);
+        \draw[->] (phi_u) -- (out_u);
+        \draw[->] (in_V) -- (phi_v);
+        \draw[->] (in_V) -- (phi_e);
+        \draw[->] (phi_v) -- (out_V);
+        \draw[->] (in_E) -- (phi_e);
+        \draw[->] (phi_e) -- (out_E);
+        \draw[->] (phi_e) -- (rho_ev);
+        \draw[->] (rho_ev) -- (phi_v);
+        \draw[->] (phi_e) -- (rho_eu);
+        \draw[->] (phi_v) -- (rho_vu);
+        \draw[->] (rho_vu) -- (phi_u);
+        \draw[->] (rho_eu) -- (phi_u) ;
+
+    \end{tikzpicture}
+    \caption[Full GN block]{Visualization of the evaluation order in a \textbf{full GN block}. Arrows indicate inputs as well as temporal dependency. The three inputs to a GN block are on the left, the three outputs (transformations of the inputs) are on the right-hand side. Several variation of the depicted version exist. \cite{deepmind:graphnets} show the full block, as well as the variations independent recurrent block, message-passing neural network, non-local neural network, relation network, and deep set in Figure 4.}
+    \label{fig:fullgraphblock}
+\end{figure}
+
+
+Graph networks in related forms have been applied to a variety of different problems from different domains:
+\begin{itemize}
+    \item \textbf{Social sciences}. \cite{graphnetsreddit} apply graph networks to post data from the social network Reddit. Like we do, \cite{graphnetscitationgraph} use convolutional graph networks. They run experiments on citation networks and on a knowledge graph dataset.
+    \item \textbf{Physics}. \cite{graphnetsphysicsengine} and \cite{graphnetsphysics2} train graph networks that focus on the modelling of physical relationships between objects.
+    \item \textbf{Medicine}. \cite{graphnetsproteininterface} consider the prediction of interfaces between proteins, a challenging problem with important applications in drug discovery and design.
+    \item \textbf{Algorithms}. See e.g. \cite{selsam:satsolver} and \cite{dai:graphnetscombinatorialalgo}.
+\end{itemize}
+
+Graph networks can be trained with stochastic gradient descent (SGD), since they are fully differentiable, if aggregation and attribute update functions are differentiable. \cite{selsam:satsolver} train a graph network on a boolean satisfiability task (SAT-solver) with a single bit of supervision, namely whether or not the statement is satisfiable. They thereby show that graph networks can be successfully trained on NP-complete tasks with very little supervision, namely just a single bit.
+
+They extract the fixed-size information (true or false) from the graph network by computing the mean of all nodes. This fits into \cite{deepmind:graphnets} Deep Mind's graph networks framework, since the output bit can be interpreted as a global state. Depending on the application, a model's output might be a graph itself, in such cases, the last layer can be a GN block. !!! extend with set2vec and explain the problem on a more general level
+
+
+\subsection{Screenshot Processing}
+\label{sec:screenshotprocessing}
+
+Convolutional neural networks (CNNs) were originally inspired by the visual cortex of humans, see \cite{lecun:lenet}, and had their most notable breakthrough with the success of AlexNet (\cite{krizhevsky:imagenet}) in the domain of image classification. The convolutional layers are sliding multiple kernels over two dimensions of the input while looking at all channels simultaneously. This concept allows for two-dimensional translation invariant feature extraction and has proven to be both effective and efficient.
+
+Most commonly, CNNs are applied to natual images, for instance pictures of animals taken in nature or car traffic scenes from a driver's point of view. Screenshots, i.e. images that show the content of a monitor, differ from natural images: Often they do not contain smooth transitions, do not feature a large color variety, and contain many equally colored areas such as white background. CNNs have been shown to have an inductive bias towards natural images, see e.g. \cite{deepimageprior} who exploit this bias in denoising, super-resolution, and inpainting problems. The question arises whether CNNs are also applicable to screenshots, which have different characteristics. There is little work that uses CNNs for screenshots processing, which can either be attributed to them handling screenshots just as fine as natural images or few applications.
+
+The closest to us is the work of \cite{beltramelli:pix2code}, who feeds screenshots into a CNN in order to extract structual information from them. He tries to convert screenshots of a user interface into code that describes that exact layout. In his setup, a CNN is combined with an LSTM: The former is responsible for the feature extraction, whereas the latter converts the extracted features into a sequence of layout descriptions.
+
+More specifically, he does not perform any pre-processing and feeds images of size $256\times 256$ into the model. The model consists of three convolutional blocks, each of which contains two convolutional layers with kernels of size $3\times 3$ and stride 1, followed by $2\times 2$ max-pooling and dropout with a probability of $p=0.25$. The third convolutional block is followed by two fully connected layers with $1024$ units each. Both regularized with $p=0.3$ dropout. The filter count for the convolutions is $32$, $64$, and $128$ for the three blocks, respectively.
+
+We choose to use CNNs as feature extractors for the website screenshots as well. Our baseline architecture is a slightly adjusted version of \cite{beltramelli:pix2code}, with more agressive pooling to make it work for screenshots with larger resolution.
 
 \subsection{Ground Truth}
 \subsubsection{Open PageRank}

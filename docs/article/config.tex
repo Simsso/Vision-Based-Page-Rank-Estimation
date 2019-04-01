@@ -1,0 +1,55 @@
+% todo
+\usepackage{xargs}                      % Use more than one optional parameter in a new commands
+\usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
+\newcommandx{\unsure}[2][1=]{\todo[linecolor=red,backgroundcolor=red!25,bordercolor=red,#1]{#2} \PackageWarning{}{#2!}}
+\newcommandx{\change}[2][1=]{\todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue,#1]{#2}\PackageWarning{}{#2!}}
+\newcommandx{\info}[2][1=]{\todo[linecolor=OliveGreen,backgroundcolor=OliveGreen!25,bordercolor=OliveGreen,#1]{#2}\PackageWarning{}{#2!}}
+\newcommandx{\improve}[2][1=]{\todo[linecolor=Plum,backgroundcolor=Plum!25,bordercolor=Plum,#1]{#2}\PackageWarning{}{#2!}}
+\newcommandx{\thiswillnotshow}[2][1=]{\todo[disable,#1]{#2}\PackageWarning{}{#2!}}
+
+% citing
+\usepackage[backend=bibtex,style=alphabetic]{biblatex}
+\addbibresource{bibliography.bib}
+
+% new paragraph spacing and indent
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+% line spacing
+\renewcommand{\baselinestretch}{1.2}
+\usepackage{setspace}
+
+% math
+\usepackage{amsmath}
+\usepackage{amssymb}  % special set sybmols e.g. for real numbers R
+\usepackage{bm}  % bold math
+\usepackage{isomath}
+\usepackage{amsmath}
+\usepackage{subfigure}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{multirow}
+\usepackage{colortbl}
+\usepackage{booktabs}
+
+% graphics
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepgfplotslibrary{fillbetween}
+
+% box diagrams
+\usepackage{flowchart}
+\usetikzlibrary{arrows}
+
+% new paragraph spacing and indent
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+% line spacing
+\renewcommand{\baselinestretch}{1.2}
+\usepackage{setspace}
+
+% links
+\usepackage{url}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+%\usepackage[htt]{hyphenat}  % enable auto line break for texttt
