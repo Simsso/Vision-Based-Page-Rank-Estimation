@@ -147,8 +147,32 @@ We choose to use CNNs as feature extractors for the website screenshots as well.
 
 Open PageRank uses the number of backlinks of a domain found in \textit{Common Crawl} to calculate the pagerank. The greater the number of links, different domains use to refer to the given domain, the better the pagerank of the given domain according to Open PageRank.
 
-\subsection{Kubernetes \cite{SAPTerraformSamed}}
-Kubernetes (short: K8s) is an open source container orchestration solution that was originally designed by \textit{Google} in 2014. It aims to provide a platform where containers and containerized applications can be deployed, scaled, and managed \cite{Wikik8s}. K8s orchestrates computing, networking, and storage infrastructure on behalf of user workloads. This means applications are automatically scaled depending on incoming workload.
+The list offered by Open PageRank contains about 10 million domains ordered by their page rank. Each entry in the list consists of following comma-separated attributes:
+
+\begin{itemize}
+	\item rank of the domain
+	\item domain name
+	\item calculated score by Open PageRank
+\end{itemize}
+
+The list can be downloaded at \texttt{https://www.domcop.com/openpagerank/}.
+
+\subsubsection{Google Chrome and Chromium}
+\label{chrome_chromium}
+
+\subsubsection{Puppeeter}
+\label{puppeeter}
+
+\subsubsection{Chromium Embedded Framework}
+\label{cef}
+
+\subsubsection{Fully Qualified Domain Names}
+\label{fqdn}
+
+\subsection{Kubernetes}
+This section is taken from the project work \citetitle{SAPTerraformSamed} by \citeauthor{SAPTerraformSamed} (\citeyear{SAPTerraformSamed}).
+
+Kubernetes (K8s) is an open source container orchestration solution that was originally designed by \textit{Google} in 2014. It aims to provide a platform where containers and containerized applications can be deployed, scaled, and managed \cite{Wikik8s}. K8s orchestrates computing, networking, and storage infrastructure on behalf of user workloads. This means applications are automatically scaled depending on incoming workload.
 
 K8s is much of the simplicity of Platform as a Service with the flexibility of Infrastructure as a Service \cite{k8s}. K8s offers platform abstraction at container level. Therefore, developers are responsible for building their own application containers rather than only the application itself. This is rewarded with more freedom in application development, but comes at the cost of lower productivity.
 
