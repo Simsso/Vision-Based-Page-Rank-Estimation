@@ -96,6 +96,7 @@ const ui = (() => {
         setAPIStatus: status => document.getElementById('statusindicator').innerHTML = status ? "API reached" : "API error",
         showTupleV1: showTupleV1,
         showTupleV2: showTupleV2,
-        showScore: showScore
+        showScore: showScore,
+        scrollToBottom: () => setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 50)  // set timeout to wait shortly for images to load
     };
 })();

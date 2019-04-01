@@ -8,6 +8,7 @@ events.on('NEXT_TUPLE_REQ', async () => {
     tuple = await api.nextTuple('v2');
     selectionMade = false;
     ui.showTupleV2(tuple, false);
+    ui.scrollToBottom();
 });
 
 events.on('SELECTION_MADE', async (elemId) => {
