@@ -30,7 +30,9 @@ const ui = (() => {
     });
 
     // reset score button
-    document.getElementById('score-reset-link').addEventListener('click', () => events.emit('RESET_SCORE'));
+    const scoreResetLink = document.getElementById('score-reset-link');
+    if (scoreResetLink != null)
+        scoreResetLink.addEventListener('click', () => events.emit('RESET_SCORE'));
 
     function showImg(id, imgName) {
         document.getElementById(`page${id}img`).src = `api/v1/data/v1/img/${imgName}`;
@@ -85,6 +87,9 @@ const ui = (() => {
             acc = (correctCtr / totalCtr * 100).toFixed(2);
         }
         document.getElementById('score').innerHTML = `Your accuracy is ${acc}%`;
+        const totalCountElem = document.getElementById('total-count');
+        if (totalCountElem != null)
+            totalCountElem.innerHTML = `Pairs evaluted: #${totalCtr}`
     }
 
     return {
