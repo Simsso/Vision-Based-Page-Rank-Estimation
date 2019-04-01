@@ -18,10 +18,16 @@
 %subfigures
 \usepackage{subcaption}
 % math
-\usepackage{amsmath}
 \usepackage{amssymb}  % special set sybmols e.g. for real numbers R
 \usepackage{bm}  % bold math
 \usepackage{isomath}
+\usepackage{amsmath}
+\usepackage{subfigure}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{multirow}
+\usepackage{colortbl}
+\usepackage{booktabs}
 
 % citing
 \usepackage[backend=bibtex,style=alphabetic]{biblatex}
@@ -74,13 +80,18 @@
 	{[}{{{\color{delim}{[}}}}{1}
 	{]}{{{\color{delim}{]}}}}{1},
 }
+% credits to Deepl Learning Book
+% Spacing between notation sections
+\newlength{\notationgap}
+\setlength{\notationgap}{1pc}
+\input{math_commands} 
 
 \begin{document}
 
 \maketitle
 
+\input{content/notation}
 \input{content/introduction}
-
 \input{content/background}
 
 \section{Method}
