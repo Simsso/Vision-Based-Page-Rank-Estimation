@@ -1,16 +1,24 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
+\usepackage{tikz}
 
 \title{Pagerank Estimation with Deep Graph Networks}
-\author{Timo Denk, Samed Guener}
+\author{Timo Denk, Samed Güner}
 \date{June 2019}
 
 \input{config}
+
+% credits to Deepl Learning Book
+% Spacing between notation sections
+\newlength{\notationgap}
+\setlength{\notationgap}{1pc}
+\input{math_commands} 
 
 \begin{document}
 
 \maketitle
 
+\input{content/notation}
 \input{content/introduction}
 
 \input{content/background}
@@ -18,8 +26,7 @@
 \section{Method}
 Our contributions, novel aspects, great detail
 
-\section{Datasets}
-Description of the dataset versions, where to get them, and an exact specification.
+\include{content/datasets}
 
 \section{Implementation Details}
 Technical aspects of our methods, things we have tried that might have failed, code snippets
@@ -34,7 +41,7 @@ Discussion of the results, assumptions about why things are the way they are
 \section{Conclusion}
 Summary, outlook, future work
 
-\bibliography{content/bibliography}
+\printbibliography
 \addcontentsline{toc}{section}{References}
 \label{sec:references}
 
