@@ -1,4 +1,6 @@
 const apiReached = api.status();
+const slowMode = true;
+
 ui.setAPIStatus(apiReached);
 
 let tuple = null;
@@ -17,7 +19,9 @@ events.on('SELECTION_MADE', async (elemId) => {
     }
     selectionMade = true;
     const correct = tuple[elemId].rank < tuple[1-elemId].rank;
-    ui.showTupleV2(tuple, true);
+    if (slowMode) {
+        ui.showTupleV2(tuple, true);
+    }
 
     if (correct) {
         storage.addCorrect();
@@ -27,7 +31,12 @@ events.on('SELECTION_MADE', async (elemId) => {
     }
     updateScore();
 
-    alert(correct ? "Correct!" : "That was wrong!");
+    if (slowMode) {
+        alert(correct ? "Correct!" : "That was wrong!");
+    }
+    else {
+        events.emit('NEXT_TUPLE_REQ');
+    }
 });
 
 events.on('RESET_SCORE', () => {
