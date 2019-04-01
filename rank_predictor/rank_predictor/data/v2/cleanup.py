@@ -10,6 +10,7 @@ from tqdm import tqdm
 import shutil
 
 
+delete = False
 root_dir = os.path.expanduser('~/Development/pagerank/data/v2')
 assert os.path.isdir(root_dir), "The provided path '{}' is not a directory".format(root_dir)
 
@@ -44,6 +45,8 @@ for page_path in tqdm(page_paths):
     if all_below:
         to_delete.add(page_path)
 
-tqdm.write('Deleting {} folders'.format(len(to_delete)))
-for page_path in to_delete:
-    shutil.rmtree(page_path)
+tqdm.write('Found {} for potential deletion'.format(len(to_delete)))
+if delete:
+    tqdm.write('Deleting folders...')
+    for page_path in to_delete:
+        shutil.rmtree(page_path)
