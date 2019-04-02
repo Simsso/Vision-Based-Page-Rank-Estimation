@@ -12,7 +12,7 @@ from rank_predictor.trainer.ranking.probabilistic_loss import ProbabilisticLoss
 from rank_predictor.trainer.training_run import GNTrainingRun
 from sacred import Experiment
 
-name = 'v2/full_04'
+name = 'v2/fullc_11_1c'
 ex = Experiment(name)
 
 ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred'))
@@ -20,7 +20,7 @@ ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred')
 
 @ex.config
 def run_config():
-    # TODO: dropout 0, layer norm, and weight decay
+    # TODO: batch norm and weight decay
     learning_rate: float = 1e-4
     batch_size = 2
     pairwise_batch_size = 2
@@ -30,9 +30,9 @@ def run_config():
     model_name = 'GraphExtractorFull'
     loss = 'ProbabilisticLoss'
     weighting = 'c_ij = c_ij'
-    logrank_b = 10
+    logrank_b = 1.5
     drop_p = 0
-    num_core_blocks = 4
+    num_core_blocks = 1
 
 
 @ex.main
