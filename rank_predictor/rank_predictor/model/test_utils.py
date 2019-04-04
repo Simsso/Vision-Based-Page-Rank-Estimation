@@ -4,7 +4,7 @@ import torch
 import numpy as np
 from unittest import TestCase
 
-from rank_predictor.model.util import global_avg_pool_1d, global_avg_pool, flatten
+from rank_predictor.model.utils import global_avg_pool_1d, global_avg_pool, flatten
 
 
 class TestUtil(TestCase):

@@ -1,5 +1,5 @@
 from __future__ import print_function
-import rank_predictor.model.util as uf
+import rank_predictor.model.utils as uf
 import torch.nn as nn
 import torch.nn.functional as F
 

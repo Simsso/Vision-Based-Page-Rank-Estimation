@@ -1,7 +1,7 @@
 from typing import Dict
 import torch
 from graph_nets.data_structures.attribute import Attribute
-from rank_predictor.model.util import global_avg_pool
+from rank_predictor.model.utils import global_avg_pool
 from graph_nets.block import GNBlock
 from graph_nets.data_structures.graph import Graph
 from graph_nets.functions.aggregation import ConstantAggregation, AvgAggregation
@@ -9,7 +9,7 @@ from graph_nets.functions.update import IdentityEdgeUpdate, IndependentNodeUpdat
     EdgeUpdate, NodeUpdate, NodeAggregationGlobalStateUpdate
 from torch import nn
 import torch.nn.functional as F
-import rank_predictor.model.util as uf
+import rank_predictor.model.utils as uf
 
 
 class GraphConnected(nn.Module):

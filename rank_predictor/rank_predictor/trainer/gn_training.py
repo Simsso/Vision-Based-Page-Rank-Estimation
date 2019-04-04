@@ -1,8 +1,6 @@
 import logging
 import os
 from sacred.observers import MongoObserver
-from torch import nn
-
 from rank_predictor.data.v2.pagerank_dataset import DatasetV2
 import torch
 from rank_predictor.model.graph_baseline import GraphBaseline
@@ -15,7 +13,7 @@ from sacred import Experiment
 name = 'fullc_12_2c'
 ex = Experiment(name)
 
-ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred'))
+# ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred'))
 
 
 @ex.config
