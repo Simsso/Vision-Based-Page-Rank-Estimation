@@ -39,13 +39,10 @@ f = []  # model outputs vector
 iterator = tqdm(data)
 for batch in iterator:
     sample = batch[0]
-    model_out = model(sample['graph'])
+    with torch.no_grad():
+        model_out = model(sample['graph'])
     r.append(sample['rank'])
     f.append(model_out)
-
-    if len(r) >= 300:
-        iterator.close()
-        break
 
 tqdm.write("Computing ranking and prediction matrices")
 r: torch.Tensor = torch.Tensor(r)
