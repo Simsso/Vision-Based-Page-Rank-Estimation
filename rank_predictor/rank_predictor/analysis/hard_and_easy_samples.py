@@ -1,35 +1,18 @@
 """
 Post-training analysis script that finds hard and easy samples.
 """
-import os
+
 import torch
 from tqdm import tqdm
-from torch.utils.data import DataLoader
-from rank_predictor.data.v2.pagerank_dataset import DatasetV2
+from rank_predictor.analysis.utils import get_env_vars, restore_model, get_data
 from rank_predictor.model.graph_extractor_full import GraphExtractorFull
 import numpy as np
 from rank_predictor.trainer.ranking.utils import per_sample_accuracy
 
-# env variables / parameters
-model_weights_dir = os.path.expanduser(os.getenv('weight_file_path'))
-assert os.path.isfile(model_weights_dir), "Environment variable 'weight_file_path' must point to a file"
 
-dataset_dir = os.path.expanduser(os.getenv('dataset_v2_path'))
-assert os.path.isdir(dataset_dir), "Environment variables 'dataset_v2_path' must point to a directory"
-
-# model
-tqdm.write("Restoring model weights from '{}'".format(model_weights_dir))
-device = torch.device('cpu')
-model = GraphExtractorFull(num_core_blocks=1, drop_p=0.)
-model.load_state_dict(torch.load(model_weights_dir, map_location=device))
-model.eval()
-
-# dataset
-tqdm.write("Loading dataset")
-train_ratio, valid_ratio = .85, .1
-logrank_b = 1.5
-data = DatasetV2.get_threefold(dataset_dir, train_ratio, valid_ratio, logrank_b)
-data = DataLoader(data.test, 1, shuffle=False, num_workers=0, collate_fn=lambda b: b)
+env = get_env_vars()
+model = restore_model(env, GraphExtractorFull, {'num_core_blocks': 1, 'drop_p': 0.})
+data = get_data(env)
 
 r = []  # vector of ranks
 f = []  # model outputs vector

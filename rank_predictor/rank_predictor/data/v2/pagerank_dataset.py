@@ -6,7 +6,6 @@ import os
 from typing import Set, Union, Dict, Tuple, List
 from torch.utils.data import Dataset
 from torchvision.transforms import ToPILImage, Resize, ToTensor, Normalize, Compose
-
 from graph_nets.data_structures.attribute import Attribute
 from graph_nets.data_structures.edge import Edge
 from graph_nets.data_structures.graph import Graph
@@ -156,9 +155,9 @@ class DatasetV2(Dataset):
         return set(page_paths)
 
     @staticmethod
-    def from_path(root_dir: str):
+    def from_path(root_dir: str, logrank_b: float):
         page_paths = DatasetV2._get_page_paths(root_dir)
-        return DatasetV2(page_paths)
+        return DatasetV2(page_paths, logrank_b)
 
     @staticmethod
     def get_threefold(root_dir: str, train_ratio: float, valid_ratio: float, logrank_b: float) -> threefold.Data:
