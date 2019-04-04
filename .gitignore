@@ -1,3 +1,4 @@
 /data/
 .DS_STORE
 datacrawler/datacrawler-project/Docker/datacrawler/
+/models/
