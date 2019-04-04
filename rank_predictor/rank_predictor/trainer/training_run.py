@@ -8,6 +8,7 @@ from torch import nn, optim
 from tensorboardX import SummaryWriter
 from torch.utils.data import Dataset, DataLoader
 from graph_nets.data_structures.graph import Graph
+from rank_predictor.data.v2.pagerank_dataset import DatasetV2Screenshots
 from rank_predictor.trainer.ranking.utils import compute_batch_accuracy, compute_multi_batch_accuracy
 from rank_predictor.data import threefold
 
@@ -171,6 +172,95 @@ class GNTrainingRun(TrainingRun):
         return float(accuracy.cpu().detach().numpy())
 
 
+class FeatureExtractorTrainingRun(TrainingRun):
+
+    def __init__(self, ex: sacred.Experiment, name: str, net: nn.Module, opt: optim.Adam, loss_fn: Callable,
+                 data: threefold.Data, batch_size: int, device: torch.device) -> None:
+        super().__init__(ex, name, net, opt, loss_fn, data, batch_size, device,
+                         collate_fn=DatasetV2Screenshots.collate_fn)
+
+    def _train_step(self, batch: Dict[str, torch.Tensor]) -> None:
+        self.net.train()
+        self.opt.zero_grad()
+
+        desktop_imgs = batch['desktop_imgs'].to(self.device)
+        mobile_imgs = batch['mobile_imgs'].to(self.device)
+        logranks = batch['logranks'].to(self.device).float()
+        weighting = batch['weighting'].to(self.device).float()
+
+        model_out: torch.Tensor = self.net.forward(desktop_imgs, mobile_imgs)
+        w = weighting * (1-logranks)
+        loss = self.loss_fn(model_out, logranks, w=w)
+        loss.backward()
+
+        self.opt.step()
+
+        accuracy, _ = compute_batch_accuracy(target_ranks=logranks, model_outputs=model_out)
+
+        self.log_scalar('batch_loss_train', loss)
+        self.log_scalar('batch_accuracy_train', accuracy)
+
+    @staticmethod
+    def remove_rank_duplicates_from_batch(batch) -> Dict:
+        desktop_imgs, mobile_imgs, logranks = [], [], []
+        prev_rank = None
+        i = -1
+        for rank in batch['ranks'].detach():
+            i += 1
+            if prev_rank is not None and rank == prev_rank:
+                continue
+            prev_rank = rank
+            desktop_imgs.append(batch['desktop_imgs'][i])
+            mobile_imgs.append(batch['mobile_imgs'][i])
+            logranks.append(batch['logranks'][i])
+
+        del batch['ranks']
+        del batch['weighting']
+
+        batch['desktop_imgs'] = torch.stack(desktop_imgs)
+        batch['mobile_imgs'] = torch.stack(mobile_imgs)
+        batch['logranks'] = torch.stack(logranks)
+
+        return batch
+
+    def _run_valid(self, dataset: Dataset, name: str, approx: bool = False) -> float:
+        self.net.eval()
+
+        with torch.no_grad():
+            # accumulators
+            loss_sum, model_out_batches, rank_batches = 0., [], []
+
+            for batch in dataset:
+                if approx and len(model_out_batches) >= 500:
+                    break
+                
+                batch = self.remove_rank_duplicates_from_batch(batch)
+
+                desktop_imgs = batch['desktop_imgs'].to(self.device)
+                mobile_imgs = batch['mobile_imgs'].to(self.device)
+                logranks = batch['logranks'].to(self.device).float()
+
+                rank_batches.append(logranks)
+
+                # forward pass
+                with torch.no_grad():
+                    model_out: torch.Tensor = self.net.forward(desktop_imgs, mobile_imgs)
+                    model_out_batches.append(model_out)
+
+                    loss = self.loss_fn(model_out, logranks, w=(1-logranks))
+                    loss_sum += loss
+
+            n = len(model_out_batches)
+            loss = loss_sum / n
+
+            accuracy, _ = compute_multi_batch_accuracy(rank_batches, model_out_batches)
+
+            self.log_scalar('loss_{}'.format(name), loss)
+            self.log_scalar('accuracy_{}'.format(name), accuracy)
+
+            return float(accuracy.detach().numpy())
+
+
 class VanillaTrainingRun(TrainingRun):
 
     def _train_step(self, batch: Dict[str, torch.Tensor]) -> None:
@@ -201,6 +291,9 @@ class VanillaTrainingRun(TrainingRun):
             loss_sum, model_out_batches, rank_batches = 0., [], []
 
             for batch in dataset:
+                if approx and len(model_out_batches) >= 500:
+                    break
+
                 imgs: torch.Tensor = batch['img'].to(self.device)
                 logranks: torch.Tensor = batch['logrank'].to(self.device).float()
                 rank_batches.append(logranks)
@@ -213,7 +306,7 @@ class VanillaTrainingRun(TrainingRun):
                     loss = self.loss_fn(model_out, logranks, w=(1-logranks))
                     loss_sum += loss
 
-            n = len(dataset)
+            n = len(model_out_batches)
             loss = loss_sum / n
 
             accuracy, _ = compute_multi_batch_accuracy(rank_batches, model_out_batches)

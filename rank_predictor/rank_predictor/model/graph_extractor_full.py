@@ -238,3 +238,24 @@ class ScreenshotsFeatureExtractor(nn.Module):
             return xd, xm, d_feat_maps, m_feat_maps
 
         return xd, xm
+
+
+class ScreenshotsFeatureExtractorWithHead(nn.Module):
+
+    def __init__(self, drop_p: float):
+        super().__init__()
+
+        self.extractor = ScreenshotsFeatureExtractor(drop_p)
+        self.head = nn.Linear(64, 1)
+
+    def forward(self, desktop_imgs: Tensor, mobile_imgs: Tensor) -> Tensor:
+        """
+        :return: Scalar tensor
+        """
+
+        x = self.extractor(desktop_imgs, mobile_imgs)
+        x = torch.cat(x, dim=1)
+        x = F.relu(x)
+        x = self.head(x).view(-1)
+
+        return x
