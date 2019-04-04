@@ -40,25 +40,25 @@ for batch in iterator:
     img_no = node.attr.val['no']
 
     with torch.no_grad():
-        d_feat, m_feat, d_activations, m_activations = cnn(
+        d_feat, m_feat, d_act, m_act = cnn(
             desktop_img.unsqueeze(0),
             mobile_img.unsqueeze(0),
             return_feature_maps=True)
 
     # add outputs to activation dictionary
-    d_activations['feat'] = d_feat
-    m_activations['feat'] = m_feat
+    d_act['feat'] = d_feat
+    m_act['feat'] = m_feat
 
     # convert tensors into numpy arrays
-    d_activations: Dict[str, np.ndarray] = {k: d_activations[k].view((-1)).numpy() for k in d_activations}
-    m_activations: Dict[str, np.ndarray] = {k: m_activations[k].view((-1)).numpy() for k in m_activations}
+    d_act: Dict[str, np.ndarray] = {k: d_act[k].view(d_act[k].shape[1:]).numpy() for k in d_act}
+    m_act: Dict[str, np.ndarray] = {k: m_act[k].view(m_act[k].shape[1:]).numpy() for k in m_act}
 
     # add to accumulators
     r.append(this_r)
-    a_desktop.append(d_feat)
-    a_mobile.append(m_feat)
+    a_desktop.append(d_act)
+    a_mobile.append(m_act)
 
-    if len(this_r) >= 100:
+    if len(r) >= 100:
         iterator.close()
         break
 
@@ -69,5 +69,5 @@ result = {
 }
 
 tqdm.write("Saving results")
-with open('images_exciting_units_result.pickle', 'wb') as handle:
+with open('feature_maps.pickle', 'wb') as handle:
     pickle.dump(result, handle, protocol=pickle.HIGHEST_PROTOCOL)
