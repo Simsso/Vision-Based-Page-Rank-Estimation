@@ -8,11 +8,9 @@ from torch.utils.data import DataLoader
 from rank_predictor.data.v2.pagerank_dataset import DatasetV2
 from rank_predictor.model.graph_extractor_full import GraphExtractorFull
 import numpy as np
-
-# env variables / parameters
-from rank_predictor.trainer.ranking.probabilistic_loss import ProbabilisticLoss
 from rank_predictor.trainer.ranking.utils import per_sample_accuracy
 
+# env variables / parameters
 model_weights_dir = os.path.expanduser(os.getenv('weight_file_path'))
 assert os.path.isfile(model_weights_dir), "Environment variable 'weight_file_path' must point to a file"
 
@@ -31,7 +29,7 @@ tqdm.write("Loading dataset")
 train_ratio, valid_ratio = .85, .1
 logrank_b = 1.5
 data = DatasetV2.get_threefold(dataset_dir, train_ratio, valid_ratio, logrank_b)
-data = DataLoader(data.test, 1, shuffle=True, num_workers=0, collate_fn=lambda b: b)
+data = DataLoader(data.test, 1, shuffle=False, num_workers=0, collate_fn=lambda b: b)
 
 r = []  # vector of ranks
 f = []  # model outputs vector
