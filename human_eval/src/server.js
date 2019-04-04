@@ -10,7 +10,7 @@ async function main() {
     const api = Router();
 
     // logging
-    app.use(morgan('combined'));
+    app.use(morgan(':method :url :status :res[content-length] - :response-time ms'));
 
     // parse application/x-www-form-urlencoded
     app.use(bodyParser.urlencoded({ extended: false }));

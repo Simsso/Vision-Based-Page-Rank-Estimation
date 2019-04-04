@@ -1,5 +1,5 @@
 const apiReached = api.status();
-const slowMode = true;
+const slowMode = false;
 
 ui.setAPIStatus(apiReached);
 
