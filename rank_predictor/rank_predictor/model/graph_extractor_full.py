@@ -7,7 +7,7 @@ from graph_nets.functions.update import IndependentNodeUpdate, EdgeUpdate, Globa
 from graph_nets.data_structures.graph import Graph
 from torch import nn, Tensor
 import torch.nn.functional as F
-import rank_predictor.model.util as uf
+import rank_predictor.model.utils as uf
 
 
 class GraphExtractorFull(nn.Module):
