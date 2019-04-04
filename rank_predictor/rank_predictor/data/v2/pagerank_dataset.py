@@ -34,14 +34,14 @@ class DatasetV2(Dataset):
             ToPILImage(),
             # Resize((1920 // 4, 1080 // 4)),
             ToTensor(),
-            Normalize((.5, .5, .5, .5), (.5, .5, .5, .5)),
+            Normalize((.5, .5, .5), (.5, .5, .5)),
         ])
 
         self.mobile_img_transform = Compose([
             ToPILImage(),
             # Resize((333, 187)),
             ToTensor(),
-            Normalize((.5, .5, .5, .5), (.5, .5, .5, .5)),
+            Normalize((.5, .5, .5), (.5, .5, .5)),
         ])
 
         self.page_paths = sorted(list(page_paths))
@@ -66,7 +66,7 @@ class DatasetV2(Dataset):
         json_file_path = glob(os.path.join(path, '*.json'))
         assert len(json_file_path) == 1, "Number of json files in '{}' must be exactly one.".format(path)
         json_file_path = json_file_path[0]
-        with open(json_file_path) as json_file:
+        with open(json_file_path, encoding='utf-8') as json_file:
             pages_json: List = json.load(json_file)
 
         # read screenshot paths
