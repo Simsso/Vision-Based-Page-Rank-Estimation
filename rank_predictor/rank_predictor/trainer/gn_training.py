@@ -6,14 +6,15 @@ import torch
 from rank_predictor.model.graph_baseline import GraphBaseline
 from rank_predictor.model.graph_connected import GraphConnected
 from rank_predictor.model.graph_extractor_full import GraphExtractorFull
+from rank_predictor.trainer.lr_scheduler.warmup_scheduler import GradualWarmupScheduler
 from rank_predictor.trainer.ranking.probabilistic_loss import ProbabilisticLoss
 from rank_predictor.trainer.training_run import GNTrainingRun
 from sacred import Experiment
 
-name = 'fullc_12_2c'
+name = 'fullc_13_2c'
 ex = Experiment(name)
 
-# ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred'))
+ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred'))
 
 
 @ex.config
@@ -30,12 +31,14 @@ def run_config():
     logrank_b = 1.5
     drop_p = .05
     num_core_blocks = 2
+    lr_scheduler = 'GradualWarmupSchedulerExponentialLR'
+    lr_scheduler_gamma = 0.98
 
 
 @ex.main
 def train(learning_rate: float, batch_size: int, pairwise_batch_size: int, epochs: int, optimizer: str,
           train_ratio: float, valid_ratio: float, model_name: str, loss: str, logrank_b: float, drop_p: float,
-          num_core_blocks: int) -> str:
+          num_core_blocks: int, lr_scheduler: str, lr_scheduler_gamma: float) -> str:
     logging.basicConfig(level=logging.INFO)
     use_cuda = torch.cuda.is_available()
     device = torch.device('cuda' if use_cuda else 'cpu')
@@ -67,7 +70,13 @@ def train(learning_rate: float, batch_size: int, pairwise_batch_size: int, epoch
     else:
         raise ValueError("Unknown loss '{}'".format(loss))
 
-    training_run = GNTrainingRun(ex, name, net, opt, loss, data, batch_size, pairwise_batch_size, device)
+    if lr_scheduler == 'GradualWarmupSchedulerExponentialLR':
+        exp_scheduler = torch.optim.lr_scheduler.ExponentialLR(opt, gamma=lr_scheduler_gamma)
+        lr_scheduler = GradualWarmupScheduler(opt, multiplier=15, total_epoch=20, after_scheduler=exp_scheduler)
+    else:
+        lr_scheduler = None
+
+    training_run = GNTrainingRun(ex, name, net, opt, loss, data, batch_size, pairwise_batch_size, device, lr_scheduler)
     val_acc = training_run(epochs)
 
     return "Val acc: {:.4f}".format(val_acc)
