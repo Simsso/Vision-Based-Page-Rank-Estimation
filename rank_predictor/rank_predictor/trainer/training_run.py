@@ -46,7 +46,7 @@ class TrainingRun:
         # create data loader from dataset
         self.data_loader: threefold.Data[DataLoader] = threefold.Data(
             train=DataLoader(data.train, batch_size, shuffle=True, num_workers=worker_count, collate_fn=collate_fn),
-            valid=DataLoader(data.valid, 1, shuffle=True, num_workers=worker_count, collate_fn=collate_fn),
+            valid=DataLoader(data.valid, batch_size, shuffle=True, num_workers=worker_count, collate_fn=collate_fn),
             test=DataLoader(data.test, batch_size, shuffle=False, num_workers=worker_count, collate_fn=collate_fn),
         )
 
@@ -219,7 +219,6 @@ class FeatureExtractorTrainingRun(TrainingRun):
                          collate_fn=DatasetV2Screenshots.collate_fn, lr_scheduler=lr_scheduler)
 
     def _train_step(self, batch: Dict[str, torch.Tensor]) -> None:
-        return
         self.net.train()
         self.opt.zero_grad()
 
@@ -264,7 +263,6 @@ class FeatureExtractorTrainingRun(TrainingRun):
         return batch
 
     def _run_valid(self, dataset: Dataset, name: str, approx: bool = False) -> float:
-        return
         self.net.eval()
 
         with torch.no_grad():
@@ -272,7 +270,7 @@ class FeatureExtractorTrainingRun(TrainingRun):
             loss_sum, model_out_batches, rank_batches = 0., [], []
 
             for batch in dataset:
-                if approx and len(model_out_batches) >= 500:
+                if approx and len(model_out_batches) >= 100:
                     break
                 
                 batch = self.remove_rank_duplicates_from_batch(batch)
@@ -284,12 +282,11 @@ class FeatureExtractorTrainingRun(TrainingRun):
                 rank_batches.append(logranks)
 
                 # forward pass
-                with torch.no_grad():
-                    model_out: torch.Tensor = self.net.forward(desktop_imgs, mobile_imgs)
-                    model_out_batches.append(model_out)
+                model_out: torch.Tensor = self.net.forward(desktop_imgs, mobile_imgs)
+                model_out_batches.append(model_out)
 
-                    loss = self.loss_fn(model_out, logranks, w=(1-logranks))
-                    loss_sum += loss
+                loss = self.loss_fn(model_out, logranks, w=(1-logranks))
+                loss_sum += loss
 
             n = len(model_out_batches)
             loss = loss_sum / n
@@ -299,7 +296,7 @@ class FeatureExtractorTrainingRun(TrainingRun):
             self.log_scalar('loss_{}'.format(name), loss)
             self.log_scalar('accuracy_{}'.format(name), accuracy)
 
-            return float(accuracy.detach().numpy())
+            return float(accuracy.detach().cpu().numpy())
 
 
 class VanillaTrainingRun(TrainingRun):
@@ -338,12 +335,11 @@ class VanillaTrainingRun(TrainingRun):
                 rank_batches.append(logranks)
 
                 # forward pass
-                with torch.no_grad():
-                    model_out: torch.Tensor = self.net.forward(imgs)
-                    model_out_batches.append(model_out)
+                model_out: torch.Tensor = self.net.forward(imgs)
+                model_out_batches.append(model_out)
 
-                    loss = self.loss_fn(model_out, logranks, w=(1-logranks))
-                    loss_sum += loss
+                loss = self.loss_fn(model_out, logranks, w=(1-logranks))
+                loss_sum += loss
 
             n = len(model_out_batches)
             loss = loss_sum / n
@@ -353,4 +349,4 @@ class VanillaTrainingRun(TrainingRun):
             self.log_scalar('loss_{}'.format(name), loss)
             self.log_scalar('accuracy_{}'.format(name), accuracy)
 
-            return float(accuracy.detach().numpy())
+            return float(accuracy.detach().cpu().numpy())

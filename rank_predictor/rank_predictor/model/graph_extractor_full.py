@@ -259,3 +259,6 @@ class ScreenshotsFeatureExtractorWithHead(nn.Module):
         x = self.head(x).view(-1)
 
         return x
+
+    def state_dict(self, **kwargs):
+        return self.extractor.state_dict(**kwargs)

@@ -8,7 +8,7 @@ from rank_predictor.data.v2.pagerank_dataset import DatasetV2Screenshots
 from rank_predictor.model.graph_extractor_full import ScreenshotsFeatureExtractorWithHead
 from rank_predictor.trainer.training_run import FeatureExtractorTrainingRun
 
-name = 'featextr_04'
+name = 'featextr_06'
 ex = Experiment(name)
 
 
