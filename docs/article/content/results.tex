@@ -1,0 +1,25 @@
+\section{Results}
+
+In this section we present results...
+
+Configuration:
+* Train/test/valid split. What we use what for.
+* Optimizer Adam
+* Learning rate warmup and decay
+* Training on a GTX 970 and V100
+* Dropout
+* ...
+
+Advantage of feature extraction is faster training so we pursued that one. Comparison of pre-trained weights vs. end-to-end training. Quick description of both methods, advantages and disadvantages (batch sizes, efficiency, only indirect optimization of the target task).
+
+Table with results: pre-trained, fine-tuned, end-to-end.
+
+Following from here: pre-trained with out fine-tuning. Allows for fast iteration and evaluation of many GN variants. Best GN variant trained end to end (?) depending on the table above.
+
+Recall the variants. Table with results.
+
+Importance of the logarithmic weighting. Which model do we train here? Ablation study. Table with results.
+
+How to deal with dataset v1 here? Perhaps: Served as an experimentation platform and we did not max it out. Our best accuracy was xxx but that can likely be improved with tuning.
+
+Graph structure usage: recall that the averaging GN variant does not take the structure into account. It's the trivial baseline. Compare with single directed graph, both directions, and fully connected. Table.

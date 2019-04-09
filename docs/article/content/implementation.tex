@@ -1,0 +1,11 @@
+\section{Implementation Details}
+
+As part of this xxx four separate pieces of software: list them, with note on dependencies.
+
+For the ML parts (gn and rankpred): Implemented in PyTorch. Alternative framework TF not chosen bc of (1) non-laziness by the time of writing, (2) complicated data pipelines, (3) less OOP-friendly.
+
+The following sub-sections explain the details for each piece separately. Special focus on GN lib because it may be used by others whereas rankpred and human eval where rather tools.
+
+\input{content/implementation/gnlib}
+\input{content/implementation/rankpredictor}
+\input{content/implementation/humanevaltool}

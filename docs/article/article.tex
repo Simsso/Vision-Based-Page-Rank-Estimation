@@ -8,82 +8,22 @@
 
 \input{config}
 
-% plot
-\usepackage{pgfplots}
-
-% json listing
-\usepackage{listings}
-
-\colorlet{punct}{red!60!black}
-\definecolor{background}{HTML}{EEEEEE}
-\definecolor{delim}{RGB}{20,105,176}
-\colorlet{numb}{magenta!60!black}
-
-\lstdefinelanguage{json}{
-	basicstyle=\normalfont\ttfamily,
-	numbers=left,
-	numberstyle=\scriptsize,
-	stepnumber=1,
-	numbersep=8pt,
-	showstringspaces=false,
-	breaklines=true,
-	frame=lines,
-	backgroundcolor=\color{background},
-	literate=
-	*{0}{{{\color{numb}0}}}{1}
-	{1}{{{\color{numb}1}}}{1}
-	{2}{{{\color{numb}2}}}{1}
-	{3}{{{\color{numb}3}}}{1}
-	{4}{{{\color{numb}4}}}{1}
-	{5}{{{\color{numb}5}}}{1}
-	{6}{{{\color{numb}6}}}{1}
-	{7}{{{\color{numb}7}}}{1}
-	{8}{{{\color{numb}8}}}{1}
-	{9}{{{\color{numb}9}}}{1}
-	{:}{{{\color{punct}{:}}}}{1}
-	{,}{{{\color{punct}{,}}}}{1}
-	{\{}{{{\color{delim}{\{}}}}{1}
-	{\}}{{{\color{delim}{\}}}}}{1}
-	{[}{{{\color{delim}{[}}}}{1}
-	{]}{{{\color{delim}{]}}}}{1},
-}
-% credits to Deepl Learning Book
-% Spacing between notation sections
-\newlength{\notationgap}
-\setlength{\notationgap}{1pc}
-\input{math_commands} 
-
 \begin{document}
 
 \maketitle
 
-\input{content/notation}
-\input{content/introduction}
+\tableofcontents
 
-\input{content/background}
-
-\section{Method}
-Our contributions, novel aspects, great detail
-
-\include{content/datasets}
-
-\section{Implementation Details}
-Technical aspects of our methods, things we have tried that might have failed, code snippets
-Technical description of the dataset creation process
-
-% Datacrawler section
-\include{content/datacrawler}
-\section{Results}
-Presentation of our results, no opinion
-
-\section{Discussion}
-Discussion of the results, assumptions about why things are the way they are
-
-\section{Conclusion}
-Summary, outlook, future work
-
-\printbibliography
-\addcontentsline{toc}{section}{References}
-\label{sec:references}
+%\input{content/notation}
+%\input{content/introduction}
+%\input{content/background}
+\input{content/method}
+%\input{content/datasets}
+\input{content/implementation}
+%\input{content/datacrawler}
+\input{content/results}
+\input{content/discussion}
+\input{content/conclusion}
+\input{content/references}
 
 \end{document}

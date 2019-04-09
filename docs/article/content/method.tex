@@ -1,0 +1,77 @@
+\section{Method}
+
+This section describes... sentence. We do not introduce novel, generic methodologies but present our individual solution to a very specific and special problem. (?)
+
+Recall the problem at hand (aspects: huge noisy dataset of images(!), ranking ground truth, graph structure of the input), we use an ML algorithm to solve it.
+
+Graph networks are suitable for dealing with the image graph. Arbitrary size, arbitrary pieces of information (we use only images, theoretically text, etc. can be used as well).
+
+CNNs are suitable for screenshot processing.
+
+Ranking problem requires special losses.
+
+We want to measure the performance of our model, motivation for evaluation metrics.
+
+Motivation for inference; meaning of inference in this context.
+
+Based on these finding, we use this setup: High-level description of what the model does and how we train it. Infer split into components: data, feature extractor, GN blocks, output, loss / evaluation. Describe each.
+
+Figure showing the components.
+
+\subsection{Feature Extractor}
+
+Feature extractor is a component in this model. Applied node-wise to the inputs. It is a neural network itself, no specifics yet, roughly inputs and outputs
+
+Idea of feature extraction is borrowed from pre-trained models. Distinction from pre-training: we train on a separate, but very similar task. Two methods: train end-to-end or pre-train
+
+Mathematical notation, clarify inputs and outputs.
+
+Model architecture (+figure)
+
+Generation of batches from variably-sized graphs, weighting
+
+Training of the feature extractor
+
+\subsection{Graph Network Blocks}
+
+Where the GN blocks are positioned in the model, first layer to make use of the graph structure, nodes are from feature extractor. Inputs and outputs, formal definition.
+
+Baseline GN block; maps to scalar and aggregates. Intuition: looking a single images and ranking based on them + avg. +figure
+
+Full GN block; more complex: Block definition with concat and avg/max aggregation. Dense layers everywhere. Reflexive graph for avg (to avoid 0 edge count). +figure
+
+Intuition behind the block: Information flows, global state is sort of an aggregation.
+
+Weight-sharing between consecutive blocks or not.
+
+Conversion into a fixed-size output using the global attribute (output block).
+
+Interpretation of the feature extractor as a special kind of block, bring up the encoder-core-decoder scheme from the GN DeepMind example.
+
+(potentially +figure, if it adds any value)
+
+\subsection{Loss Function}
+
+Loss function is in a ranking setting. We chose pairwise because initial experiments showed that pointwise resulted in unstable training. Derive the loss function in the following.
+
+Dataset vector, computation of the output matrix, ..., weighting w
+
+Sum aggregation, final loss scalar normalized
+
+Additional weighting term w, chosen as bla bla, with log base. Plot with linear and log in comparison (axis: 1-100k, 0-1). Intuition is that the top 10k samples contain more information than the e.g. 80k-90k.
+
+Approximation with mini-batches, number of comparisons grows quadratically so larger batches are desirable. Also regularizing effect, as always.
+
+Note that this is single scalar supervision (or binary classificatio) and it effectively trains a CNN.
+
+\subsection{Evaluation Metrics and Inference}
+
+Accuracy is computed by feeding all samples through the model, large vec. Then matrix and ground-truth matrix comparison. Number of correct pairwise results.
+
+Advantage: Can be easily compared to humans, however difficulty is not taken into consideration, e.g. 80,001 and 80,000 are extremely hard/impossible. Band of growing width that masks out the close samples.
+
+Formal definition of inference, i.e. sample $x$ to rank or pairwise and listwise. 
+
+Pairwise: feed both samples, magnitude of difference is certainty, sign is relative ranking.
+
+Pointwise: requires ground truth, pairwise with everyone, come up with something here...
