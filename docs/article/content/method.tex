@@ -1,24 +1,70 @@
 \section{Method}
 
-This section describes... sentence. We do not introduce novel, generic methodologies but present our individual solution to a very specific and special problem. (?)
+This section describes our approach to solving the pagerank estimation problem. We present our methodology as we have applied it to the problem at hand, as opposed to extracting the generic, underlying principles, as these are mostly covered in the background section of this document.
 
-Recall the problem at hand (aspects: huge noisy dataset of images(!), ranking ground truth, graph structure of the input), we use an ML algorithm to solve it.
+The pagerank estimation problem is, given a webpage represented as an attributed graph with screenshots, to estimate the global popularity of that webpage.
+Our ground-truth for \textit{popularity} is a list containing 100,000 webpages, created by Open PageRank.
+More details can be found in Section \ref{OpenPageRank}.
+The given data has several characteristics which have influenced our way of tackling the problem:
+
+\begin{itemize}
+    \item With approximately 100,000 samples, there is plenty of data available. The number of images is even higher, since a single sample can consist of up to 16 images.
+    \item The problem is a ranking task. Samples need to be ordered and during inference the rank of a (possibly) unseen sample must be predicted.
+    \item Images make up the majority of the information contained in the dataset. Neural networks, in particular convolutional neural networks (CNNs; see \cite{lecun1989backpropagation}) are performing well at processing images and at extracting features from them. With \cite{krizhevsky:imagenet} they have become the de-factor standard way of solving image classification problems where ever large datasets are available.
+    \item The samples are variably-sized and can be easily represented as a graph: The number of screenshots taken from a domain may vary depending on the number of subpages. Links between subpages can be represented as edges in a graph. Naturally, the samples can be seen as graphs and a model capable of using the entire information from the graph seems best suited.
+    \item The data is relatively noisy, e.g. samples might be mostly black or ranks might be inaccurate (as they are subject to change over time anyways).
+\end{itemize}
+
+Motivated by the stated observations, we decided to use a combination of CNN and graph network (GN) (see \cite{deepmind:graphnets}), trained with ranking loss functions, to predict pageranks.
+
+Learning features as opposed to hand-engineering them seems reasonable as it is unknown to us what the visual elements are that distinguish popular and unpopular webpages. Furthermore, a dataset containing more than 1,000,000 images provides more than enough training data to work with high-capacity models, capable of learning complex features.
+
+While many of today's CNN-papers deal with natural images, e.g. \cite{gu2018ava,szegedy2017inception,openai:learningdexterity}, there have been applications with computer generated images as well. \cite{beltramelli:pix2code} converts a screenshot into a fixed size feature vector. Therefore, CNNs seem very suitable for screenshot processing as well and are our choice.
 
 Graph networks are suitable for dealing with the image graph. Arbitrary size, arbitrary pieces of information (we use only images, theoretically text, etc. can be used as well).
 
-CNNs are suitable for screenshot processing.
-
 Ranking problem requires special losses.
 
-We want to measure the performance of our model, motivation for evaluation metrics.
+We define an accuracy metric that allows us to evaluate the performance of our model. It measures how accurate the model ranks any two given webpages from a subset of the dataset relative to each other.
 
-Motivation for inference; meaning of inference in this context.
+While our dataset contains webpages from domains which are (or have been) publicly available on the web, we want it to work with unseen inputs as well. The goal of our model's inference mode is to either estimate the absolute popularity of a webpage with respect to the top 100,000 webpages or, secondly, compare two (or more) given webpages relative to one and another.
 
-Based on these finding, we use this setup: High-level description of what the model does and how we train it. Infer split into components: data, feature extractor, GN blocks, output, loss / evaluation. Describe each.
+\begin{figure}
+    \centering
 
-Figure showing the components.
+    \begin{tikzpicture}[]
 
-\subsection{Feature Extractor}
+        \draw[dashed] (0,-1) rectangle (6,1);
+        
+        % inputs and outputs
+        \node (in_data) at (-1,0.5) [draw,process]{Dataset};
+        \node (in_inference) at (-1,-.5) [draw,process]{Inference};
+        \node (out_loss) at (7,1) [draw,process]{Loss};
+        \node (out_accuracy) at (7,0) [draw,process]{Accuracy};
+        \node (out_rank) at (7,-1) [draw,process]{Rank};
+        
+        % processing
+        \node (cnn) at (1,0) [text width=1.65cm, align=center, draw, process]{Screenshot feature extractor};
+        \node (gn) at (3,0) [text width=1.5cm, align=center, draw, process]{Graph network};
+        \node (pred) at (5,0) [draw, process]{Output};
+
+        % edges
+        \draw[->] (in_data) -- (cnn);
+        \draw[->] (in_inference) -- (cnn);
+        \draw[->] (cnn) -- (gn);
+        \draw[->] (gn) -- (pred);
+        \draw[->] (pred) -- (out_loss);
+        \draw[->] (pred) -- (out_rank);
+        \draw[->] (pred) -- (out_accuracy);
+
+    \end{tikzpicture}
+    \caption[Webpage rank prediction model architecture overview]{Overview of the components of our webpage rank prediction model. Input to the model is either the pagerank dataset or one/several samples during inference. The model processes the inputs with the screenshot feature extractor, here a convolutional neural network (CNN), followed by a graph network which deals with the graph structure of the data, yielding a fixed-size output. The output is used to compute loss and accuracy (when training), or estimate a rank (during inference). The dashed box separates the model from the components orchestrating it.}
+    \label{fig:methodcomponents}
+\end{figure}
+
+The remainder of this section describes the components of our model in greater detail. Figure \ref{fig:methodcomponents} gives an overview.
+
+\subsection{Screenshot Feature Extractor}
 
 Feature extractor is a component in this model. Applied node-wise to the inputs. It is a neural network itself, no specifics yet, roughly inputs and outputs
 
@@ -62,7 +108,7 @@ Additional weighting term w, chosen as bla bla, with log base. Plot with linear 
 
 Approximation with mini-batches, number of comparisons grows quadratically so larger batches are desirable. Also regularizing effect, as always.
 
-Note that this is single scalar supervision (or binary classificatio) and it effectively trains a CNN.
+Note that this is single scalar supervision (or binary classification) and it effectively trains a CNN.
 
 \subsection{Evaluation Metrics and Inference}
 
