@@ -1,0 +1,12 @@
+sacred
+sacredboard
+pymongo
+torchvision
+matplotlib
+numpy
+pillow
+scikit-image
+tensorboardX
+torch
+tqdm
+graph_nets
