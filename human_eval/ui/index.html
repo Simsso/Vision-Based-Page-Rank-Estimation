@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Pagerank Dataset V2 Human Evaluation Tool</title>
+    <style type="text/css">
+        div.pagepreview {
+            cursor: pointer;
+            white-space: nowrap;
+            position: relative;
+            overflow-x: scroll;
+            overflow-y: hidden;
+        }
+
+        #page0url, #page1url {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h2><span id="score"></span> (<span id="total-count"></span>)</h2>
+    
+    <a href="#" id="score-reset-link">Reset score</a>
+
+    <p>Status: <span id="statusindicator">pending</span></p>
+
+    <p><button id="nexttuple">Next Tuple (Skip)</button> <em>Hotkey [n]</em></p>
+
+    <p>Click on the page with the higher rank!</p>
+
+    <h2>Page 1</h2>
+    <em>Hotkey [1]</em>
+    <div>
+        <p><span id="page0rank"></span></p>
+        <div id="page0screenshots" class="pagepreview" data-id="0"></div>
+        <p><a id="page0url"></a></p>
+    </div>
+
+    <h2>Page 2</h2>
+    <em>Hotkey [2]</em>
+    <div>
+        <p><span id="page1rank"></span></p>
+        <div id="page1screenshots" class="pagepreview" data-id="1"></div>
+        <p><a id="page1url"></a></p>
+    </div>
+
+    <script src="pubsub.js"></script>
+    <script src="ui.js"></script>
+    <script src="api.js"></script>
+    <script src="storage.js"></script>
+    <script src="mainv2.js"></script>
+</body>
+</html>
