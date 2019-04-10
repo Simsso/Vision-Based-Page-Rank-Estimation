@@ -183,9 +183,6 @@ Puppeeter is available at \texttt{https://github.com/GoogleChrome/puppeteer}.
 As the \texttt{Chromium} code base has grown, it was inevitable to avoid opaque dependencies and features in the wrong places. Therefore the \textit{content module} was introduced, which contains the core functionality of \texttt{Chromium}. The \texttt{Chromium Content API} wraps the \texttt{content module} and offers isolation for developers from the core functionalities \cite{ChromiumContentAPI}.
 \texttt{CEF 3} insulates the user from the underlying complexity of \texttt{Chromium} by using the \texttt{Chromium Content API} and offering production-quality stable APIs \cite{CEFGeneralUsage}.
 
-\subsection{Fully Qualified Domain Names}
-\label{fqdn}
-
 \subsection{Kubernetes}
 This section is taken from the project work \citetitle{SAPTerraformSamed} by \citeauthor{SAPTerraformSamed} (\citeyear{SAPTerraformSamed}).
 
@@ -193,12 +190,12 @@ Kubernetes (K8s) is an open source container orchestration solution that was ori
 
 K8s is much of the simplicity of Platform as a Service with the flexibility of Infrastructure as a Service \cite{k8s}. K8s offers platform abstraction at container level. Therefore, developers are responsible for building their own application containers rather than only the application itself. This is rewarded with more freedom in application development, but comes at the cost of lower productivity.
 
-\subsubsection{Kubernetes Components and Concepts}
+\subsubsection*{Kubernetes Components and Concepts}
 The most popular container runtime in the industry is \textit{Docker}. Container runtimes are responsible for serving the communication to the OS and the container environment, where applications can be configured and ran.
 \begin{figure}
 	\centering
-	\includegraphics[width=0.8\textwidth]{resources/k8s_architecture}
-	\caption{Architecture Diagram of K8s \cite{K8sArch}}
+	\includegraphics[width=0.7\textwidth]{resources/k8s_architecture}
+	\caption[Architecture Diagram of K8s]{This diagram illustrates the main parts: The \textit{master node} representing the central unit for the orchestration of the Kubernetes cluster. The \textit{worker nodes} running the user-specified workloads represented as \textit{pods} on the Kubernetes cluster. The cluster can be controller and orchestrated by the user using the \textit{kubectl}-CLI. \cite{K8sArch}}
 	\label{k8s_architecture}
 \end{figure}
 K8s consist of three main components \textit{kubectl}, \textit{master node}, and the \textit{worker nodes}. Kubectl represents the client interface to communicate with the master node, by sending requests against the API server. The master node represents the administrative entrypoint and is responsible for managing the whole K8s cluster \cite{K8sArch}. It consists of the \textit{API server}, \textit{etcd storage}, \textit{scheduler}, and \textit{controller manager}:
