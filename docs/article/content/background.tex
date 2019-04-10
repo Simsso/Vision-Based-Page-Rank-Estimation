@@ -140,8 +140,7 @@ More specifically, he does not perform any pre-processing and feeds images of si
 
 We choose to use CNNs as feature extractors for the website screenshots as well. Our baseline architecture is a slightly adjusted version of \cite{beltramelli:pix2code}, with more agressive pooling to make it work for screenshots with larger resolution.
 
-\subsection{Ground Truth}
-\subsubsection{Open PageRank}
+\subsection{Open PageRank}
 \label{OpenPageRank}
 \textit{Open PageRank} \cite{OpenPageRank} is an initiative, which has the goal to enable webmasters to determine the pagerank for their domains and easily compare with other domains. The initiative was constituted after Google had shut down the \textit{PageRank}-toolbar, leaving a void in the industry. The Open PageRank initiative provides freely available data that was built on top of \textit{Common Crawl} \cite{CommonCrawl}, which provides high quality crawl data of webpages since 2013.
 
@@ -157,16 +156,34 @@ The list offered by Open PageRank contains about 10 million domains ordered by t
 
 The list can be downloaded at \texttt{https://www.domcop.com/openpagerank/}.
 
-\subsubsection{Google Chrome and Chromium}
-\label{chrome_chromium}
-
-\subsubsection{Puppeeter}
+\subsection{Puppeeter}
 \label{puppeeter}
+\texttt{Puppeteer} is a open-source library for the JavaScript runtime \texttt{Node.js}, which provides a high-level API to control instances of the browsers \texttt{Chrome} or \texttt{Chromium}. One of the main goals of \texttt{Puppeteer} is to grow adoption in automated browser testing \cite{PuppeteerFAQ}.  For this purpose, it wraps the \texttt{Chrome DevTools Protocol} in JavaScript, which allows web developers to instrument, inspect and debug instances of \texttt{Chrome}. Technically, the protocol is HTTP-based and exposed as a RESTful API at the port for debugging by \texttt{Chrome}.
 
-\subsubsection{Chromium Embedded Framework}
+The protocol offers a variety number of functionalities, which are grouped into domains \cite{DevToolsProtocol}. Some of the interesting domains for our use-case are:
+\begin{description}
+	\item[Page]: API to load and take a screenshot of the given website.
+	\item[DOM]: API to read and manipulate the DOM of the given website.
+	\item[Network]: API to intercept network requests, track downloaded data and network issues.
+	\item[Emulation]: API to emulate different geolocation, network bandwith and mobile devices.
+\end{description}
+
+During start up \texttt{Puppeteer} starts an instance of \texttt{Chrome}, attaches to the instances using the port for debugging and afterwards custom code of the user will be executed against the instance. The instance will be started in \texttt{headless}-mode meaning that no UI will be visible.
+
+Puppeeter is available at \texttt{https://github.com/GoogleChrome/puppeteer}.
+
+\subsection{Chromium Embedded Framework}
 \label{cef}
+\texttt{Chromium Embedded Framework (CEF)} is an open-source framework for embedding the \texttt{Chromium} browser into other applications. The main goal of \texttt{CEF} is to enable developers in adding web browsing functionality such as using HTML, CSS and JavaScript to create application UI. Well-known applications such as \texttt{Adobe Acrobat}, \texttt{Spotify Desktop} and \texttt{MATLAB} are using \texttt{CEF}.
 
-\subsubsection{Fully Qualified Domain Names}
+\texttt{CEF} was designed ground-up with performance and ease-use in mind. The framework exposes \texttt{C++} interfaces with default implementation for all features requiring little or no integration work. Furthermore, the community added wrappers for the base implementation to support a wide-range of operating systems and programming languages.
+
+\texttt{CEF} has in total three versions, whereas \texttt{CEF 2} was abandoned due to the appearance of the \texttt{Chromium Content API} which will be discussed later. \texttt{CEF 1} is a single process implementation and based on the old \texttt{Chromium WebKit API}, due to deprecation of the \texttt{Chromium WebKit API} it is no longer supported and developed. \texttt{CEF 3} is a multi process implementation and based on the current \texttt{Chromium Content API}.
+
+As the \texttt{Chromium} code base has grown, it was inevitable to avoid opaque dependencies and features in the wrong places. Therefore the \textit{content module} was introduced, which contains the core functionality of \texttt{Chromium}. The \texttt{Chromium Content API} wraps the \texttt{content module} and offers isolation for developers from the core functionalities \cite{ChromiumContentAPI}.
+\texttt{CEF 3} insulates the user from the underlying complexity of \texttt{Chromium} by using the \texttt{Chromium Content API} and offering production-quality stable APIs \cite{CEFGeneralUsage}.
+
+\subsection{Fully Qualified Domain Names}
 \label{fqdn}
 
 \subsection{Kubernetes}
