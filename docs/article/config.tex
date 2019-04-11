@@ -58,6 +58,9 @@
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{6pt}
 
+% tables
+\usepackage{tabularx}
+
 % line spacing
 \renewcommand{\baselinestretch}{1.2}
 \usepackage{setspace}
@@ -112,3 +115,22 @@
 \newlength{\notationgap}
 \setlength{\notationgap}{1pc}
 \input{math_commands} 
+
+% break in texttt
+\usepackage[htt]{hyphenat}
+
+%
+\makeatletter
+\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
+	{-3.25ex\@plus -1ex \@minus -.2ex}%
+	{1.5ex \@plus .2ex}%
+	{\normalfont\normalsize\bfseries}}
+\makeatother
+
+%
+\makeatletter
+\renewcommand\subparagraph{\@startsection{subparagraph}{4}{\z@}%
+	{-3.25ex\@plus -1ex \@minus -.2ex}%
+	{1.5ex \@plus .2ex}%
+	{\normalfont\small\bfseries}}
+\makeatother
