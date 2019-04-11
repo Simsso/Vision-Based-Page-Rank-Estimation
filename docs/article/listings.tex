@@ -1,0 +1,47 @@
+\usepackage{listings}
+\renewcommand{\ttdefault}{pcr}  % bold text in monospace font
+
+% global settings
+\lstset{
+	basicstyle=\ttfamily\footnotesize,
+	breaklines=true,
+	% line-numbers
+	numbers=left,
+	numberstyle=\color{gray},  % the style that is used for the line-numbers
+	numbersep=5pt,  % space between line numbers and code
+	stepnumber=1,
+	firstnumber=1,
+	numberfirstline=true,
+	showstringspaces=false,
+	% syntax highlighting
+	%identifierstyle=,
+	keywordstyle=\color{blue}\bfseries,
+	%stringstyle=\color{editorOcher},
+	commentstyle=\color{gray},
+}
+
+
+
+% styles
+
+\lstdefinestyle{hdbprocedure}{
+	language=SQL,
+	morekeywords={
+		procedure,out,language,begin,nvarchar,declare,while,if,sqlscript,seconds_between,greatest,least,do,to_real
+	}
+}
+
+
+% languages
+
+\lstdefinelanguage{JavaScript}{
+	keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, for, do, else, case, break},
+	ndkeywords={class, export, boolean, throw, implements, import, this, let, const},
+	sensitive=false,
+	comment=[l]{//},
+	morecomment=[s]{/*}{*/},
+	morestring=[b]',
+	morestring=[b]"
+}
+
+%\usepackage[htt]{hyphenat}  % enable auto line break for texttt

@@ -218,6 +218,7 @@ The \textbf{decoder block} $\text{GN}_\text{dec}$ converts the graph returned fr
 Intuitively, the global state can be understood as an aggregation of the information contained in the graph. This is an elegant solution to the set2vec problem which must be solved when converting a graph of variable size into a single scalar.
 
 \subsection{Loss Function}
+\label{sec:loss}
 
 Our model is trained with gradient descent which requires the definition of a loss function. We choose a probabilistic loss function suitable for ranking problems that is heavily inspired by \cite{Burges:learningtorankwithsgd}. We recap their approach as well as more information on ways of tackling ranking problems in our Section \textit{Learning to Rank}, \ref{sec:learningtorank}.
 
@@ -317,6 +318,7 @@ During training, the gradient induced by the loss term (Equation \ref{eq:loss}) 
 Note that this is single scalar supervision (or binary classification) and it effectively trains a CNN successfully.
 
 \subsection{Accuracy and Inference}
+\label{sec:accuracy}
 
 During training we evaluate the performance of our model by computing an \textbf{accuracy}. Given all possible $N\times N$ pairs of samples in the dataset, the accuracy is the percentage of pairs the model ranks correctly. It is defined as \begin{equation}\label{eq:acc}
     \frac{1}{N^2}\left(\sum_{i=1}^N\sum_{j=1}^N\bm{1}\left[\left(O_{i,j}<0\land P_{i,j}=0\right)\lor\left(O_{i,j}>0\land P_{i,j}=1\right)\right]+N\right)\,,

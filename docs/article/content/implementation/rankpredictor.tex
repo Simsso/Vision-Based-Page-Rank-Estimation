@@ -1,13 +1,56 @@
 \subsection{Rank Predictor}
 
-Purpose and high level overview
+We have dubbed our working project \textit{Rank Predictor}. It contains things such as implementation of machine learning (ML) models, dataset loader and pipeline, analysis scripts, and training orchestration scripts. In this section we describe the individual components on a high level, enriched with noteworthy details.
 
-Enumerate components (not classes) and explain each of them with details
+\begin{itemize}
+    \item \textbf{Analysis}. Scripts and Jupyter notebooks for post-training analysis of model weights, activations, etc.
+    \item \textbf{Data}. The subfolders \texttt{data/v1} and \texttt{data/v2} contain code related to both dataset versions, respectively. For each dataset we define a class (\texttt{DatasetV1} and \texttt{DatasetV2}) which extends PyTorch's dataset class \texttt{torch.utils.data.Dataset}. The datasets only hold a list of all files in RAM and load the samples (images and the graph JSON file) on the fly, once a sample is requested. The dataset classes may be reused by researchers who want to work with our dataset as well.\\
+    We split our datasets with the method \texttt{get\_threefold}. It deterministically splits the dataset on program-startup. The source code is written down in Listing \ref{lst:getthreefold}.
+    \item \textbf{ML models}. Our ML models are in the \texttt{model} subfolder. Each model is a class inheriting from \texttt{torch.nn.Module} with its own file. For graph networks there are commonly implementations of aggregation and update functions which we place in the model file as well.
+    \item \textbf{Trainer}. Orchestration of training runs. We use TensorBoard to monitor training runs and Sacred to log experiments. Our \texttt{TraininRun} class is generic and calls an abstract \texttt{\_train\_step} method for each training step. After several steps it calls \texttt{\_run\_valid} with both train and test dataset to see how well the model performs on those dataset in evaluation mode (dropout disabled). We implement this class for graph network training and feature extractor pre-training. The trainer folder also contains the probabilistic ranking loss (defined in Section \ref{sec:loss}) and accuracy metric function (defined in Section \ref{sec:accuracy}). We have unit tested the critical functions.
+\end{itemize}
 
-Analysis scripts: just purpose
+\begin{lstlisting}[
+    label={lst:getthreefold},
+    language=Python,
+    caption={Dynamic and deterministic dataset splitting},
+    captionpos=b
+]
+from collections import namedtuple
+from typing import List, Type
 
-Data: may be reused, classes for v1 and v2, interface of the dataset classes, parallel loading is simple with PyTorch so the GPU is kept busy, maybe sample snippet
+Data = namedtuple('ThreefoldData', ['train', 'valid', 'test'])
 
-Models: name them and reference to method
+def get_threefold(klass: Type, sample_paths: List[str], train_ratio: float, valid_ratio: float, logrank_b: float) -> Data:
+    """
+    :param klass: Dataset class, e.g. DatasetV2
+    :param sample_paths: List of paths that point to the samples of the dataset
+    :param train_ratio: Value in [0,1], ratio of training samples
+    :param valid_ratio: Value in [0,1], ratio of validation samples
+    :param logrank_b: Logrank base (makes the weighting steeper b --> 0, more linear b --> 10, or inverted b > 10)
+    :return: Three datasets (train, validation, test)
+    """
 
-Trainer: orchestration scripts, loss, evaluation; mention Sacred and TensorBoard
+    assert train_ratio + valid_ratio <= 1., "Train and validation ratio must be less than or equal to 1."
+    assert len(sample_paths) > 0, "No dataset samples found."
+
+    sample_paths = sorted(sample_paths)
+
+    train_paths, valid_paths, test_paths = [], [], []
+
+    for path in sample_paths:
+        n_train, n_valid, n_test = len(train_paths), len(valid_paths), len(test_paths)
+        n_total = n_train + n_valid + n_test
+
+        if n_total == 0 or n_train / n_total < train_ratio:
+            train_paths.append(path)
+        elif n_valid / n_total < valid_ratio:
+            valid_paths.append(path)
+        else:
+            test_paths.append(path)
+
+    return Data(
+        train=klass(train_paths, logrank_b),
+        valid=klass(valid_paths, logrank_b),
+        test=klass(test_paths, logrank_b))
+\end{lstlisting}
