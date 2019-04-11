@@ -20,7 +20,7 @@ The model itself is a function $f:\mathbb{R}^d\rightarrow\mathbb{R}$ mapping a s
 \begin{align}
 -\overline{P}_{i,j}\left(f(x_i)-f(x_j)\right)+\log\left(1+e^{f(x_i)-f(x_j)}\right)
 \end{align}
-This formulation has some favorable properties: It allows for uncertainty in the relative ordering of items in that the $\bm{\overline{P}}$ is a probability and could be e.g. $\overline{P}_{i,j}=\frac{1}{2}$ if the relative ranking of two items was unknown. Furthermore, the loss asymptotes to a linear functions. According to the authors, this is likely to be more robus with noisy labels than a quadratic cost.
+This formulation has some favorable properties: It allows for uncertainty in the relative ordering of items in that the $\bm{\overline{P}}$ is a probability and could be e.g. $\overline{P}_{i,j}=\frac{1}{2}$ if the relative ranking of two items was unknown. Furthermore, the loss asymptotes to a linear functions. According to the authors, this is likely to be more robust with noisy labels than a quadratic cost.
 
 The \textbf{listwise approach} deals with models that take an entire list of samples as their input with the goal of ordering them. This can be either done by mapping them to real values and penalizing wrong ordering, or mapping the samples discretely to a permutation.
 
