@@ -234,11 +234,11 @@ Given the samples with indices $i$ and $j$, we interpret the model output as fol
 \end{align}
 
 All pairwise predictions (how the model ranks any two samples relative to each other) are stored in the matrix $\bm{O}\in\mathbb{R}^{N\times N}$, whose entires are defined as
-\begin{equation}
+\begin{equation}\label{eq:outputmatrix}
     O_{i,j}=f_i-f_j\,.
 \end{equation}
 
-The ground truth matrix $\bm{P}\in\mathbb{R}^{N\times N}$ can be derived from the data. Its entries\begin{equation}
+The ground truth matrix $\bm{P}\in\mathbb{R}^{N\times N}$ can be derived from the data. Its entries\begin{equation}\label{eq:groundtruthmatrix}
     P_{i,j}=\begin{cases}
         0&\text{if }r^{(i)}\triangleleft r^{(j)}\\
         0.5&\text{if }r^{(i)}\equiv r^{(j)}\\
@@ -283,8 +283,8 @@ The loss is defined as
 
 We introduce the additional weighting factor
 \begin{equation}\label{eq:weightingfactor}
-    w_b(r)=\left(\frac{\log\left(r\times r_\text{max}\right)}{\log r_\text{max}}-1\right)^b
-\end{equation}, which counteracts the imbalance of samples for high and low ranks: The first 10,000 samples presumably are more distinctive than e.g. the samples from 80,000 to 90,000. Therefore the samples with high ranks should also have a higher contribution to the loss. The hyperparameter $b$ balances this favoring. $r_\text{max}$ is the maximum rank in the dataset, in our case $r_\text{max}=100000$. Equation \ref{eq:weightingfactor} is plotted for several values of $b$ in Figure \ref{fig:weightingfactor}.
+    w_b(r)=\left(\frac{\log\left(r\times r_\text{max}\right)}{\log r_\text{max}}-1\right)^b\,,
+\end{equation}which counteracts the imbalance of samples for high and low ranks: The first 10,000 samples presumably are more distinctive than e.g. the samples from 80,000 to 90,000. Therefore the samples with high ranks should also have a higher contribution to the loss. The hyperparameter $b$ balances this favoring. $r_\text{max}$ is the maximum rank in the dataset, in our case $r_\text{max}=100000$. Equation \ref{eq:weightingfactor} is plotted for several values of $b$ in Figure \ref{fig:weightingfactor}.
 
 \begin{figure}\centering
     \begin{tikzpicture}
@@ -316,14 +316,22 @@ During training, the gradient induced by the loss term (Equation \ref{eq:loss}) 
 
 Note that this is single scalar supervision (or binary classification) and it effectively trains a CNN successfully.
 
-\subsection{Evaluation Metrics and Inference}
+\subsection{Accuracy and Inference}
 
-Accuracy is computed by feeding all samples through the model, large vec. Then matrix and ground-truth matrix comparison. Number of correct pairwise results.
+During training we evaluate the performance of our model by computing an \textbf{accuracy}. Given all possible $N\times N$ pairs of samples in the dataset, the accuracy is the percentage of pairs the model ranks correctly. It is defined as \begin{equation}\label{eq:acc}
+    \frac{1}{N^2}\left(\sum_{i=1}^N\sum_{j=1}^N\bm{1}\left[\left(O_{i,j}<0\land P_{i,j}=0\right)\lor\left(O_{i,j}>0\land P_{i,j}=1\right)\right]+N\right)\,,
+\end{equation}with $\bm{O}$ being the output matrix (defined in Equation \ref{eq:outputmatrix}) and $\bm{P}$ being the ground truth (defined in Equation \ref{eq:groundtruthmatrix}). $\bm{1}\left[\cdot\right]$ is $1$ if the boolean expression enclosed in the brackets is true, $0$ otherwise. The additional $+N$ term behind the sums accounts for the main diagonal of the matrix which is always correctly ranked because $O_{i,i}=0$.
 
-Advantage: Can be easily compared to humans, however difficulty is not taken into consideration, e.g. 80,001 and 80,000 are extremely hard/impossible. Band of growing width that masks out the close samples.
+Verbally described, the accuracy measure is the percentage of correct pairwise rankings. It is easy to interpret and can be computed for humans as well, by showing them the sample pairs and requesting a ranking.
 
-Formal definition of inference, i.e. sample $x$ to rank or pairwise and listwise. 
+The accuracy evaluation metric has the downside of not taking the difficulty into consideration: Ranking e.g. sample \#55000 relative to sample \#54590 is presumably much harder than samples \#100 and \#40000, because the sample ranks are closer together.
 
-Pairwise: feed both samples, magnitude of difference is certainty, sign is relative ranking.
+\textbf{Inference} can be done in two ways: (1) absolute and (2) relative.
 
-Pointwise: requires ground truth, pairwise with everyone, come up with something here...
+(1) A single sample $G$ can be ranked with respect to the samples of the dataset $\mathbb{D}$. This can be done by computing $f_G=f_\text{model}(G)$ and comparing it to all entries in the vector $\bm{f}$. The estimated rank of $G$ is \begin{equation}
+    r^{(G)}\approx N-\sum_{i=1}^N\bm{1}\left[f_G>f_i\right]\,.
+\end{equation}
+
+(2) The relative inference compares a set of samples $\mathbb{S}$ relative to each other, where $\left\lvert\mathbb{S}\right\rvert\ge2$. Instead of computing the matrix $\bm{O}$ for samples in the dataset we compute it for $\mathbb{S}$. The entry at $O_{i,j}$ indicates how the samples with index $i$ and $j$ are ranked relative to each other.
+
+The two methods differ in that (1) requires the ground truth dataset, whereas (2) works with an set of two or more websites.
