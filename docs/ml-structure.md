@@ -58,7 +58,7 @@
   * Graph structure usage (link information vs. fully connected)
 * Analysis and discussion
   * Human score
-  * Comparison with human scores
+  * Comparison with human scores --> discuss that the human score may change over time, it's a tendency of our time
   * Question of upper limit (aspects: plain impossibility, dataset noise, problem of similar and high ranks)
   * Is the model good at easy pairs and bad at hard ones? Tweaked accuracy score consideration and computation.
   * Dataset size, no overfitting, larger model helpful?
