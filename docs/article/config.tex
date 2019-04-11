@@ -1,3 +1,5 @@
+\usepackage{tikz}
+
 % todo
 \usepackage{xargs}                      % Use more than one optional parameter in a new commands
 \usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
@@ -31,6 +33,11 @@
 \usepackage{multirow}
 \usepackage{colortbl}
 \usepackage{booktabs}
+
+% hide abstract headline
+\usepackage{abstract}
+\renewcommand{\abstractname}{}    % clear the title
+\renewcommand{\absnamepos}{empty} % originally center
 
 % see https://tex.stackexchange.com/questions/2607/spacing-around-left-and-right
 \let\originalleft\left

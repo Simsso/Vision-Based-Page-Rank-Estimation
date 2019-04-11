@@ -1,27 +1,40 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
-\usepackage{tikz}
 
 \title{Pagerank Estimation with Deep Graph Networks}
 \author{Timo Denk, Samed Güner}
-\date{June 2019}
+\date{May 2019}
 
 \input{config}
 \input{listings}
 
 \begin{document}
 
-\maketitle
+\input{content/titlepage}
+\input{content/abstract}
 
-\tableofcontents
+\newpage
 
-%\input{content/notation}
-%\input{content/introduction}
-%\input{content/background}
+% table of contents, figures, tables, code, references, acronyms
+{\hypersetup{linkcolor=black}
+\input{content/lists/toc}
+\input{content/lists/figures}
+\input{content/lists/tables}
+\input{content/lists/listings}}
+
+\newpage
+
+\setcounter{page}{1}
+\pagenumbering{arabic}
+% place \clearpage behind every \input if desired
+
+\input{content/notation}
+\input{content/introduction}
+\input{content/background}
 \input{content/method}
-%\input{content/datasets}
+\input{content/datasets}
 \input{content/implementation}
-%\input{content/datacrawler}
+\input{content/datacrawler}
 \input{content/results}
 \input{content/discussion}
 \input{content/conclusion}

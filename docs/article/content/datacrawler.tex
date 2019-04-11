@@ -77,7 +77,7 @@ Both \texttt{Puppeteer} and \texttt{CEF} fulfill the requirements raised by the 
 		Modularity &  \checkmark &  \checkmark  \\ \hline
 		Scalability &  \checkmark &  \checkmark  \\ \hline
 	\end{tabular}
-	\caption{The table shows that both \texttt{Puppeeter} and \texttt{CEF} satisfy the framework requirements in browser emulation, information accessibility, modularity and scalability.}
+	\caption[Compairson of Puppeeter and CEF]{The table shows that both \texttt{Puppeeter} and \texttt{CEF} satisfy the framework requirements in browser emulation, information accessibility, modularity and scalability.}
 	\label{table_framework_decision}
 \end{table}
 
@@ -141,7 +141,7 @@ Upon the completion of all Datamodules for a given URL, we add all generated edg
 \begin{figure}
 	\centering
 	\includegraphics[scale=0.35]{resources/breadth-first}
-	\caption{This figure illustrates the breadth-first search. The numbers in the nodes show the order in which nodes are expanded in breadth-first search. It shows that all nodes reachable from a selected nodes are expanded, before selecting the first node encountered and expanding the nodes reachable from it. E.g the selected node is \textbf{1} and the nodes \textbf{2}, \textbf{3} \textbf{4} are expanded, before we select \textbf{2} and expand the node \textbf{5} and \textbf{6}.}
+	\caption[Breadth-first search]{This figure illustrates the breadth-first search. The numbers in the nodes show the order in which nodes are expanded in breadth-first search. It shows that all nodes reachable from a selected nodes are expanded, before selecting the first node encountered and expanding the nodes reachable from it. E.g the selected node is \textbf{1} and the nodes \textbf{2}, \textbf{3} \textbf{4} are expanded, before we select \textbf{2} and expand the node \textbf{5} and \textbf{6}.}
 	\label{datacrawler_breadth_search}
 \end{figure}
 
@@ -150,7 +150,7 @@ The use of the FIFO queue leads to breadth-first search in our graph in oppositi
 \begin{figure}
 	\centering
 	 \includegraphics[scale=0.65]{resources/datacrawler_uml_diagram}
-	 \caption{The figure shows the simplified UML-diagram of the datacrawler with the most important classes and methods. Classes in the white boxes represent essential components of the DataModule-System such as the classes \texttt{Datacrawler}, \texttt{DatacrawlerConfiguration}, \texttt{NodeElement} and the interfaces \texttt{DataModuleBaseConfiguration}, \texttt{DataModulBase} and \texttt{DataBase}. Classes in the red boxes represent implementation of DataModules such as the \texttt{URLDatamodule} (\ref{datacrawler_url_datamodule}), \texttt{ScreenshotDatamodule} (\ref{datacrawler_screenshot_datamodule}) and \texttt{MobileScreenshotDatamodule} (\ref{datacrawler_mobilescreenshot_datamodule}).}
+	 \caption[Datacrawler UML-diagram]{The figure shows the simplified UML-diagram of the datacrawler with the most important classes and methods. Classes in the white boxes represent essential components of the DataModule-System such as the classes \texttt{Datacrawler}, \texttt{DatacrawlerConfiguration}, \texttt{NodeElement} and the interfaces \texttt{DataModuleBaseConfiguration}, \texttt{DataModulBase} and \texttt{DataBase}. Classes in the red boxes represent implementation of DataModules such as the \texttt{URLDatamodule} (\ref{datacrawler_url_datamodule}), \texttt{ScreenshotDatamodule} (\ref{datacrawler_screenshot_datamodule}) and \texttt{MobileScreenshotDatamodule} (\ref{datacrawler_mobilescreenshot_datamodule}).}
 	\label{datacrawler_uml_diagram}
 \end{figure}
 
@@ -268,7 +268,7 @@ coordinates {
 };
 \end{axis}
 \end{tikzpicture}
-\caption{The figure illustrates exemplary in blue our assumption regarding the number of total changes $|| C_{t,t+1}||$ from $I_{t}$ to $I_{t+1}$. It shows that the number of total changes dramatically reduce and converge for $t \rightarrow \infty$. The red line illustrates the actual measured number of changes for \texttt{nationalgeographic.com} with the resolution $1920$ in width and $1080$ in height. }
+\caption[Number of page changes over time]{The figure illustrates exemplary in blue our assumption regarding the number of total changes $|| C_{t,t+1}||$ from $I_{t}$ to $I_{t+1}$. It shows that the number of total changes dramatically reduce and converge for $t \rightarrow \infty$. The red line illustrates the actual measured number of changes for \texttt{nationalgeographic.com} with the resolution $1920$ in width and $1080$ in height. }
 \label{plot_assumption_number_changes}
 \end{figure}
 
@@ -283,7 +283,7 @@ In addition both algorithms implement a thread, which starts a timer upon the lo
 		change matrices & 13 & 87 & 13 \% & 100 \\ \hline
 		\texttt{OnLoadingStateChange()} & 3 &  97 & 3 \% & 100
 	\end{tabular}
-\caption{The table illustrates the performance of our algorithms based on change matrices and \texttt{OnLoadingStateChange()} for the top 100 websites from \texttt{Open PageRank}. The websites are manually evaluated by us. A website is categorized as partially loaded, if it is obviously missing parts of the website, and fully loaded, if not. The approach using \texttt{OnLoadingStateChange()} performs with $3\%$ of partially loaded websites better than our approach with change matrices with $13\%$. }
+\caption[Algorithm performance based on change matrices]{The table illustrates the performance of our algorithms based on change matrices and \texttt{OnLoadingStateChange()} for the top 100 websites from \texttt{Open PageRank}. The websites are manually evaluated by us. A website is categorized as partially loaded, if it is obviously missing parts of the website, and fully loaded, if not. The approach using \texttt{OnLoadingStateChange()} performs with $3\%$ of partially loaded websites better than our approach with change matrices with $13\%$. }
 \label{table_compare_algorithm_screenshot}
 \end{table}
 
@@ -322,7 +322,7 @@ The interception and modification led us to successfully emulate a mobile device
 		\caption{}
 		\label{compare_useragent}
 	\end{subfigure}
-	\caption{This figure shows two screenshots taken from the website \texttt{youtube.com}. The figures (a) and (b) were taken with a browser instance having the resolution $375 \times 667$. In addition, we changed the user-agent of the figure (b) to represent a mobile device and use the default user-agent of \textit{CEF 3}. The usage of the mobile user-agent clearly shows that the website is being displayed for mobile devices in figure (b), whereas in figure (a) not.}
+	\caption[Screenshots from \texttt{youtube.com}]{This figure shows two screenshots taken from the website \texttt{youtube.com}. The figures (a) and (b) were taken with a browser instance having the resolution $375 \times 667$. In addition, we changed the user-agent of the figure (b) to represent a mobile device and use the default user-agent of \textit{CEF 3}. The usage of the mobile user-agent clearly shows that the website is being displayed for mobile devices in figure (b), whereas in figure (a) not.}
 	\label{compare_resolution_useragent}
 \end{figure}
 
@@ -411,7 +411,7 @@ The \texttt{json}-file consists of an array containing nodes represented as \tex
  ...
  }]
 \end{lstlisting}
-\caption{This figure exemplary illustrates the graph output for the domain \texttt{example.com}. The graph nodes are \texttt{json}-objects in the root array of the \texttt{json}-file. The \texttt{baseUrl}-attribute shows affiliation of the node to the given URL. Futhermore, each \texttt{json}-object consists of attributes mainly calculated in the URL-Datamodule such as client-sided and server-sided error (here: \texttt{client\_status} and \texttt{server\_status}), loading time, size and finally the valid URLs with the URL text. In general, all URLs found in the nodes are represented as nodes in the graph. Finally, each computed URL has an ID assigned, which represents respectively the name of the screenshots for the URL.}
+\caption[Sample graph output]{This figure exemplary illustrates the graph output for the domain \texttt{example.com}. The graph nodes are \texttt{json}-objects in the root array of the \texttt{json}-file. The \texttt{baseUrl}-attribute shows affiliation of the node to the given URL. Futhermore, each \texttt{json}-object consists of attributes mainly calculated in the URL-Datamodule such as client-sided and server-sided error (here: \texttt{client\_status} and \texttt{server\_status}), loading time, size and finally the valid URLs with the URL text. In general, all URLs found in the nodes are represented as nodes in the graph. Finally, each computed URL has an ID assigned, which represents respectively the name of the screenshots for the URL.}
 \label{examplecom_graph}
 \end{figure}
 
@@ -453,7 +453,7 @@ Upon successful computation of the specific dataset, the central storage can be 
 \begin{figure}
 	\centering
 	\includegraphics[scale=0.5]{resources/datacrawler_k8s_architecture}
-	\caption{This figure illustrates the system design of the Datacrawler Kubernetes Cluster on Google Cloud Platform. It shows that the Datacrawler Kubernetes cluster consists mainly out of three applications: The \texttt{redis}-queue which represents a work queue consisting out of domains as work items to be analysed. The Network File System provisioner which is mainly responsible for providing volume claims for Datacrawler instances from the central storage. Finally, the Datacrawler which is deployed as a container from the internal Docker registry. The Datacrawler itself is executed wrapped by a \texttt{python}-application, which represents the tie between the \texttt{redis}-queue and the Datacrawler. It is resposible for retrieving of work items from the queue, starting the Datacrawler and confirming the work item upon successful analysis.}
+	\caption[Datacrawler system design]{This figure illustrates the system design of the Datacrawler Kubernetes Cluster on Google Cloud Platform. It shows that the Datacrawler Kubernetes cluster consists mainly out of three applications: The \texttt{redis}-queue which represents a work queue consisting out of domains as work items to be analysed. The Network File System provisioner which is mainly responsible for providing volume claims for Datacrawler instances from the central storage. Finally, the Datacrawler which is deployed as a container from the internal Docker registry. The Datacrawler itself is executed wrapped by a \texttt{python}-application, which represents the tie between the \texttt{redis}-queue and the Datacrawler. It is resposible for retrieving of work items from the queue, starting the Datacrawler and confirming the work item upon successful analysis.}
 	\label{datacrawler_k8s_architecture}
 \end{figure}
 \subsubsection{Datacrawler as a Container}
