@@ -1,10 +1,15 @@
 \section{Implementation Details}
 
-As part of this xxx four separate pieces of software: list them, with note on dependencies.
+As part of this work four different pieces of software were developed. We briefly describe them in the following list and delve deeper in the following subsections.
 
-For the ML parts (gn and rankpred): Implemented in PyTorch. Alternative framework TF not chosen bc of (1) non-laziness by the time of writing, (2) complicated data pipelines, (3) less OOP-friendly.
+\begin{itemize}
+    \item \textbf{Datacrawler}. The Datacrawler served the purpose of created the dataset. In order to do so, it visits webpages, takes screenshots, collects meta information, and stores the collected data. It was developed in C++ with special focus on scalability and modularity.
+    \item \textbf{GraphNets library}. The GraphNets library is a Python implementation of the graph network framework proposed by \cite{deepmind:graphnets}. It was developed in such a way that other people can use it in their projects too. Therefore, we have put special focus on its documentation in Section \ref{sec:gnlib}.
+    \item \textbf{RankPredictor}. The RankPredictor code is a collection of Python scripts and classes which are the actual implementation of our method. The code heavily relies on the GraphNets library and implements many of its abstract classes. The code contains our models and can be used to reproduce our results.
+    \item \textbf{Human evaluation tool}. The human evaluation tool is a lightweight Node.js server with a simplistic frontend that was used to determine the human performance on the pagerank task. It shows pairs of webpages and asks the user to rank them. The answers are being stored so the human accuracy on pairwise pagerank estimation can be output.
+\end{itemize}
 
-The following sub-sections explain the details for each piece separately. Special focus on GN lib because it may be used by others whereas rankpred and human eval where rather tools.
+The two machine learning parts (GraphNets library and RankPredictor) are both relying on the deep learning platform \textit{PyTorch}. It was preferred over the alternative \textit{TensorFlow} (\cite{abadi2016:tensorflow}) for several reasons: PyTorch supports automatic differentiation, see \cite{paszke2017automatic:pytorch}, which simplifies model analysis and debugging\footnote{With TensorFlow v2 the eager execution comes to that framework as well. By the time of writing, however, v2 was still in beta.}. Secondly, we perceive PyTorch's input pipelines as cleaner because they are more opinionated. There is only a singly primary way of defining a dataset and pre-processing pipeline. Lastly, PyTorch encourages object-oriented programming by defining the classes \texttt{torch.utils.data.Datatset} and \texttt{torch.nn.Module} from which the framework user inherits.
 
 \input{content/implementation/gnlib}
 \input{content/implementation/rankpredictor}
