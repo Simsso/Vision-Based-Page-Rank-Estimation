@@ -8,23 +8,23 @@ from rank_predictor.data.v2.pagerank_dataset import DatasetV2Screenshots
 from rank_predictor.model.graph_extractor_full import ScreenshotsFeatureExtractorWithHead
 from rank_predictor.trainer.training_run import FeatureExtractorTrainingRun
 
-name = 'featextr_06'
+name = 'featextr_04'
 ex = Experiment(name)
 
 
 @ex.config
 def run_config():
-    learning_rate: float = 1e-5
-    batch_size = 6
+    learning_rate: float = 1e-4
+    batch_size = 2
     epochs = 10
     optimizer = 'adam'
     train_ratio, valid_ratio = .85, .1
     loss = 'ProbabilisticLoss'
     weighting = 'c_ij = c_ij'
-    logrank_b = 1.5
-    drop_p = 0
-    lr_scheduler = 'GradualWarmupSchedulerExponentialLR'
-    lr_scheduler_gamma = 0.98
+    logrank_b = 10
+    drop_p = 0.05
+    lr_scheduler = 'None'
+    lr_scheduler_gamma = 0
 
 
 @ex.main
@@ -59,7 +59,7 @@ def train(learning_rate: float, batch_size: int, epochs: int, optimizer: str, tr
     training_run = FeatureExtractorTrainingRun(ex, name, net, opt, loss, data, batch_size, device, lr_scheduler)
     val_acc = training_run(epochs)
 
-    return "Val acc: {:.4f}".format(val_acc)
+    return "Test acc: {:.4f}".format(val_acc)
 
 
 if __name__ == '__main__':

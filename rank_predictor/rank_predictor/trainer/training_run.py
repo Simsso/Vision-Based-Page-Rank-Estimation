@@ -39,6 +39,7 @@ class TrainingRun:
 
         cpu_count = multiprocessing.cpu_count()
         worker_count = max(cpu_count - 1, 1)
+        worker_count = 0
         logging.info("Using {} workers for the data pipeline".format(worker_count))
 
         self.data = data
@@ -76,7 +77,7 @@ class TrainingRun:
                 self._train_step(batch)
                 self._lr_scheduler_update()
         self._save_model(epochs)
-        return self._run_valid(self.data_loader.valid, 'valid', approx=False)
+        return self._run_valid(self.data_loader.test, 'valid', approx=False)
 
     def _lr_scheduler_update(self) -> None:
         if self.step_ctr % self.lr_scheduler_update_steps != 0:
