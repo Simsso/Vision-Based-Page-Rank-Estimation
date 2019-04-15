@@ -14,7 +14,7 @@ Configuration:
 * Weight sharing between core GN blocks
 * ...
 
-Advantage of feature extraction is faster training so we pursued that one. Comparison of pre-trained weights vs. end-to-end training. Quick description of both methods, advantages and disadvantages (batch sizes, efficiency, only indirect optimization of the target task).
+Advantage of feature extraction is faster training so we pursued that one. Comparison of pre-trained weights vs. end-to-end training. Description of both methods, advantages and disadvantages (batch sizes, efficiency, only indirect optimization of the target task). Also, the loss function of the images-only task verbally
 
 Table with results: pre-trained, fine-tuned, end-to-end.
 
@@ -27,3 +27,13 @@ Importance of the logarithmic weighting. Which model do we train here? Ablation 
 How to deal with dataset v1 here? Perhaps: Served as an experimentation platform and we did not max it out. Our best accuracy was xxx but that can likely be improved with tuning.
 
 Graph structure usage: recall that the averaging GN variant does not take the structure into account. It's the trivial baseline. Compare with single directed graph, both directions, and fully connected. Table.
+
+Comparison with humans, final, best accuracy in a table.
+
+Training runs
+\begin{enumerate}
+    \item \#3 [time-intense]: pre-train vs. fine-tune vs. end-to-end
+    \item \#5 [fast]: GN with averaging, GN with max pooling, GN with 1 core block, GN with 3 core blocks (w and w/o weight sharing)
+    \item \#4 [fast]: best of (2.) with different b values
+    \item \#3 [fast]: best of (2.) with different edge choices, namely fully-connected, bi-directional, default
+\end{enumerate}
