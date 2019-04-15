@@ -10,7 +10,7 @@ from rank_predictor.data.v2.pagerank_dataset import DatasetV2
 from sacred import Experiment
 from sacred.observers import MongoObserver
 
-name = 'gn_only_test'
+name = 'gn_only_avg_01'
 ex = Experiment(name)
 
 ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred'))
@@ -18,10 +18,10 @@ ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred')
 
 @ex.config
 def run_config():
-    learning_rate: float = 1e-4
+    learning_rate: float = 1e-6
     batch_size = 2
     pairwise_batch_size = 2
-    epochs = 10
+    epochs = 1
     optimizer = 'adam'
     train_ratio, valid_ratio = .85, .1
     model_name = 'GNAvg'

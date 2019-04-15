@@ -1,5 +1,5 @@
 import torch
-from graph_nets.functions.aggregation import AvgAggregation
+from graph_nets.functions.aggregation import AvgAggregation, MaxAggregation
 
 from graph_nets.block import GNBlock
 
@@ -15,25 +15,33 @@ class GNAvg(nn.Module):
 
     def __init__(self, feat_extr: nn.Module):
         super().__init__()
-
         self.extr_block = get_extraction_block(feat_extr)
 
-        self.dec1 = GNBlock(
-            phi_u=NodeAggregationGlobalStateUpdate(),
-            rho_vu=AvgAggregation()
-        )
-        self.dec2 = GNBlock(
-            phi_u=DecoderGlobalStateUpdate()
-        )
+        self.dec1 = GNBlock(phi_u=NodeAggregationGlobalStateUpdate(), rho_vu=AvgAggregation())
+        self.dec2 = GNBlock(phi_u=DecoderGlobalStateUpdate())
 
-    def forward(self, g: Graph) -> Graph:
+    def forward(self, g: Graph) -> torch.Tensor:
         with torch.no_grad():
             self.extr_block.eval()
             g: Graph = self.extr_block(g)
 
-        g.add_reflexive_edges()  # ensure that average aggregations have at least one value to work with
+        g: Graph = self.dec1(g)
+        return self.dec2(g).attr.val
+
+
+class GNMax(nn.Module):
+
+    def __init__(self, feat_extr: nn.Module):
+        super().__init__()
+        self.extr_block = get_extraction_block(feat_extr)
+
+        self.dec1 = GNBlock(phi_u=NodeAggregationGlobalStateUpdate(), rho_vu=MaxAggregation())
+        self.dec2 = GNBlock(phi_u=DecoderGlobalStateUpdate())
+
+    def forward(self, g: Graph) -> torch.Tensor:
+        with torch.no_grad():
+            self.extr_block.eval()
+            g: Graph = self.extr_block(g)
 
         g: Graph = self.dec1(g)
-        g: Graph = self.dec2(g)
-
-        return g.attr.val
+        return self.dec2(g).attr.val
