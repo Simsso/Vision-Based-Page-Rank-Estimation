@@ -1,5 +1,10 @@
+from typing import Dict
+
 import torch
 import torch.nn.functional as F
+from graph_nets.functions.update import IndependentNodeUpdate
+
+from graph_nets.block import GNBlock
 from torch import Tensor
 
 
@@ -44,3 +49,26 @@ def flatten(x: Tensor) -> Tensor:
     b = x.size(0)
     x = x.view(b, -1)
     return x
+
+
+def get_extraction_block(model: torch.nn.Module):
+    """
+    Creates a new extraction block which operates on a raw graph as provided by the dataset.
+    Applies the model to each node.
+    """
+    def node_extractor_fn(node: Dict[str, any]) -> Tensor:
+        desktop_img: Tensor = node['desktop_img']
+        mobile_img: Tensor = node['mobile_img']
+
+        # desktop and mobile feature vector
+        x1, x2 = model(
+            desktop_img.unsqueeze(0),
+            mobile_img.unsqueeze(0)
+        )
+
+        x = torch.cat((x1, x2), dim=1).view(-1)
+
+        return x
+
+    return GNBlock(
+        phi_v=IndependentNodeUpdate(node_extractor_fn))

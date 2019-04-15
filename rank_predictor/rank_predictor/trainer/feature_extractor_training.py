@@ -8,15 +8,15 @@ from rank_predictor.data.v2.pagerank_dataset import DatasetV2Screenshots
 from rank_predictor.model.graph_extractor_full import ScreenshotsFeatureExtractorWithHead
 from rank_predictor.trainer.training_run import FeatureExtractorTrainingRun
 
-name = 'featextr_04'
+name = 'featextr_06'
 ex = Experiment(name)
 
 
 @ex.config
 def run_config():
-    learning_rate: float = 1e-4
+    learning_rate: float = 1e-7
     batch_size = 2
-    epochs = 10
+    epochs = 2
     optimizer = 'adam'
     train_ratio, valid_ratio = .85, .1
     loss = 'ProbabilisticLoss'
