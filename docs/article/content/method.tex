@@ -1,4 +1,5 @@
 \section{Method}
+\label{sec:method}
 
 This section describes our approach to solving the pagerank estimation problem. We present our methodology as we have applied it to the problem at hand, as opposed to extracting the generic, underlying principles, as these are mostly covered in the background section of this document.
 
@@ -163,9 +164,9 @@ Exceptions to this are the first block which has a max-pooling size of $(2,2)$ a
 
 The parameters of the feature extraction model can be trained with backpropagation. The following modes of training are conceivable:
 \begin{itemize}
-    \item \textbf{End-to-end training}. The feature extractor ist trained alongside with the other components of the model, gradients are computed by backpropagating through the following components. This method will train the CNN such that the extracted vectors contain features most helpful/relevant for the overall task. The downside is the additional computational complexity introduced by backpropagating through a graph network.
-    \item \textbf{Pre-training without fine-tuning}. The weights of the feature extractor are learned on a separate auxiliary task and transferred to be used for the actual problem. This method requires an auxiliary task, which (in this setting) may be the prediction of a pagerank based solely on a single desktop-mobile screenshot tuple. If the model parameters are kept frozen, i.e. are not being fine-tuned, once the entire model is trained on the main task, the feature vectors for the dataset can be cached so the computational overhead of passing images through the CNN can be omitted, thereby greatly increasing the training speed. Even though the described auxiliary task is similar to the pagerank prediction based on an entire graph of screenshots, its difference may lead to slightly less meaningful feature vectors.
-    \item \textbf{Pre-training with fine-tuning}. Same as \textit{Pre-training without fine-tuning} except the weights are kept trainable and are fine-tuned on the main task as well. Caching of feature vectors is not possible.
+    \item \textbf{End-to-end training [e2e]}. The feature extractor ist trained alongside with the other components of the model, gradients are computed by backpropagating through the following components. This method will train the CNN such that the extracted vectors contain features most helpful/relevant for the overall task. The downside is the additional computational complexity introduced by backpropagating through a graph network.
+    \item \textbf{Pre-training without fine-tuning [woft]}. The weights of the feature extractor are learned on a separate auxiliary task and transferred to be used for the actual problem. This method requires an auxiliary task, which (in this setting) may be the prediction of a pagerank based solely on a single desktop-mobile screenshot tuple. If the model parameters are kept frozen, i.e. are not being fine-tuned, once the entire model is trained on the main task, the feature vectors for the dataset can be cached so the computational overhead of passing images through the CNN can be omitted, thereby greatly increasing the training speed. Even though the described auxiliary task is similar to the pagerank prediction based on an entire graph of screenshots, its difference may lead to slightly less meaningful feature vectors.
+    \item \textbf{Pre-training with fine-tuning [wft]}. Same as \textit{Pre-training without fine-tuning} except the weights are kept trainable and are fine-tuned on the main task as well. Caching of feature vectors is not possible.
 \end{itemize}
 
 \subsection{Graph Network Blocks}
@@ -321,8 +322,8 @@ Note that this is single scalar supervision (or binary classification) and it ef
 \label{sec:accuracy}
 
 During training we evaluate the performance of our model by computing an \textbf{accuracy}. Given all possible $N\times N$ pairs of samples in the dataset, the accuracy is the percentage of pairs the model ranks correctly. It is defined as \begin{equation}\label{eq:acc}
-    \frac{1}{N^2}\left(\sum_{i=1}^N\sum_{j=1}^N\bm{1}\left[\left(O_{i,j}<0\land P_{i,j}=0\right)\lor\left(O_{i,j}>0\land P_{i,j}=1\right)\right]+N\right)\,,
-\end{equation}with $\bm{O}$ being the output matrix (defined in Equation \ref{eq:outputmatrix}) and $\bm{P}$ being the ground truth (defined in Equation \ref{eq:groundtruthmatrix}). $\bm{1}\left[\cdot\right]$ is $1$ if the boolean expression enclosed in the brackets is true, $0$ otherwise. The additional $+N$ term behind the sums accounts for the main diagonal of the matrix which is always correctly ranked because $O_{i,i}=0$.
+    \frac{1}{N^2-N}\left(\sum_{i=1}^N\sum_{j=1}^N\bm{1}\left[\left(O_{i,j}<0\land P_{i,j}=0\right)\lor\left(O_{i,j}>0\land P_{i,j}=1\right)\right]\right)\,,
+\end{equation}with $\bm{O}$ being the output matrix (defined in Equation \ref{eq:outputmatrix}) and $\bm{P}$ being the ground truth (defined in Equation \ref{eq:groundtruthmatrix}). $\bm{1}\left[\cdot\right]$ is $1$ if the boolean expression enclosed in the brackets is true, $0$ otherwise. The additional $(-N)$ term in the denominator of the leading normalization factor accounts for the main diagonal of the matrix which is always correctly ranked because $O_{i,i}=0$, so we disregard it.
 
 Verbally described, the accuracy measure is the percentage of correct pairwise rankings. It is easy to interpret and can be computed for humans as well, by showing them the sample pairs and requesting a ranking.
 
