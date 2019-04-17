@@ -77,7 +77,7 @@ class MaxAggregation(Aggregation):
         attr_vals = [a.val for a in attrs]
         attr_vals = torch.stack(attr_vals)
 
-        attr_vals_max = torch.max(attr_vals, dim=0, keepdim=False)
+        attr_vals_max = torch.max(attr_vals, dim=0, keepdim=False)[0]  # returns (Tensor, LongTensor)
 
         return Attribute(attr_vals_max)
 

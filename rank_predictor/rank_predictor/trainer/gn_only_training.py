@@ -2,7 +2,7 @@ import logging
 import os
 import torch
 from rank_predictor.model.graph_extractor_full import ScreenshotsFeatureExtractor
-from rank_predictor.model.graph_only_models import GNAvg
+from rank_predictor.model.graph_only_models import GNAvg, GNMax
 from rank_predictor.trainer.training_run import GNTrainingRun
 from rank_predictor.trainer.lr_scheduler.warmup_scheduler import GradualWarmupScheduler
 from rank_predictor.trainer.ranking.probabilistic_loss import ProbabilisticLoss
@@ -10,7 +10,7 @@ from rank_predictor.data.v2.pagerank_dataset import DatasetV2
 from sacred import Experiment
 from sacred.observers import MongoObserver
 
-name = 'gn_only_avg_01'
+name = 'gn_only_max_01'
 ex = Experiment(name)
 
 ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred'))
@@ -18,16 +18,16 @@ ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred')
 
 @ex.config
 def run_config():
-    learning_rate: float = 1e-6
+    learning_rate: float = 1e-5
     batch_size = 2
     pairwise_batch_size = 2
     epochs = 1
     optimizer = 'adam'
-    train_ratio, valid_ratio = .85, .1
-    model_name = 'GNAvg'
+    train_ratio, valid_ratio = .6, .2
+    model_name = 'GNMax'
     loss = 'ProbabilisticLoss'
     weighting = 'c_ij = c_ij'
-    logrank_b = 1.5
+    logrank_b = 10
     drop_p = .05
     num_core_blocks = 2
     lr_scheduler = 'None'
@@ -55,6 +55,8 @@ def train(learning_rate: float, batch_size: int, pairwise_batch_size: int, epoch
     # model with weights
     if model_name == 'GNAvg':
         net = GNAvg(feat_extr)
+    elif model_name == 'GNMax':
+        net = GNMax(feat_extr)
     else:
         raise ValueError("Unknown model name '{}'".format(model_name))
 

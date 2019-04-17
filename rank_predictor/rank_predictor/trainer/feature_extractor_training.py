@@ -1,6 +1,7 @@
 import logging
 import os
 import torch
+from sacred.observers import MongoObserver
 from rank_predictor.trainer.lr_scheduler.warmup_scheduler import GradualWarmupScheduler
 from rank_predictor.trainer.ranking.probabilistic_loss import ProbabilisticLoss
 from sacred import Experiment
@@ -8,21 +9,23 @@ from rank_predictor.data.v2.pagerank_dataset import DatasetV2Screenshots
 from rank_predictor.model.graph_extractor_full import ScreenshotsFeatureExtractorWithHead
 from rank_predictor.trainer.training_run import FeatureExtractorTrainingRun
 
-name = 'featextr_06'
+name = 'featextr_07'
 ex = Experiment(name)
+
+ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred'))
 
 
 @ex.config
 def run_config():
-    learning_rate: float = 1e-7
+    learning_rate: float = 1e-5
     batch_size = 2
-    epochs = 2
+    epochs = 10
     optimizer = 'adam'
-    train_ratio, valid_ratio = .85, .1
+    train_ratio, valid_ratio = .6, .2
     loss = 'ProbabilisticLoss'
     weighting = 'c_ij = c_ij'
     logrank_b = 10
-    drop_p = 0.05
+    drop_p = 0.1
     lr_scheduler = 'None'
     lr_scheduler_gamma = 0
 

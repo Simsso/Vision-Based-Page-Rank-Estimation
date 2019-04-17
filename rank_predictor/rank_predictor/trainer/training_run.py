@@ -77,7 +77,15 @@ class TrainingRun:
                 self._train_step(batch)
                 self._lr_scheduler_update()
         self._save_model(epochs)
-        return self._run_valid(self.data_loader.test, 'valid', approx=False)
+
+        logging.info("Training completed, reporting final accuracy")
+        train_acc = self._run_valid(self.data_loader.train, 'train', approx=False)
+        logging.info("Train acc.: {:.4f}".format(train_acc))
+        valid_acc = self._run_valid(self.data_loader.valid, 'valid', approx=False)
+        logging.info("Valid acc.: {:.4f}".format(valid_acc))
+        test_acc = self._run_valid(self.data_loader.test, 'test', approx=False)
+        logging.info("Test acc.: {:.4f}".format(test_acc))
+        return test_acc
 
     def _lr_scheduler_update(self) -> None:
         if self.step_ctr % self.lr_scheduler_update_steps != 0:
@@ -271,7 +279,7 @@ class FeatureExtractorTrainingRun(TrainingRun):
             loss_sum, model_out_batches, rank_batches = 0., [], []
 
             for batch in dataset:
-                if approx and len(model_out_batches) >= 100:
+                if approx and len(model_out_batches) >= 400:
                     break
                 
                 batch = self.remove_rank_duplicates_from_batch(batch)
