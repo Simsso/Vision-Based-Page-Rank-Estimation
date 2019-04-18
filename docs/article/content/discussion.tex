@@ -1,18 +1,20 @@
 \section{Discussion and Analysis}
 
-In this section we discuss our results, and analyze the model internals.
+In this section we discuss our results and compare them to the human score. We elaborate on potential limiting factors, capping the maximum achievable accuracy. Furthermore, we analyze the model internals and try to interpret them.
 
 \subsection{Accuracy}
 
-Difficulty of the task, human score, comparison with human score.
+The page rank estimation task is difficult. Our model is provided with screenshots of up to eight webpages of a domain as well as their link structure. Given two samples of that kind, guessing the relative ranking is hard. In the real world, a website's popularity depends on many factors other than its look. By achieving accuracies significantly beyond random guessing (50\%), we do however show that a website's look correlates to some extent with its rank. Obviously, a deduction on the causal relationship between look and rank would be purely speculative.
 
-There is definitely a correlation, both humans and model find them. Model exceeds human performance (super-human).
+The human score gives an idea of the performance of our model. Even though the model achieves super-human results, it seems unlikely that more sophisticated methods can push the accuracy much further to, say, 90\%. We suspect the upper limit of purely vision-based rank estimation to be below 70\%.
 
-Question of upper limit (aspects: plain impossibility, dataset noise, problem of similar and high ranks)
+Another aspect of difficulty is noise in the dataset: When crawling and screenshotting 100k websites, some errors are almost inevitable. A small but not negligible percentage of our data is therefore corrupt, e.g. because the website has not finished loading by the time we took the screenshot. Consequently, our model is confronted with all- or almost all-black screenshots occasionally.
 
-Dataset size, no overfitting, larger model helpful?
+It is noteworthy that the dataset size was sufficient to prevent our CNN architecture from overfitting. We saw no need to make use of regularization methods such as weight decay or data augmentation because the accuracy on training and validation data was almost the same throughout all training runs. We therefore suspect that a model with greater capacity might be able to capture more fine-grained details of screenshots, thereby achieving a higher accuracy.
 
-Is the model good at easy pairs and bad at hard ones? Tweaked accuracy score consideration and computation. Is the accuracy score unfair?
+The accuracy score as proposed in Equation \ref{eq:acc} has some \textit{unfairness} to it because the distance of two compared samples is disregarded. For example, a erroneous assessment of the relative ranking of two samples with ranks \#12,000 and \#12,001 is contributing to the accuracy just like the confusion of samples with ranks \#1,000 and \#25,000, even though the latter should be easier to disentangle. An alternative formulation could take the difficulty of a pairwise comparison into account.
+
+In summary, we can strongly assume that a correlation between page rank and visual features exists. Our model was able to learn these features and make use of them to solve the pairwise ranking task with an accuracy of xx.x\%. Based on the assumption that an upper limit below 70\% exists, which cannot be exceeded by purely vision-based models, the outcomes of our trainings are a success.
 
 \subsection{Model Understanding}
 
