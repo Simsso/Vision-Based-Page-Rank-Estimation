@@ -334,6 +334,7 @@ The accuracy evaluation metric has the downside of not taking the difficulty int
 \textbf{Inference} can be done in two ways: (1) absolute and (2) relative.
 
 (1) A single sample $G$ can be ranked with respect to the samples of the dataset $\mathbb{D}$. This can be done by computing $f_G=f_\text{model}(G)$ and comparing it to all entries in the vector $\bm{f}$. The estimated rank of $G$ is \begin{equation}
+    \label{eq:inference}
     r^{(G)}\approx N-\sum_{i=1}^N\bm{1}\left[f_G>f_i\right]\,.
 \end{equation}
 
