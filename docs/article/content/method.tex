@@ -183,7 +183,7 @@ On a semantic level the GN module consists of three different types of blocks: e
 
 The \textbf{encoder block} $\text{GN}_\text{enc}$ converts the raw input graph into a graph where nodes, edges, and global state are all attributed with a single vector. In our case this is achieved defining the following update and aggregation functions for the encoder:\begin{align}
     \phi^e_\text{enc}\left(\bm{e}_k,\bm{v}_{r_k},\bm{v}_{s_k},\bm{u}\right)=&\bm{v}_{s_k}\label{eq:enc:edgeupdate}\\
-    \rho^{e\rightarrow u}_\text{enc}\left(\mathbb{E}'\right)_j=&\operatorname{avg}\left(\left\{x_j:x\in\mathbb{E}'\right\}\right)\label{eq:enc:edgeaggreforu}\\
+    \rho^{e\rightarrow u}_\text{enc}\left(\mathbb{E}'\right)_j=&\operatorname{avg}\left(\left\{x_j:\bm{x}\in\mathbb{E}'\right\}\right)\label{eq:enc:edgeaggreforu}\\
     \phi^v_\text{enc}\left(\bm{\overline{e}}'_i,\bm{v}_i,\bm{u}\right)=&\bm{v}_i\label{eq:enc:nodeupdate}\\
     \phi^u_\text{enc}\left(\bm{\overline{e}}',\bm{\overline{v}},\bm{u}\right)=&\bm{\overline{e}}'\label{eq:enc:uupdate}\,,
 \end{align}where $\rho^{e\rightarrow v}$ and $\rho^{v\rightarrow u}$ remain undefined because they are not needed. The edges are initially populated with the feature vector of the sender node (Equation \ref{eq:enc:edgeupdate}). Equation \ref{eq:enc:edgeaggreforu}, the edge aggregation for the global state, is an element-wise averaging of the edge vectors. To ensure there is at least one element in $\mathbb{E}'$ we add reflexive edges to the graph so every node has at least one outgoing (and incoming) edge, namely the one pointing to itself. The node attributes remain unchanged, Equation \ref{eq:enc:nodeupdate} is an identity mapping. The global state is set to be the aggregation of all edges (Equation \ref{eq:enc:uupdate}). Alternatively, the node aggregation $\bm{\overline{v}}$ could be chosen.
@@ -288,7 +288,7 @@ The loss is defined as
 We introduce the additional weighting factor
 \begin{equation}\label{eq:weightingfactor}
     w_b(r)=\left(\frac{\log\left(r\times r_\text{max}\right)}{\log r_\text{max}}-1\right)^b\,,
-\end{equation}which counteracts the imbalance of samples for high and low ranks: The first 10,000 samples presumably are more distinctive than e.g. the samples from 80,000 to 90,000. Therefore the samples with high ranks should also have a higher contribution to the loss. The hyperparameter $b$ balances this favoring. $r_\text{max}$ is the maximum rank in the dataset, in our case $r_\text{max}=100000$. Equation \ref{eq:weightingfactor} is plotted for several values of $b$ in Figure \ref{fig:weightingfactor}.
+\end{equation}which counteracts the imbalance of samples for high and low ranks: The first 10,000 samples presumably are more distinctive than e.g. the samples from 80,000 to 90,000. Therefore the samples with high ranks should also have a higher contribution to the loss. The hyperparameter $b$ balances this favoring. $r_\text{max}$ is the maximum rank in the dataset, in our case $r_\text{max}=100,000$. Equation \ref{eq:weightingfactor} is plotted for several values of $b$ in Figure \ref{fig:weightingfactor}.
 
 \begin{figure}\centering
     \begin{tikzpicture}
