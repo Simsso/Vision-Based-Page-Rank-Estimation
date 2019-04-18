@@ -1,3 +1,15 @@
 \section{Conclusion}
 
 Summary, outlook, future work
+
+While carrying out the research and experiments of this project, we have touched several aspects qualifying as topics for future work. They are listed in the following.
+
+Our model did not overfit on the training samples of the dataset. It is therefore likely that it was not able to extract all fine-grained features that correlate with page ranks. The use of \textbf{higher capacity models} might help improve the accuracy on the task even more.
+
+Besides model capacity, the \textbf{model architecture} was not subject of extensive empirical evaluation in this work. We started off by building a variant of the CNN proposed by \cite{beltramelli:pix2code} and altered it only slightly to work well with the resolution of our images. Different architectures might achieve better results on the task.
+
+Due to GPU memory limitations and the implementation of our GN library, we were not able to train end-to-end with a batch size greater than two. \textbf{Increasing the batch size}, however, would lead to better estimations of the true gradient of the overall objective.
+
+Our \textbf{dataset} is a rich resource which could be used for other tasks as well. For instance a GAN \cite{goodfellow2014generative} could be trained to generate realistic websites.
+
+The page rank estimation tasks could be extended such that the model has access to \textbf{information other than screenshots and links}. The GN framework seems particularly appealing for such as an extension because it is naturally capable of dealing with text of variable length or HTML source code as well. The text could be embedded into a vector representation (e.g. using GloVe word embeddings \cite{pennington2014:glove}) and would simply extend the graph nodes by another attribute.
