@@ -1,0 +1,29 @@
+\section{Results}
+
+\subsection{Human Evaluation}
+Most of machine learning algorithms are developed to imitate and automate human like performance on a hard problem such as the classification of animals in images. Human performance is often seen as the baseline for machine learning algorithms to outperform. As part of our research we evaluate the performance of humans on vision-based pagerank estimation of websites and compare it with our current novel approach the usage of deep graph networks. 
+
+Therefore, the following sections will introduce our experimental setup and the results of the human evaluation. Afterwards we will compare the results with our current research and discuss the criteria on which the test persons based their decisions.
+
+\subsubsection{Experimental Setup} 
+The human performance on pagerank estimation is measured solely based on the vision of websites. In our experimental setup each test person has to select the website with the higher rank from a pair of different and randomly choosen websites from the dataset version 2. The selection is supported by the domain names and all mobile and desktop screenshots of the given websites from the dataset version 2. For each test person we calculate the accuracy from the number of correct and total classified websites, which is shown during the evaluation to each test person. In general there is no time limit for the decision making and the test is repeated for $n$ pairs. The whole evaluation is taken place in a web application solely developed for the human evaluation.
+
+\subsubsection{Results}
+We evaluated in total of 11 test persons regarding their performance on estimating pagerank of websites, who rated in total $1900$ pairs of websites. The average performance of humans is at $57.8$\% and with accuracies ranging from $51.67$\% (lowest) to $64$\% (highest), while our best performing deep graph network has achieved the accuracy of $63$\%.
+
+We ensure using a $z$-test that our test persons are performing better than random guessing ($50$\%) and the accuracies are not compromised by noise with a significance level of $p << 1$\%. In addition, we ensure using a \textit{Welch's} $t$-student test with $p << 1$\% that our deep graph network outperforms humans.
+
+\subsubsection{Criteria}
+
+\subsubsection{Conclusion}
+
+
+
+- subject of work
+- but how do human score
+- show experiment with 11 test persons, 1900 probands 
+- add screenshot of human evaluation tool
+- table (?)
+- criterias
+- show that computer is better for p=<1\% 
+- conclusion 
