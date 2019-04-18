@@ -16,7 +16,7 @@ Unless indicated otherwise, we train with the following configuration:
     \item Training were run on GPU; specifically a Nvidia GTX 970 with 4 GB of RAM.
 \end{itemize}
 
-When introducing our model in Section \ref{sec:method} we have already enumerated three different ways of training it (end-to-end training [e2e], pre-training without fine-tuning [woft], and pre-training with fine-tuning [wft]). Due to GPU memory constraints, the training modes [e2e] and [wft] allow for a maximum batch size of two, which we is seemingly harmful to proper gradient approximation. Besides that, both training modes require gradient propagation through the GN part of the model which is relatively slow. Except for the comparison of the three approaches, which can be found in Table \ref{tab:trainmethodcomparison} we have used [woft] for all experiments.
+When introducing our model in Section \ref{sec:method} we have already enumerated three different \textbf{methods of training} it (end-to-end training [e2e], pre-training without fine-tuning [woft], and pre-training with fine-tuning [wft]). Due to GPU memory constraints, the training modes [e2e] and [wft] allow for a maximum batch size of two, which we is seemingly harmful to proper gradient approximation. Besides that, both training modes require gradient propagation through the GN part of the model which is relatively slow. Except for the comparison of the three approaches, which can be found in Table \ref{tab:trainmethodcomparison} we have used [woft] for all experiments.
 
 For [woft] we attach a linear layer to the screenshot feature extractor and train it to output a scalar that ranks webpages. That way the model has only access to individual images without any context, i.e. screenshots of other pages, mobile/desktop in parallel, or graph edges. The loss function from Equation \ref{eq:loss} is slightly modified to account for the variable number of screenshots: We weigh the loss with the inverse number of screenshots so the rank prediction of a sample with a single webpage has the contribution to the loss as a sample with e.g. eight screenshots combined. After convergence of the feature extractor we compute all feature vectors for the entire dataset and use them as input to the GN part of our model. That way we reduce the computational overhead significantly by bypassing the CNN in the GN training. This gave us headroom for a greater number of experiments with GN variants.
 
@@ -29,11 +29,11 @@ For [woft] we attach a linear layer to the screenshot feature extractor and trai
         \textbf{[woft]} & $xx.x\%$ & xx h\\
         \textbf{[woft] + GN} & $xx.x\%$ & xx h\\
     \end{tabular}
-    \caption[Model training method comparison]{Model training method comparison: end-to-end training [e2e], pre-training without fine-tuning [woft], pre-training with fine-tuning [wft]. The accuracy is reported on the held-out test set; wall-clock time is the time until convergence.}
+    \caption[Model training method comparison]{Model training method comparison: end-to-end training [e2e], pre-training without fine-tuning [woft], pre-training with fine-tuning [wft]. The accuracy is reported on the held-out test set; wall-clock time is the time per epoch.}
     \label{tab:trainmethodcomparison}
 \end{table}
 
-Our loss term contains a weighting function (Equation \ref{eq:weightingfactor}) $w_b$. We evaluate its importance by fine tuning a graph network attached to a pre-trained feature extractor. For computation reasons, the feature extractor is pre-trained with $w_{10}$, so $b$ is only varied for the GN training. The results can be found in Table \ref{tab:weightingbase}. The model trained with $b=xxx$ achieves the best accuracy on the test set.
+Our loss term contains a \textbf{weighting function} (Equation \ref{eq:weightingfactor}) $w_b$. We evaluate its importance by fine tuning a graph network attached to a pre-trained feature extractor. For computation reasons, the feature extractor is pre-trained with $w_{10}$, so $b$ is only varied for the GN training. The results can be found in Table \ref{tab:weightingbase}. The model trained with $b=xxx$ achieves the best accuracy on the test set.
 
 \begin{table}
     \centering
@@ -49,16 +49,54 @@ Our loss term contains a weighting function (Equation \ref{eq:weightingfactor}) 
     \label{tab:weightingbase}
 \end{table}
 
-How to deal with dataset v1 here? Perhaps: Served as an experimentation platform and we did not max it out. Our best accuracy was xxx but that can likely be improved with tuning.
+We compare several \textbf{GN variants} each other. The GN framework introduced in Section \ref{sec:graphnetworks} allows for great flexibility. We have decided to use a combination of encoder, core, and decoder, presented in Section \ref{sec:gnblocks}.
+We compare the following GN variants to each other, all trained in [woft] fashion. Results are listed in Table \ref{tab:gnvariantscomparison}.
 
-Graph structure usage: recall that the averaging GN variant does not take the structure into account. It's the trivial baseline. Compare with single directed graph, both directions, and fully connected. Table.
+\begin{table}
+    \centering
+    \begin{tabular}{lrrr}
+        \textbf{GN variant} & \textbf{Test acc.} & \textbf{Train acc.} & \textbf{\#Blocks}\\\hline
+        \textbf{[baseline+avg]} & $xx.x\%$ & $xx.x\%$ & 1\\
+        \textbf{[baseline+max]} & $xx.x\%$ & $xx.x\%$ & 1\\
+        \textbf{[1-core]} & $xx.x\%$ & $xx.x\%$ & 3\\
+        \textbf{[3-core]} & $xx.x\%$ & $xx.x\%$ & 5\\
+        \textbf{[3-core-shared]} & $xx.x\%$ & $xx.x\%$ & 5\\
+    \end{tabular}
+    \caption[Comparison of GN variants]{Comparison of GN variants}
+    \label{tab:gnvariantscomparison}
+\end{table}
 
-Comparison with humans, final, best accuracy in a table.
+\begin{itemize}
+    \item \textbf{[baseline+avg]}. The baseline multiplies a weight matrix with all nodes feature vectors in the graph independently, converting them into scalars. The scalars are averaged, yielding the global state, i.e. network output. Mathematically spoken, the node update function is the one state in Equation \ref{eq:dec:nodeupdate}; the node aggregation is $\rho^{v\rightarrow u}\left(\mathbb{V}'\right)=\operatorname{avg}\left(\mathbb{V}'\right)$, and the final global state is computed as $\phi^u\left(\bm{\overline{e}}',\overline{v},\bm{u}\right)=\overline{v}$. This architecture can be seen as a baseline because it does not exploit any graph information and merges the information extracted from the pages in the simples possible way. Each of them is regarded separately and the final website score is an average.
+    \item \textbf{[baseline+max]}. Same as [baseline+avg] except the node aggregation is $\rho^{v\rightarrow u}\left(\mathbb{V}'\right)=\operatorname{max}\left(\mathbb{V}'\right)$. Both [baseline+avg] and this variant do not make use of graph structure information, i.e. edges or number of nodes.
+    \item \textbf{[1-core]}. GN with encoder, single core, and decoder block; as described in Section \ref{sec:gnblocks}.
+    \item \textbf{[3-core]}. Same as [1-core], except the core block is repeated three times without weight sharing.
+    \item \textbf{[3-core-shared]}. Same as [3-core], except the core blocks share their weights.
+\end{itemize}
 
-Training runs
-\begin{enumerate}
-    \item \#3 [time-intense]: pre-train vs. fine-tune vs. end-to-end
-    \item \#5 [fast]: GN with averaging, GN with max pooling, GN with 1 core block, GN with 3 core blocks (w and w/o weight sharing)
-    \item \#4 [fast]: best of (2.) with different b values
-    \item \#3 [fast]: best of (2.) with different edge choices, namely fully-connected, bi-directional, default
-\end{enumerate}
+
+We seek to understand the extent of \textbf{graph structure usage}. Recall that the GN variants [baseline+avg] and [baseline+max] do not make use of edge information. We want to analyze to which extent the graph structure aids correct page rank estimations. The graphs as yielded by the dataset contain directed edges connecting websites that link to each other. Besides that every graph is extended with reflexive edges, i.e. every node points to itself, for the sake of preventing a division by zero when averaging. We alter the graph structure to analyze its impact on ranking accuracy. We use the model [3-core] for these experiments, because assume it is performing message passing. Results are in Table \ref{tab:edgecomparison}.
+
+\begin{table}
+    \centering
+    \begin{tabular}{lrr}
+        \textbf{Edge information} & \textbf{Test acc.} & \textbf{Train acc.}\\\hline
+        \textbf{[no-edges]} & $xx.x\%$ & $xx.x\%$\\
+        \textbf{[default]} & $xx.x\%$ & $xx.x\%$\\
+        \textbf{[bi-directional]} & $xx.x\%$ & $xx.x\%$\\
+        \textbf{[full]} & $xx.x\%$ & $xx.x\%$\\
+    \end{tabular}
+    \caption[Comparison of GN variants]{Comparison of GN variants}
+    \label{tab:edgecomparison}
+\end{table}
+
+\begin{itemize}
+    \item \textbf{[no-edges]}. Remove all but the reflexive edges from the graph.
+    \item \textbf{[default]}. Use directed edges. This is the default variant as the graphs yielded by the dataset are not altered except for the mandatory addition of reflexive edges.
+    \item \textbf{[bi-directional]}. For every edge, add a directed edge pointing into the opposite direction. That way nodes are not only affected by who is referencing them but also by who they reference. The graph is still directed but every connection between two nodes is bi-directional.
+    \item \textbf{[full]}. The graph is fully connected, i.e. every node points to every other node.
+\end{itemize}
+
+Our \textbf{best model on dataset version 2} is xxx. It achieved a test accuracy of xx.x\%. That is xx.x\% percentage points better than the human score and xx.x\% above random guessing.
+
+The best accuracy we achieved on \textbf{dataset version 1} was xx.x \%. In favor of version 2 we did not perform extensive experiments and hyperparameter tuning. It served solely as our experimentation basis where we validated the usefulness of the feature extractor architecture. Most likely, more tuning would lead to an improvement.

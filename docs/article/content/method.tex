@@ -170,6 +170,7 @@ The parameters of the feature extraction model can be trained with backpropagati
 \end{itemize}
 
 \subsection{Graph Network Blocks}
+\label{sec:gnblocks}
 
 The graph network (GN) module is an integral component of our model: It utilizes the graph structure of the dataset samples and outputs the actual model prediction, thereby converting a graph into a scalar. It is positioned after the screenshot feature extractor. The graph network consists of several GN blocks, which were introduced in \cite{deepmind:graphnets}. A summary of the most important aspects as well as the notation we use in the following can be found in Section \ref{sec:graphnetworks}.
 
@@ -213,6 +214,7 @@ Before applying the encoder block we concatenate desktop and mobile feature vect
 
 The \textbf{decoder block} $\text{GN}_\text{dec}$ converts the graph returned from the last core block into the desired output. In our case the output of the GN module is a scalar (see Equation \ref{eq:gnmodule}). We extract a scalar from the graph by muliplying the global state vector $u$ of the last core block with a weight vector or matching size:
 \begin{equation}
+    \label{eq:dec:nodeupdate}
     \phi^u_\text{dec}\left(\bm{\overline{e}}',\bm{\overline{v}},\bm{u}\right)=\bm{w}_\text{dec}\cdot\bm{u}+\bm{b}_\text{dec}\,.
 \end{equation}
 
