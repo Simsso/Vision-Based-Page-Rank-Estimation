@@ -14,6 +14,8 @@ It is noteworthy that the dataset size was sufficient to prevent our CNN archite
 
 The accuracy score as proposed in Equation \ref{eq:acc} has some \textit{unfairness} to it because the distance of two compared samples is disregarded. For example, a erroneous assessment of the relative ranking of two samples with ranks \#12,000 and \#12,001 is contributing to the accuracy just like the confusion of samples with ranks \#1,000 and \#25,000, even though the latter should be easier to disentangle. An alternative formulation could take the difficulty of a pairwise comparison into account.
 
+Insert plot on mean accuracy vs. rank (log scale).
+
 In summary, we can strongly assume that a correlation between page rank and visual features exists. Our model was able to learn these features and make use of them to solve the pairwise ranking task with an accuracy of xx.x\%. Based on the assumption that an upper limit below 70\% exists, which cannot be exceeded by purely vision-based models, the outcomes of our trainings are a success.
 
 \subsection{Model Understanding}
