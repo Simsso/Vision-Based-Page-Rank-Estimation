@@ -1,7 +1,7 @@
-import logging
 import os
 import torch
 from sacred.observers import MongoObserver
+from rank_predictor.trainer.logging import setup_custom_logger
 from rank_predictor.trainer.lr_scheduler.warmup_scheduler import GradualWarmupScheduler
 from rank_predictor.trainer.ranking.probabilistic_loss import ProbabilisticLoss
 from sacred import Experiment
@@ -9,7 +9,7 @@ from rank_predictor.data.v2.pagerank_dataset import DatasetV2Screenshots
 from rank_predictor.model.graph_extractor_full import ScreenshotsFeatureExtractorWithHead
 from rank_predictor.trainer.training_run import FeatureExtractorTrainingRun
 
-name = 'featextr_07'
+name = 'featextr_08'
 ex = Experiment(name)
 
 ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred'))
@@ -33,9 +33,12 @@ def run_config():
 @ex.main
 def train(learning_rate: float, batch_size: int, epochs: int, optimizer: str, train_ratio: float, valid_ratio: float,
           loss: str, logrank_b: float, drop_p: float, lr_scheduler: str, lr_scheduler_gamma: float) -> str:
-    logging.basicConfig(level=logging.INFO)
+
+    logger = setup_custom_logger('default')
+
     use_cuda = torch.cuda.is_available()
     device = torch.device('cuda' if use_cuda else 'cpu')
+    logger.info("Device: {}".format(device))
 
     # dataset
     dataset_dir = os.path.expanduser(os.getenv('dataset_v2_path'))

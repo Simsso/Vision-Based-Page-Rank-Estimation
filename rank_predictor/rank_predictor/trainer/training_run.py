@@ -1,4 +1,3 @@
-import logging
 import multiprocessing
 import os
 from typing import Dict, Callable, Union, List, Optional
@@ -10,9 +9,12 @@ from tensorboardX import SummaryWriter
 from torch.utils.data import Dataset, DataLoader
 from graph_nets.data_structures.graph import Graph
 from rank_predictor.data.v2.pagerank_dataset import DatasetV2Screenshots
+from rank_predictor.trainer.logging import setup_custom_logger
 from rank_predictor.trainer.lr_scheduler.warmup_scheduler import GradualWarmupScheduler
 from rank_predictor.trainer.ranking.utils import compute_batch_accuracy, compute_multi_batch_accuracy
 from rank_predictor.data import threefold
+
+logger = setup_custom_logger('run')
 
 
 class TrainingRun:
@@ -40,7 +42,7 @@ class TrainingRun:
         cpu_count = multiprocessing.cpu_count()
         worker_count = max(cpu_count - 1, 1)
         worker_count = 0
-        logging.info("Using {} workers for the data pipeline".format(worker_count))
+        logger.info("Using {} workers for the data pipeline".format(worker_count))
 
         self.data = data
 
@@ -65,26 +67,31 @@ class TrainingRun:
         for epoch in range(epochs):
             self._save_model(epoch)
 
-            logging.info("Starting epoch #{}".format(epoch + 1))
+            logger.info("Starting epoch #{}".format(epoch + 1))
             for batch in self.data_loader.train:
                 if self.step_ctr % 5000 == 0:
-                    logging.info("Running approx. validation at step #{}".format(self.step_ctr))
+                    logger.info("Running approx. validation at step #{}".format(self.step_ctr))
                     self._run_valid(self.data_loader.valid, 'valid', approx=True)
                     self._run_valid(self.data_loader.train, 'train', approx=True)
-                    logging.info("Resuming training")
+                    logger.info("Resuming training")
 
                 self.step_ctr += 1
-                self._train_step(batch)
+                try:
+                    self._train_step(batch)
+                except AssertionError as error:
+                    logger.info("Skipping train step because of an error")
+                    logger.info(error)
+                    self.step_ctr -= 1
                 self._lr_scheduler_update()
         self._save_model(epochs)
 
-        logging.info("Training completed, reporting final accuracy")
-        train_acc = self._run_valid(self.data_loader.train, 'train', approx=False)
-        logging.info("Train acc.: {:.4f}".format(train_acc))
-        valid_acc = self._run_valid(self.data_loader.valid, 'valid', approx=False)
-        logging.info("Valid acc.: {:.4f}".format(valid_acc))
+        logger.info("Training completed, reporting final accuracy")
         test_acc = self._run_valid(self.data_loader.test, 'test', approx=False)
-        logging.info("Test acc.: {:.4f}".format(test_acc))
+        logger.info("Test acc.: {:.4f}".format(test_acc))
+        valid_acc = self._run_valid(self.data_loader.valid, 'valid', approx=False)
+        logger.info("Valid acc.: {:.4f}".format(valid_acc))
+        train_acc = self._run_valid(self.data_loader.train, 'train', approx=False)
+        logger.info("Train acc.: {:.4f}".format(train_acc))
         return test_acc
 
     def _lr_scheduler_update(self) -> None:
@@ -95,7 +102,7 @@ class TrainingRun:
         if self.lr_scheduler is not None:
             self.lr_scheduler.step(epoch=self.step_ctr // self.lr_scheduler_update_steps)  # update learning rate
             lr = self.opt.param_groups[0]['lr']
-            logging.info("Updating learning rate, now {}".format(lr))
+            logger.info("Updating learning rate, now {}".format(lr))
 
         self.log_scalar('learning_rate', lr)
 
@@ -104,7 +111,7 @@ class TrainingRun:
         file_name = '{}_{:04d}.pt'.format(self.name, epoch)
         save_path = os.path.join(save_dir, file_name)
 
-        logging.info("Storing model at '{}'.".format(save_path))
+        logger.info("Storing model at '{}'.".format(save_path))
 
         torch.save(self.net.state_dict(), save_path)
 
