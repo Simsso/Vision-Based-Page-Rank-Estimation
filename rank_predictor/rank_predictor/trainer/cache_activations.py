@@ -3,12 +3,14 @@ import logging
 import os
 
 import torch
+from graph_nets.data_structures.attribute import Attribute
+from torch import Tensor
+
+from graph_nets.data_structures.graph import Graph
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-
 from rank_predictor.data.v2.pagerank_dataset import DatasetV2
 from rank_predictor.model.graph_extractor_full import ScreenshotsFeatureExtractor
-from rank_predictor.model.graph_only_models import GNAvg
 
 logging.basicConfig(level=logging.INFO)
 use_cuda = torch.cuda.is_available()
@@ -20,12 +22,11 @@ data = DatasetV2.from_path(dataset_dir, logrank_b=1)
 # restore feature extractor
 feat_extr_weights_path = os.path.expanduser(os.path.join(os.getenv('model_save_dir'), os.getenv('model_name')))
 logging.info("Restoring pre-trained model weights")
-feat_extr = ScreenshotsFeatureExtractor(drop_p=0)
-feat_extr.load_state_dict(torch.load(feat_extr_weights_path))
-net = GNAvg(feat_extr)
+net = ScreenshotsFeatureExtractor(drop_p=0)
+net.load_state_dict(torch.load(feat_extr_weights_path)['extractor'])
+net.eval()
 
 if device.type == 'cuda':
-    feat_extr.cuda()
     net.cuda()
 
 # create data loader from dataset
@@ -35,12 +36,26 @@ cache = {}
 
 for batch in tqdm(data_loader):
     with torch.no_grad():
-        g = batch[0]['graph'].to(device)
+        g: Graph = batch[0]['graph'].to(device)
         g_hash = batch[0]['rank']
         assert g_hash not in cache
 
-        g_processed = net(g)
+        for n in g.nodes:
 
-        cache[g_hash] = g_processed
+            desktop_img: Tensor = n.attr.val['desktop_img']
+            mobile_img: Tensor = n.attr.val['mobile_img']
 
+            # desktop and mobile feature vector
+            x1, x2 = net(
+                desktop_img.unsqueeze(0),
+                mobile_img.unsqueeze(0)
+            )
+
+            x = torch.cat((x1, x2), dim=1).view(-1)
+
+            n.attr = Attribute(x)
+
+        cache[g_hash] = g
+
+logging.info("Writing cached graphs to disk")
 torch.save(cache, '{}-cache.pt'.format(feat_extr_weights_path))
