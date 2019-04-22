@@ -1,3 +1,5 @@
+import operator
+from functools import reduce
 from typing import Dict
 
 import torch
@@ -5,7 +7,7 @@ import torch.nn.functional as F
 from graph_nets.functions.update import IndependentNodeUpdate
 
 from graph_nets.block import GNBlock
-from torch import Tensor
+from torch import Tensor, nn
 
 
 def global_avg_pool_1d(x: Tensor) -> Tensor:
@@ -74,7 +76,7 @@ def get_extraction_block(model: torch.nn.Module):
         phi_v=IndependentNodeUpdate(node_extractor_fn))
 
 
-class ListModule(torch.nn.Module):
+class ListModule(nn.Module):
     """
     Source: https://discuss.pytorch.org/t/list-of-nn-module-in-a-nn-module/219/2
     Can be used to have nn.Modules which contain lists of nn.Modules.
@@ -103,3 +105,11 @@ class ListModule(torch.nn.Module):
 
     def forward(self, *args):
         raise NotImplementedError()
+
+
+def parameter_count(model: nn.Module) -> int:
+    params = [p for p in model.parameters()]
+    param_count = map(lambda p: p.size(), params)
+    param_count = map(lambda p_size: reduce(operator.mul, p_size, 1), param_count)
+    param_count = sum(param_count)
+    return param_count
