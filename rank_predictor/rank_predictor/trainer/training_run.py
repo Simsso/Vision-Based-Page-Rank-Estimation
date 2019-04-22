@@ -90,8 +90,6 @@ class TrainingRun:
         logger.info("Test acc.: {:.4f}".format(test_acc))
         valid_acc = self._run_valid(self.data_loader.valid, 'valid', approx=False)
         logger.info("Valid acc.: {:.4f}".format(valid_acc))
-        train_acc = self._run_valid(self.data_loader.train, 'train', approx=False)
-        logger.info("Train acc.: {:.4f}".format(train_acc))
         return test_acc
 
     def _lr_scheduler_update(self) -> None:
