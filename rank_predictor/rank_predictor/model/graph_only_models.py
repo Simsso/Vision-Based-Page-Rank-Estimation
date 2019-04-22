@@ -6,6 +6,7 @@ from torch import nn, Tensor
 from graph_nets.functions.update import NodeAggregationGlobalStateUpdate, IndependentNodeUpdate
 from rank_predictor.model.graph_extractor_full import DecoderGlobalStateUpdate, EncoderEdgeUpdate, \
     EncoderGlobalStateUpdate, CoreGlobalStateUpdate, CoreNodeUpdate, CoreEdgeUpdate
+from rank_predictor.model.utils import ListModule
 
 
 class GNAvg(nn.Module):
@@ -37,6 +38,7 @@ class GNMax(nn.Module):
 
 
 class GNDeep(nn.Module):
+    """[n-core(-shared)]"""
 
     def __init__(self, drop_p: float, num_core_blocks: int, shared_weights: bool = False):
         super().__init__()
@@ -50,10 +52,10 @@ class GNDeep(nn.Module):
 
         assert num_core_blocks >= 0
 
-        self.core_blocks = []
+        core_blocks = []
         for i in range(num_core_blocks):
             if shared_weights and i > 0:
-                block = self.core_blocks[0]
+                block = core_blocks[0]
             else:
                 block = GNBlock(
                     phi_e=CoreEdgeUpdate(self.drop_p),
@@ -62,7 +64,8 @@ class GNDeep(nn.Module):
                     rho_ev=AvgAggregation(),
                     rho_vu=AvgAggregation(),
                     rho_eu=AvgAggregation())
-            self.core_blocks.append(block)
+            core_blocks.append(block)
+        self.core_blocks = ListModule(*core_blocks)
 
         self.dec = GNBlock(phi_u=DecoderGlobalStateUpdate())  # maps global state from vec to scalar
 
@@ -75,9 +78,3 @@ class GNDeep(nn.Module):
         g: Graph = self.dec(g)
 
         return g.attr.val
-
-    def cuda(self, device=None):
-        super().cuda(device)
-
-        for core_block in self.core_blocks:
-            core_block.cuda(device)

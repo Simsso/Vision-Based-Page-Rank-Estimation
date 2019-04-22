@@ -9,7 +9,7 @@ from rank_predictor.trainer.ranking.probabilistic_loss import ProbabilisticLoss
 from sacred import Experiment
 from sacred.observers import MongoObserver
 
-name = 'gn_only_fe_08_deep_01'
+name = 'gn_only_fe_08_deep_03'
 ex = Experiment(name)
 
 ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred'))
@@ -40,6 +40,9 @@ def train(learning_rate: float, batch_size: int, pairwise_batch_size: int, epoch
           train_ratio: float, valid_ratio: float, model_name: str, loss: str, logrank_b: float, drop_p: float,
           num_core_blocks: int, lr_scheduler: str, lr_scheduler_gamma: float, feat_extr_weights_path: str,
           share_core_weights: bool) -> str:
+
+    assert pairwise_batch_size >= batch_size, "Pairwise batch size most be greater than or equal to the batch size"
+
     logging.basicConfig(level=logging.INFO)
     use_cuda = torch.cuda.is_available()
     device = torch.device('cuda' if use_cuda else 'cpu')
