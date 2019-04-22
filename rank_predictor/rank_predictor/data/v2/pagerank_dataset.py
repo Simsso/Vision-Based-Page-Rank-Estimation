@@ -160,7 +160,8 @@ class DatasetV2(Dataset):
         return DatasetV2(page_paths, logrank_b)
 
     @staticmethod
-    def get_threefold(root_dir: str, train_ratio: float, valid_ratio: float, logrank_b: float) -> threefold.Data:
+    def get_threefold(root_dir: str, train_ratio: float, valid_ratio: float, logrank_b: float, **kwargs)\
+            -> threefold.Data:
         """
         Load dataset from root_dir and split it into three parts (train, validation, test).
         The function splits in a deterministic way.
@@ -173,7 +174,7 @@ class DatasetV2(Dataset):
         assert os.path.isdir(root_dir), "The provided path '{}' is not a directory".format(root_dir)
 
         page_paths = list(DatasetV2.get_page_paths(root_dir))
-        return get_threefold(DatasetV2, page_paths, train_ratio, valid_ratio, logrank_b)
+        return get_threefold(DatasetV2, page_paths, train_ratio, valid_ratio, logrank_b, **kwargs)
 
 
 class DatasetV2Screenshots(Dataset):

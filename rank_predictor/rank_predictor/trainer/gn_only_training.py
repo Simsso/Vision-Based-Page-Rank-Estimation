@@ -1,16 +1,15 @@
 import logging
 import os
 import torch
-from rank_predictor.model.graph_extractor_full import ScreenshotsFeatureExtractor
+from rank_predictor.data.v2.pagerank_dataset_cached import DatasetV2Cached
 from rank_predictor.model.graph_only_models import GNAvg, GNMax
 from rank_predictor.trainer.training_run import GNTrainingRun
 from rank_predictor.trainer.lr_scheduler.warmup_scheduler import GradualWarmupScheduler
 from rank_predictor.trainer.ranking.probabilistic_loss import ProbabilisticLoss
-from rank_predictor.data.v2.pagerank_dataset import DatasetV2
 from sacred import Experiment
 from sacred.observers import MongoObserver
 
-name = 'gn_only_max_01'
+name = 'gn_only_max_02'
 ex = Experiment(name)
 
 ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred'))
@@ -32,7 +31,7 @@ def run_config():
     num_core_blocks = 2
     lr_scheduler = 'None'
     lr_scheduler_gamma = 0.98
-    feat_extr_weights_path = os.path.expanduser('~/dev/pagerank/models/featextr_04_0007.pt')
+    feat_extr_weights_path = os.path.expanduser('~/dev/pagerank/models/featextr_08_0010.pt')
 
 
 @ex.main
@@ -45,23 +44,18 @@ def train(learning_rate: float, batch_size: int, pairwise_batch_size: int, epoch
 
     # dataset
     dataset_dir = os.path.expanduser(os.getenv('dataset_v2_path'))
-    data = DatasetV2.get_threefold(dataset_dir, train_ratio, valid_ratio, logrank_b)
-
-    # restore feature extractor
-    logging.info("Restoring pre-trained model weights")
-    feat_extr = ScreenshotsFeatureExtractor(drop_p=0)
-    feat_extr.load_state_dict(torch.load(feat_extr_weights_path))
+    data = DatasetV2Cached.get_threefold(dataset_dir, train_ratio, valid_ratio, logrank_b,
+                                         feat_extr_weights_path=feat_extr_weights_path)
 
     # model with weights
     if model_name == 'GNAvg':
-        net = GNAvg(feat_extr)
+        net = GNAvg()
     elif model_name == 'GNMax':
-        net = GNMax(feat_extr)
+        net = GNMax()
     else:
         raise ValueError("Unknown model name '{}'".format(model_name))
 
     if device.type == 'cuda':
-        feat_extr.cuda()
         net.cuda()
 
     if optimizer == 'adam':

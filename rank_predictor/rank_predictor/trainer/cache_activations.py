@@ -1,6 +1,7 @@
 # dataset
 import logging
 import os
+from typing import Dict
 
 import torch
 from graph_nets.data_structures.attribute import Attribute
@@ -32,12 +33,19 @@ if device.type == 'cuda':
 # create data loader from dataset
 data_loader: DataLoader = DataLoader(data, 1, shuffle=False, num_workers=0, collate_fn=lambda x: x)
 
-cache = {}
+cache: Dict[int, Graph] = {}
+file_ctr = 0
 
-for batch in tqdm(data_loader):
-    with torch.no_grad():
+
+def save_cached_graphs(c: Dict[int, Graph], ctr: int) -> None:
+    logging.info("Writing cached graphs to disk; #{}, len #{}".format(ctr, len(c)))
+    torch.save(c, '{}-cache-{}.pt'.format(feat_extr_weights_path, ctr))
+
+
+with torch.no_grad():
+    for batch in tqdm(data_loader):
         g: Graph = batch[0]['graph'].to(device)
-        g_hash = batch[0]['rank']
+        g_hash = int(batch[0]['rank'])
         assert g_hash not in cache
 
         for n in g.nodes:
@@ -51,11 +59,20 @@ for batch in tqdm(data_loader):
                 mobile_img.unsqueeze(0)
             )
 
-            x = torch.cat((x1, x2), dim=1).view(-1)
+            x: torch.Tensor = torch.cat((x1, x2), dim=1).view(-1)
+            x = x.detach().cpu()
 
+            x = torch.Tensor(x.data)
+
+            del n.attr
             n.attr = Attribute(x)
+
+        g.to(torch.device('cpu'))
 
         cache[g_hash] = g
 
-logging.info("Writing cached graphs to disk")
-torch.save(cache, '{}-cache.pt'.format(feat_extr_weights_path))
+        if len(cache) == 4000:
+            save_cached_graphs(cache, file_ctr)
+            file_ctr += 1
+            cache = {}
+save_cached_graphs(cache, file_ctr)
