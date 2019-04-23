@@ -10,7 +10,7 @@ from rank_predictor.trainer.ranking.probabilistic_loss import ProbabilisticLoss
 from sacred import Experiment
 from sacred.observers import MongoObserver
 
-name = 'gn_only_fe_08_deep_05'
+name = 'gn_only_fe_08_deep_06'
 ex = Experiment(name)
 
 ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred'))
@@ -30,7 +30,7 @@ def run_config():
     logrank_b = 10
     drop_p = 0.1
     num_core_blocks = 3
-    share_core_weights = False
+    share_core_weights = True
     lr_scheduler = 'None'
     lr_scheduler_gamma = None
     feat_extr_weights_path = os.path.expanduser('~/dev/pagerank/models/featextr_08_0010.pt')
