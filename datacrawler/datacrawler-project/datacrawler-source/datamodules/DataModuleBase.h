@@ -11,10 +11,10 @@ protected:
     Logger* logger;
 
 public:
-    virtual DataBase* process(CefMainArgs*, std::string);
+    virtual DataBase* process(std::string);
 
     DataModuleBase();
-    ~DataModuleBase();
+    virtual ~DataModuleBase();
 };
 
 

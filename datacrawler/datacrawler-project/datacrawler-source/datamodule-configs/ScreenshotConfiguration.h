@@ -9,12 +9,14 @@ private:
     int height;
     int width;
     bool mobile;
+    int onPaintTimeout;
+    int elapsedTimeOnPaintTimeout;
 
 public:
     DataModuleBase* createInstance();
 
     ScreenshotConfiguration();
-    ScreenshotConfiguration(int, int, bool);
+    ScreenshotConfiguration(int, int, int, int, bool);
     ~ScreenshotConfiguration();
 
 };

@@ -4,18 +4,16 @@
  * ~NodelElement
  */
 NodeElement::~NodeElement() {
-    for(DataBase* database: *data){
+    for(DataBase* database: data){
         delete database;
     }
-
-    delete data;
 }
 
 /**
  * NodeElement
  */
-NodeElement::NodeElement(){
-    data = new std::vector<DataBase*>;
+NodeElement::NodeElement(bool isStartNode){
+    startNode = isStartNode;
 }
 
 /**
@@ -23,11 +21,15 @@ NodeElement::NodeElement(){
  * @param newData, which shall be added
  */
 void NodeElement::addData(DataBase * newData) {
-    data->push_back(newData);
+    data.push_back(newData);
 }
 
 /**
  * getData - Returns the DataBase-instances saved in this NodeElement
  * @return A pointer on to a vector<DataBase*> having all DataBase-instances of this NodeElement
  */
-std::vector<DataBase*>* NodeElement::getData(){ return data;}
+std::vector<DataBase*>* NodeElement::getData(){ return &data;}
+
+bool NodeElement::isStartNode(){
+    return startNode;
+}

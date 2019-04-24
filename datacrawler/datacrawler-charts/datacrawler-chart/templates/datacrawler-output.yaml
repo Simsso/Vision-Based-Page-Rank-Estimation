@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: datacrawler-output
+spec:
+  storageClassName: ""
+  capacity:
+    storage: 100G
+  accessModes:
+    - ReadWriteOnce
+  gcePersistentDisk:
+    pdName: datacrawler-output
+    fsType: ext4
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: datacrawler-output-claim
+spec:
+  storageClassName: ""
+  volumeName: datacrawler-output
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100G

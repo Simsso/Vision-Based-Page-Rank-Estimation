@@ -14,15 +14,18 @@ ScreenshotConfiguration::ScreenshotConfiguration(){
     mobile = false;
 }
 
+// TODO refactor parameter
 /**
  * ScreenshotConfiguration - Constructor to configure the ScreenshotDataModule
  * @param width specifies the width of the screenshot to be taken
  * @param height specifies the height of the screenshot to be taken
  */
-ScreenshotConfiguration::ScreenshotConfiguration(int width, int height, bool mobile){
+ScreenshotConfiguration::ScreenshotConfiguration(int height, int width, int onPaintTimeout, int elapsedTimeOnPaintTimeout, bool mobile) {
     this->width  = width;
     this->height = height;
     this->mobile = mobile;
+    this->onPaintTimeout = onPaintTimeout;
+    this->elapsedTimeOnPaintTimeout = elapsedTimeOnPaintTimeout;
 }
 
 /**
@@ -30,6 +33,6 @@ ScreenshotConfiguration::ScreenshotConfiguration(int width, int height, bool mob
  * @return instance of the ScreenshotDataModule
  */
 DataModuleBase* ScreenshotConfiguration::createInstance() {
-    return new ScreenshotDataModule(height, width, mobile);
+    return new ScreenshotDataModule(height, width, onPaintTimeout, elapsedTimeOnPaintTimeout, mobile);
 }
 

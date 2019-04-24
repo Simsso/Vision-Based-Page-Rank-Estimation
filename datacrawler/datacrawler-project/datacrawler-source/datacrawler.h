@@ -2,7 +2,6 @@
 #define DATACRAWLER_PROJECT_DATACRAWLER_H
 
 #include <iostream>
-#include <list>
 
 #include <include/internal/cef_linux.h>
 #include <include/cef_app.h>
@@ -10,25 +9,26 @@
 
 #include "DatacrawlerConfiguration.h"
 #include "datamodules/DataModuleBase.h"
-#include "datamodules/screenshot-datamodule/ScreenshotDataModule.h"
 #include "util/Logger.h"
 
 
 using namespace std;
 
 class Datacrawler {
-
 private:
    DatacrawlerConfiguration datacrawlerConfiguration;
+   int numNodes;
    list<DataModuleBase*> dataModules;
    Logger* logger;
-   CefMainArgs* mainArgs;
+   map<std::string, NodeElement*>* graph;
+
+   vector<pair<string, NodeElement*>>  buildNodes(NodeElement*);
 
 public:
-    NodeElement* process(string);
+    map<string,NodeElement*> * process(string);
     void init();
 
-    Datacrawler(CefMainArgs*);
+    Datacrawler();
     ~Datacrawler();
 };
 

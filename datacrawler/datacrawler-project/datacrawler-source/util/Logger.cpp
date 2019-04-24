@@ -20,17 +20,12 @@ Logger::Logger() {
             this->logLevel = LOG_OFF;
         } else {
             this->logLevel = LOG_ALL;
-            info("Your log level is unknown! Using LOG_ALL as default!");
             return;
         }
 
-        std::string str("Your log level is ");
-        str.append(logLevelEnv);
-        info(str);
         return;
     } else {
         this->logLevel = LOG_ALL;
-        info("No log level was set! Using LOG_ALL as default!");
         return;
     }
 }
