@@ -6,7 +6,7 @@ Most of machine learning algorithms are developed to imitate and automate human 
 Therefore, the following sections will introduce our experimental setup and the results of the human evaluation. Afterwards we will compare the results with our current research and discuss the criteria on which the test persons based their decisions.
 
 \subsubsection{Experimental Setup} 
-The human performance on pagerank estimation is measured solely based on the vision of websites. In our experimental setup each test person has to select the website with the higher rank from a pair of different and randomly choosen websites from the dataset version 2. The selection is supported by the domain names and all mobile and desktop screenshots of the given websites from the dataset version 2. For each test person we calculate the accuracy from the number of correct and total classified websites, which is shown during the evaluation to each test person. In general there is no time limit for the decision making and the test is repeated for $n$ pairs. The whole evaluation is taken place in a web application solely developed for the human evaluation.
+The human performance on page rank estimation is measured solely based on the vision of websites. In our experimental setup each test person has to select the website with the higher rank from a pair of different and randomly chosen websites from the dataset version 2. In addition to reduce the distortion in our results caused by additional knowledge other than vision of the website, we advised the test persons to skip website they know. The selection is supported by the domain names and all mobile and desktop screenshots of the given websites from the dataset version 2. For each test person we calculate the accuracy from the number of correct and total classified websites, which is shown during the evaluation to each test person. In general there is no time limit for the decision making and the test is repeated for $n$ pairs. The whole evaluation is taken place in a web application solely developed for the human evaluation.
 
 \subsubsection{Results}
 We evaluated in total of 11 test persons regarding their performance on estimating pagerank of websites, who rated in total $1900$ pairs of websites. The average performance of humans is at $57.8$\% and with accuracies ranging from $51.67$\% (lowest) to $64$\% (highest), while our best performing deep graph network has achieved the accuracy of $63$\% as table \ref{table_human_eval_results} shows.
@@ -32,16 +32,26 @@ We ensure using a $z$-test that our test persons are performing better than rand
 \end{table}
 
 \subsubsection{Criteria}
+By the end of the experiment, each test person was asked about their criteria used during the evaluation on which they based their decisions. We summarized positive and negative criteria on which the test persons have based their decision:
+
+\begin{itemize}
+	\item Positive: \begin{enumerate}
+	 \item Responsive and modern looking websites
+	 \item Official, game, news and personal websites of seemingly famous people
+	 \item High-content density
+	 \item Matching colors
+	 \item Professional looking
+	 \item Article-like
+	\end{enumerate}
+	\item Negative: \begin{enumerate}
+	\item Unresponsive and old looking websites
+	\item Low-content density
+	\item Personal sites of seemingly unpopular persons
+	\item Websites with placeholders such as domain parking or errors
+	\end{enumerate}
+\end{itemize}
+
+The listed criteria clearly shows that the test persons did not estimate the page rank solely based on aspects in vision, rather also on the content and errors they saw. The test persons emphasized that they ranked matching colors, overall responsive and professional looking websites higher than old and unresponsive looking websites. In addition, another major factor was the type of the given website. Thus, news, games and official websites were clearly ranked more often higher than their counterparts.
 
 \subsubsection{Conclusion}
-
-
-
-- subject of work
-- but how do human score
-- show experiment with 11 test persons, 1900 probands 
-- add screenshot of human evaluation tool
-- table (?)
-- criterias
-- show that computer is better for p=<1\% 
-- conclusion 
+The human evaluation has shown us that we were able to outperform human performance in page rank estimation of website, despite the fact that estimation of page rank being a very difficult problem for both humans and machines. We have to emphasize that the test persons primarily decided on their prior-experience and perception of good and bad websites, which is ultimately distorted by the common perception and understanding of websites in 2019.
