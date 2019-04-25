@@ -20,7 +20,7 @@ The model itself is a function $f:\mathbb{R}^d\rightarrow\mathbb{R}$ mapping a s
 \begin{align}
 -\overline{P}_{i,j}\left(f(x_i)-f(x_j)\right)+\log\left(1+e^{f(x_i)-f(x_j)}\right)
 \end{align}
-This formulation has some favorable properties: It allows for uncertainty in the relative ordering of items in that the $\bm{\overline{P}}$ is a probability and could be e.g. $\overline{P}_{i,j}=\frac{1}{2}$ if the relative ranking of two items was unknown. Furthermore, the loss asymptotes to a linear functions. According to the authors, this is likely to be more robus with noisy labels than a quadratic cost.
+This formulation has some favorable properties: It allows for uncertainty in the relative ordering of items in that the $\bm{\overline{P}}$ is a probability and could be e.g. $\overline{P}_{i,j}=\frac{1}{2}$ if the relative ranking of two items was unknown. Furthermore, the loss asymptotes to a linear functions. According to the authors, this is likely to be more robust with noisy labels than a quadratic cost.
 
 The \textbf{listwise approach} deals with models that take an entire list of samples as their input with the goal of ordering them. This can be either done by mapping them to real values and penalizing wrong ordering, or mapping the samples discretely to a permutation.
 
@@ -173,18 +173,11 @@ During start up \texttt{Puppeteer} starts an instance of \texttt{Chrome}, attach
 Puppeeter is available at \texttt{https://github.com/GoogleChrome/puppeteer}.
 
 \subsection{Chromium Embedded Framework}
-\label{cef}
-\texttt{Chromium Embedded Framework (CEF)} is an open-source framework for embedding the \texttt{Chromium} browser into other applications. The main goal of \texttt{CEF} is to enable developers in adding web browsing functionality such as using HTML, CSS and JavaScript to create application UI. Well-known applications such as \texttt{Adobe Acrobat}, \texttt{Spotify Desktop} and \texttt{MATLAB} are using \texttt{CEF}.
 
 \texttt{CEF} was designed ground-up with performance and ease-use in mind. The framework exposes \texttt{C++} interfaces with default implementation for all features requiring little or no integration work. Furthermore, the community added wrappers for the base implementation to support a wide-range of operating systems and programming languages.
-
 \texttt{CEF} has in total three versions, whereas \texttt{CEF 2} was abandoned due to the appearance of the \texttt{Chromium Content API} which will be discussed later. \texttt{CEF 1} is a single process implementation and based on the old \texttt{Chromium WebKit API}, due to deprecation of the \texttt{Chromium WebKit API} it is no longer supported and developed. \texttt{CEF 3} is a multi process implementation and based on the current \texttt{Chromium Content API}.
 
-As the \texttt{Chromium} code base has grown, it was inevitable to avoid opaque dependencies and features in the wrong places. Therefore the \textit{content module} was introduced, which contains the core functionality of \texttt{Chromium}. The \texttt{Chromium Content API} wraps the \texttt{content module} and offers isolation for developers from the core functionalities \cite{ChromiumContentAPI}.
-\texttt{CEF 3} insulates the user from the underlying complexity of \texttt{Chromium} by using the \texttt{Chromium Content API} and offering production-quality stable APIs \cite{CEFGeneralUsage}.
-
 \subsection{Kubernetes}
-This section is taken from the project work \citetitle{SAPTerraformSamed} by \citeauthor{SAPTerraformSamed} (\citeyear{SAPTerraformSamed}).
 
 Kubernetes (K8s) is an open source container orchestration solution that was originally designed by \textit{Google} in 2014. It aims to provide a platform where containers and containerized applications can be deployed, scaled, and managed \cite{Wikik8s}. K8s orchestrates computing, networking, and storage infrastructure on behalf of user workloads. This means applications are automatically scaled depending on incoming workload.
 
