@@ -32,20 +32,20 @@ Once a model has produced a ranking, it must be evaluated. Since the magnitude o
 \label{sec:graphnetworks}
 
 The most basic type of neural network, consisting solely of fully connected layers, converts a vector of fixed size into another vector of fixed size.
-In contast, convolutional neural networks (CNNs) can convert variably-sized input into variably-sized output. In image classification or segmentation tasks, the inputs are often scaled to a fixed size and the convolutional layers serve as feature extractors for a fully-connected classification head.
+In contrast, convolutional neural networks (CNNs) can convert variably-sized inputs into variably-sized outputs. In image classification or segmentation tasks, the inputs are often scaled to a fixed size and the convolutional layers serve as feature extractors for a fully-connected classification head.
 Recurrent neural networks can convert a sequence of vectors into another sequence.
 
-While some of those neural network types \textit{can} handle variably-sized inputs, they do not deal with sets very well: Consider for instance an (unordered) set of images and the task to assign a single label to the entire set. All architectures from above could be applied to that task by simply concatenating all the images into one large vector. However, they would implicitly try to assign a semantic meaning to the ordering in which the samples are being presented to them (relational inductive bias). One could augment the dataset by shuffling the samples of a set before concatenating them but that does not solve the underlying problem.
+While some of those neural network types \textit{can} handle variably-sized inputs, they do not deal with sets very well: Consider for instance an (unordered) set of images and the task to assign a single label to the entire set. All architectures from above could be applied to that task by simply concatenating all the images into one large vector. However, they would implicitly try to assign a semantic meaning to the ordering in which the samples are being presented to them (relational inductive bias). One could augment the dataset by shuffling the samples of a set before concatenating them but that does not solve the underlying problem. Alternatively, one might process the images in the set individually and combine the outputs. This setup has the drawback that information exchange between internal representations of the model cannot take place. The feature representation of one image cannot influence the processing of other images, which could, however, be a requirement when dealing with a set of images.
 
-Graph networks are designed to handle graphs and sets naturally. They can deal with any size of graph and do not regard the ordering of nodes. \cite{deepmind:graphnets} have brought several different types of graph networks under a common hood. We follow their notation and will replicate the relevant parts in the following paragraphs. That is the formal definition of a directed, attributed multi-graph with a global attribute, and of graph networks.
+Graph networks are designed to handle graphs and sets naturally. They can deal with any size of graph and do not regard the ordering of nodes. While processing the nodes, information can freely flow between them. \cite{deepmind:graphnets} have brought several different types of graph networks under a common hood. We follow their notation and will recapitulate the relevant parts in the following paragraphs. That is the formal definition of a directed, attributed multi-graph with a global attribute, as well as the definition of graph networks.
 
 Let a graph $G$ be a 3-tuple $G=\left(\bm{u},\mathbb{V},\mathbb{E}\right)$, where $\bm{u}$ is a vector of global attributes.
-$\mathbb{V}=\left\{\bm{v}_i\right\}_{i=1}^{N^{(v)}}$ is a set of $N^{(v)}$ nodes (also referred to as vertices) consisting solely of an attribute vector.
+$\mathbb{V}=\left\{\bm{v}_i\right\}_{i=1}^{N^{(v)}}$ is a set of $N^{(v)}$ nodes (also referred to as vertices), each consisting solely of an attribute vector.
 $\mathbb{E}=\left\{\left(\bm{e}_k,r_k,s_k\right)\right\}_{k=1}^{N^{(e)}}$ is a set of $N^{(e)}$ edges, each of which connects a sender node $\bm{v}_{s_k}$ to a receiver node $\bm{v}_{r_k}$, and contains an attribute vector $\bm{e}_k$.
 
-The attribute vectors ($\bm{u}$, $\bm{v}_i$, and $\bm{e}_k$) can contain any kind of information. In fact they could even be graphs themselves.
+The attribute vectors $\bm{u}$, $\bm{v}_i$, and $\bm{e}_k$ can contain any kind of information. In fact they could even be graphs themselves.
 
-Graph networks (GN) are neural networks that contain at least one GN block. \cite{deepmind:graphnets} describe it as follows: A GN block contains three update functions, $\phi$, and three aggregation function, $\rho$,
+Graph networks (GN) are neural networks that contain at least one GN block. \cite{deepmind:graphnets} describe it as follows: A GN block contains three update functions, $\phi$, and three aggregation functions, $\rho$,
 \begin{align}
     \bm{e}'_k=&\phi^e\left(\bm{e}_k,\bm{v}_{r_k},\bm{v}_{s_k},\bm{u}\right)\\
     \bm{\overline{e}}'_i=&\rho^{e\rightarrow v}\left(\mathbb{E}'_i\right)\\
@@ -54,18 +54,18 @@ Graph networks (GN) are neural networks that contain at least one GN block. \cit
     \bm{\overline{v}}'=&\rho^{v\rightarrow u}\left(\mathbb{V}'\right)\\
     \bm{u}'=&\phi^u\left(\bm{\overline{e}}',\bm{\overline{v}},\bm{u}\right)\,,
 \end{align}
-where $\mathbb{E}'_i=\left\{\left(\bm{e}'_k,r_k,s_k\right)\right\}_{r_k=i,k=1}^{N^{(e)}}$ is the set of all edges pointing to the $i$th node, $\mathbb{V}'=\left\{\bm{v}'_i\right\}_{i=1}^{N^{(v)}}$, and $\mathbb{E}'=\bigcup_i\mathbb{E}'_i$.
+where $\mathbb{E}'_i=\left\{\left(\bm{e}'_k,r_k,s_k\right)\right\}_{r_k=i,k=1}^{N^{(e)}}$ is the set of all edges pointing to the $i$th node; $\mathbb{V}'=\left\{\bm{v}'_i\right\}_{i=1}^{N^{(v)}}$; $\mathbb{E}'=\bigcup_i\mathbb{E}'_i$.
 
 \begin{enumerate}
-    \item $\phi^e$ is the \textbf{edge update function} and applied to every edge in the graph. For the $k$th edge it computes a new attribute vector $\bm{e}'_k$ based on the previous state $\bm{e}_k$, the attributes of the two nodes that this edge connected (i.e. $\bm{v}_{r_k}$ and $\bm{v}_{s_k}$), and the global state $\bm{u}$.
+    \item $\phi^e$ is the \textbf{edge update function} and applied to every edge in the graph. For the $k$th edge it computes a new attribute vector $\bm{e}'_k$ based on the previous state $\bm{e}_k$, the attributes of the two nodes that this edge connects, namely $\bm{v}_{r_k}$ and $\bm{v}_{s_k}$, and the global state $\bm{u}$.
     \item $\rho^{e\rightarrow v}$ is the \textbf{edge aggregation function} and applied once for every node in the graph. It computes an aggregation of all edges pointing to the $i$th node.
     \item $\phi^v$ is the \textbf{node update function}. It is applied to every node in the graph and computes the new attribute vector $\bm{v}'_i$ based on the aggregation of all edges pointing to the node, the previous state of the node, and the global state.
     \item $\rho^{e\rightarrow u}$ is the \textbf{global edge aggregation function} which computes an aggregation $\bm{\overline{e}}'$ of all edges in the graph.
     \item $\rho^{v\rightarrow u}$ is the \textbf{node aggregation function} which compuates an aggregation $\bm{\overline{v}}'$ of all nodes in the graph.
-    \item $\phi^u$ is the \textbf{global attribute update function}. It takes both node and edge aggregation as well as the previous global attribute $\bm{u}$ and computes a new global attribute $\bm{u}'$.
+    \item $\phi^u$ is the \textbf{global attribute update function}. It takes both node and edge aggregation, as well as the previous global attribute $\bm{u}$, and computes a new global attribute $\bm{u}'$.
 \end{enumerate}
 
-The functions are being evaluated in a specific sequence, visualized in Figure \ref{fig:fullgraphblock}. GN blocks do not alter the structure of the data, i.e. they convert a graph into another graph. In order to extract a fixed size representation from a GN block, the global attribute can be used.
+The functions are being evaluated in a specific sequence, visualized in Figure \ref{fig:fullgraphblock}. GN blocks do not alter the structure of the graph, i.e. they convert a graph into another graph isomorphic to the input. In order to extract a fixed size representation from a GN block, the global attribute can be used.
 
 \begin{figure}
     \centering
@@ -109,7 +109,7 @@ The functions are being evaluated in a specific sequence, visualized in Figure \
         \draw[->] (rho_eu) -- (phi_u) ;
 
     \end{tikzpicture}
-    \caption[Full GN block]{Visualization of the evaluation order in a \textbf{full GN block}. Arrows indicate inputs as well as temporal dependency. The three inputs to a GN block are on the left, the three outputs (transformations of the inputs) are on the right-hand side. Several variation of the depicted version exist. \cite{deepmind:graphnets} show the full block, as well as the variations independent recurrent block, message-passing neural network, non-local neural network, relation network, and deep set in Figure 4.}
+    \caption[Full GN block]{Visualization of the evaluation order in a \textbf{full GN block}. Arrows indicate inputs as well as temporal dependency. The three inputs to a GN block are on the left, the three outputs (transformations of the inputs) are on the right-hand side. Several variation of the depicted version exist. \cite{deepmind:graphnets} show the full block, as well as the variations independent recurrent block, message-passing neural network, non-local neural network, relation network, and deep set in their Figure 4.}
     \label{fig:fullgraphblock}
 \end{figure}
 
@@ -122,9 +122,9 @@ Graph networks in related forms have been applied to a variety of different prob
     \item \textbf{Algorithms}. See e.g. \cite{selsam:satsolver} and \cite{dai:graphnetscombinatorialalgo}.
 \end{itemize}
 
-Graph networks can be trained with stochastic gradient descent (SGD), since they are fully differentiable, if aggregation and attribute update functions are differentiable. \cite{selsam:satsolver} train a graph network on a boolean satisfiability task (SAT-solver) with a single bit of supervision, namely whether or not the statement is satisfiable. They thereby show that graph networks can be successfully trained on NP-complete tasks with very little supervision, namely just a single bit.
+Graph networks can be trained with stochastic gradient descent (SGD), since they are fully differentiable, if aggregation and attribute update functions are differentiable.
 
-They extract the fixed-size information (true or false) from the graph network by computing the mean of all nodes. This fits into \cite{deepmind:graphnets} Deep Mind's graph networks framework, since the output bit can be interpreted as a global state. Depending on the application, a model's output might be a graph itself, in such cases, the last layer can be a GN block. !!! extend with set2vec and explain the problem on a more general level
+\cite{selsam:satsolver} train a graph network on a boolean satisfiability task (SAT-solver) with a single bit of supervision, namely whether or not the statement is satisfiable. The authors thereby show that graph networks can be successfully trained on NP-complete tasks with very little supervision, namely just a single bit. The method presented in the paper extracts a fixed-size information (true or false) from the graph network by computing the mean of all nodes. This fits into \cite{deepmind:graphnets} Deep Mind's graph networks framework, since the output bit can be interpreted as a global state. Depending on the application, a model's output might be a graph itself, in such cases, the last layer can be a GN block.
 
 
 \subsection{Screenshot Processing}
