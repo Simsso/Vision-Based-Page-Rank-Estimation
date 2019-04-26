@@ -18,6 +18,47 @@ Unless indicated otherwise, we train with the following configuration:
     \item Training were run on GPU; specifically a Nvidia GTX 970 with 4 GB of RAM.
 \end{itemize}
 
+\subsection{Human Evaluation}
+
+Many ML algorithms are developed to imitate and automate human like behavior on a hard problem, such as action recognition \cite{gu2018ava}. Human performance is often seen as the baseline for machine learning algorithms to outperform. We determine the performance of humans on vision-based page rank estimation and compare it with our ML models. 
+
+The human performance on page rank estimation is measured solely based on the vision of websites. In our experimental setup each test person has to select the website with the higher rank from a pair of different, randomly chosen websites from the dataset version 2. To reduce the distortion in our results caused by additional knowledge other than the screenshots of the website, we advised the test persons to skip websites they know. The selection is supported by the domain names and all mobile and desktop screenshots of the given websites from the dataset. For each test person we calculate the accuracy from the number of correctly ranked website pairs and count the total number of pairs which were shown during the evaluation to each test person. In general there is no time limit for the decision making and the test is repeated for $n$ pairs. The whole evaluation is taken place in a web application developed just for that purpose.
+
+We evaluated in total of 11 test persons regarding their performance on estimating the pairwise page rank of websites, who rated in total $1900$ pairs of websites. The average performance of humans is at $57.8\%$ and with accuracies ranging from $51.67\%$ (lowest) to $64\%$ (highest).
+
+Using a $z$-test we ensure our test persons are performing better than random guessing (which is equivalent to an accuracy of $50\%$) and the accuracies are not compromised by noise with a significance level of $p << 1\%$. In addition, we ensure using a Welch's $t$-student test with $p << 1\%$ that best model outperforms humans.
+
+\begin{table}[]
+	\center
+	\begin{tabular}{r|r|r}
+		\textbf{Test person} \# & $n$ & \textbf{Accuracy} \\ \hline \hline
+		1 & $100$ & $60.00\%$ \\ \hline
+		2 & $100$ & $64.00\%$\\ \hline
+		3 & $100$ & $58.00\%$\\ \hline
+          & $100$ & $57.00\%$\\
+        4 & $100$ & $62.00\%$\\
+          & $500$ & $56.80\%$\\ \hline
+		5 & $100$ & $56.00\%$\\ \hline
+		6 & $100$ & $60.00\%$\\ \hline
+		7 & $300$ & $51.67\%$\\ \hline
+		8 & $200$ & $57.00\%$\\ \hline
+		9 & $200$ & $54.00\%$\\
+	\end{tabular}
+	\caption[Results of Human Performance on Page Rank Estimation]{The table shows the results in our experiments on the performance of Humans on page rank estimation. While the lowest accuracy was achieved by test person 7 with $51.67\%$, the highest accuracy was $64\%$ by test person 1.}
+\label{table_human_eval_results}
+\end{table}
+
+By the end of the experiment, each test person was asked about their criteria used during the evaluation on which they based their decisions. Below is a summarization of the criteria people have used:
+
+\begin{itemize}
+	\item \textbf{Positive factors}, i.e. websites meeting those criteria are assumed by the test persons to have a higher rank: responsive and modern looking websites; official, game, news, and personal websites of seemingly famous people; high-content density; matching colors; professional looking; article-like.
+	\item \textbf{Negative factors}, i.e. websites meeting those criteria are assumed by the test persons to have a lower rank: unresponsive and old looking websites; low-content density; personal sites of seemingly unpopular persons; websites with placeholders such as domain parking or errors
+\end{itemize}
+
+The listed criteria clearly show that the test persons did not estimate the page rank solely based on aspects in vision, rather also on the content and errors they saw. The test persons emphasized that they ranked matching colors, overall responsive and professional looking websites higher than old and unresponsive looking websites. Responsiveness refers to a website's optimization for different screen sizes, in our case that is mobile and desktop screens. In addition, another major factor was the type of the given website. For instance news, games, and official websites were clearly ranked above the other sample more often.
+
+The human evaluation gives us a human baseline to compare our model to. It is also helpful because it gives us a rough idea of the task's difficulty. We emphasize that the test persons primarily decided based on their prior-experience and perception of good and bad websites, which is ultimately distorted by the common perception and understanding of websites in 2019.
+
 \subsection{Methods of Training}
 
 When introducing our model in Section \ref{sec:method} we have already enumerated three different methods of training it (end-to-end training [e2e], pre-training without fine-tuning [woft], and pre-training with fine-tuning [wft]). Due to GPU memory constraints, the training modes [e2e] and [wft] allow for a maximum batch size of two, which we is seemingly harmful to proper gradient approximation. Besides that, both training modes require gradient propagation through the GN part of the model which is relatively slow. Except for the comparison of the three approaches, which can be found in Table \ref{tab:trainmethodcomparison} we have used [woft] for all experiments.
