@@ -2,6 +2,22 @@
 
 We report results on the pairwise page rank estimation task and compare several variants of our models with each other. As a reference point we consider the human score on the task as well.
 
+\subsection{Pairwise Page Rank Estimation Task}
+
+In the pairwise page rank estimation task, the model (or human) is asked to make a guess about the relative ordering of two samples $G^{(i)}$ and $G^{(j)}$ drawn from a subset of the dataset. There are three possible answers: (1) both samples have the same rank, (2) sample $G^{(i)}$ has a higher rank than $G^{(j)}$, and (3) sample $G^{(j)}$ has a lower rank than $G^{(i)}$. A guess is either right or wrong, depending on the ground truth, i.e. $r^{(i)}$ and $r^{(j)}$.
+
+Given multiple answers to pairwise ranking questions, the accuracy can be computed as described in Equation \ref{eq:acc}. This accuracy is the main evaluation metric we report in this section and the comparison of models is also based on it.
+
+Unless indicated otherwise, we train with the following configuration:
+\begin{itemize}
+    \item Dataset version 2 (Section \ref{DatasetVersion2}), split into train, validation, and test split. We train on 60\% of the dataset, tune hyperparameters on 20\% (validation), and use the remaining 20\% for final performance reporting. The samples are assigned to the dataset splits across all ranks. E.g. we do not use a specific range of ranks as our test set. See Listing \ref{lst:getthreefold} for the dataset splitting algorithm. All accuracy scores are computed on unseen test samples; exceptions are specified.
+    \item Parameters are updated by the Adam optimizer \cite{kingma2014:adam}, parameterized with learning rate $\eta=10^{-4}$, $\beta_1=0.9$, $\beta_2=0.999$, and $\epsilon=10^{-8}$. We do not use weight decay as overfitting was not an issue. The learning rate is kept constant throughout the training.
+    \item We employ dropout \cite{srivastava2014:dropout} at a rate of $p_\text{drop}=0.1$.
+    \item Screenshots, both desktop and mobile, are normalized across all three channels (RGB) to have a mean of $0.5$ and standard deviation of $0.5$. No other data augmentation is used.
+    \item The weighting function's base is set to $b=2$.
+    \item Training were run on GPU; specifically a Nvidia GTX 970 with 4 GB of RAM.
+\end{itemize}
+
 \subsection{Human Evaluation}
 
 Many ML algorithms are developed to imitate and automate human like behavior on a hard problem, such as action recognition \cite{gu2018ava}. Human performance is often seen as the baseline for machine learning algorithms to outperform. We determine the performance of humans on vision-based page rank estimation and compare it with our ML models. 
@@ -42,22 +58,6 @@ By the end of the experiment, each test person was asked about their criteria us
 The listed criteria clearly show that the test persons did not estimate the page rank solely based on aspects in vision, rather also on the content and errors they saw. The test persons emphasized that they ranked matching colors, overall responsive and professional looking websites higher than old and unresponsive looking websites. Responsiveness refers to a website's optimization for different screen sizes, in our case that is mobile and desktop screens. In addition, another major factor was the type of the given website. For instance news, games, and official websites were clearly ranked above the other sample more often.
 
 The human evaluation gives us a human baseline to compare our model to. It is also helpful because it gives us a rough idea of the task's difficulty. We emphasize that the test persons primarily decided based on their prior-experience and perception of good and bad websites, which is ultimately distorted by the common perception and understanding of websites in 2019.
-
-\subsection{Pairwise Page Rank Estimation Task}
-
-In the pairwise page rank estimation task, the model (or human) is asked to make a guess about the relative ordering of two samples $G^{(i)}$ and $G^{(j)}$ drawn from a subset of the dataset. There are three possible answers: (1) both samples have the same rank, (2) sample $G^{(i)}$ has a higher rank than $G^{(j)}$, and (3) sample $G^{(j)}$ has a lower rank than $G^{(i)}$. A guess is either right or wrong, depending on the ground truth, i.e. $r^{(i)}$ and $r^{(j)}$.
-
-Given multiple answers to pairwise ranking questions, the accuracy can be computed as described in Equation \ref{eq:acc}. This accuracy is the main evaluation metric we report in this section and the comparison of models is also based on it.
-
-Unless indicated otherwise, we train with the following configuration:
-\begin{itemize}
-    \item Dataset version 2 (Section \ref{DatasetVersion2}), split into train, validation, and test split. We train on 60\% of the dataset, tune hyperparameters on 20\% (validation), and use the remaining 20\% for final performance reporting. The samples are assigned to the dataset splits across all ranks. E.g. we do not use a specific range of ranks as our test set. See Listing \ref{lst:getthreefold} for the dataset splitting algorithm. All accuracy scores are computed on unseen test samples; exceptions are specified.
-    \item Parameters are updated by the Adam optimizer \cite{kingma2014:adam}, parameterized with learning rate $\eta=10^{-4}$, $\beta_1=0.9$, $\beta_2=0.999$, and $\epsilon=10^{-8}$. We do not use weight decay as overfitting was not an issue. The learning rate is kept constant throughout the training.
-    \item We employ dropout \cite{srivastava2014:dropout} at a rate of $p_\text{drop}=0.1$.
-    \item Screenshots, both desktop and mobile, are normalized across all three channels (RGB) to have a mean of $0.5$ and standard deviation of $0.5$. No other data augmentation is used.
-    \item The weighting function's base is set to $b=2$.
-    \item Training were run on GPU; specifically a Nvidia GTX 970 with 4 GB of RAM.
-\end{itemize}
 
 \subsection{Methods of Training}
 
