@@ -45,7 +45,7 @@ def get_data(env: Dict[str, str], train_ratio: float = .85, valid_ratio: float =
     else:
         data = DatasetV2Cached.get_threefold(env['dataset_dir'], train_ratio, valid_ratio, logrank_b=10,
                                              feat_extr_weights_path=env['feat_extr_weights_path'])
-    data = DataLoader(data.train, 1, shuffle=False, num_workers=0, collate_fn=lambda b: b)
+    data = DataLoader(data.test, 1, shuffle=False, num_workers=0, collate_fn=lambda b: b)
     return data
 
 
