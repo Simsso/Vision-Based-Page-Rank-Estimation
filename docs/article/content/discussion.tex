@@ -12,9 +12,91 @@ Another aspect of difficulty is noise in the dataset: When crawling and screensh
 
 It is noteworthy that the dataset size was sufficient to prevent our CNN architecture from overfitting. We saw no need to make use of regularization methods such as weight decay or data augmentation because the accuracy on training and validation data was almost the same throughout all training runs. We therefore suspect that a model with greater capacity might be able to capture more fine-grained details of screenshots, thereby achieving a higher accuracy.
 
-The accuracy score as proposed in Equation \ref{eq:acc} has some \textit{unfairness} to it because the distance of two compared samples is disregarded. For example, a erroneous assessment of the relative ranking of two samples with ranks \#12,000 and \#12,001 is contributing to the accuracy just like the confusion of samples with ranks \#1,000 and \#25,000, even though the latter should be easier to disentangle. An alternative formulation could take the difficulty of a pairwise comparison into account.
+The accuracy score as proposed in Equation \ref{eq:acc} has some \textit{unfairness} to it, because the distance of two compared samples is disregarded. For example, a erroneous assessment of the relative ranking of two samples with ranks \#12,000 and \#12,001 is contributing to the accuracy just like the confusion of samples with ranks \#1,000 and \#25,000, even though the latter should presumably be easier to disentangle. Figure \ref{fig:accvsrank} supports this hypothesis by plotting the mean accuracy against the sample rank. Samples at the end of the spectrum tend to have higher accuracy scores than the ones in the middle. Alternative accuracy metric formulations could take the difficulty of a pairwise comparison into account.
 
-Insert plot on mean accuracy vs. rank (log scale).
+\begin{figure}
+    \centering
+    \begin{tikzpicture}
+
+        \pgfplotsset{
+            scale only axis,
+        }
+      
+        \begin{axis}[
+          xlabel=Rank $r$,
+          ylabel=Accuracy,
+          xmin=1,xmax=100000,
+        ]
+          %\addplot[mark=x,color=black,error bars/.cd, y dir=both,y explicit]
+          \addplot[mark=x,color=black]
+       coordinates { 
+      (2042.0927536231884, 0.6323095560073853) +- (0.252880334854126,0.252880334854126)
+      (5994.739130434783, 0.6122098565101624) +- (0.23341456055641174,0.23341456055641174)
+      (9987.672131147541, 0.5961850881576538) +- (0.22007544338703156,0.22007544338703156)
+      (14314.282571912014, 0.6346387267112732) +- (0.19101302325725555,0.19101302325725555)
+      (18001.915745856353, 0.6088740229606628) +- (0.16929037868976593,0.16929037868976593)
+      (21796.904761904763, 0.6173704266548157) +- (0.152631938457489,0.152631938457489)
+      (25896.116013071896, 0.5939950942993164) +- (0.14189182221889496,0.14189182221889496)
+      (29956.708053691276, 0.5828483700752258) +- (0.12687844038009644,0.12687844038009644)
+      (34018.020188425304, 0.5788435935974121) +- (0.10543978214263916,0.10543978214263916)
+      (37994.73270013568, 0.592072069644928) +- (0.07398778200149536,0.07398778200149536)
+      (42004.752380952385, 0.5882502198219299) +- (0.05585600063204765,0.05585600063204765)
+      (45999.76454668471, 0.5834199786186218) +- (0.042080748826265335,0.042080748826265335)
+      (50028.14344827586, 0.5820223093032837) +- (0.03431824594736099,0.03431824594736099)
+      (53989.265027322406, 0.5824041962623596) +- (0.04247155413031578,0.04247155413031578)
+      (57966.04674220963, 0.5840225219726562) +- (0.05858512595295906,0.05858512595295906)
+      (61993.13711911358, 0.586538553237915) +- (0.07541247457265854,0.07541247457265854)
+      (66035.42020497804, 0.590856671333313) +- (0.0997852087020874,0.0997852087020874)
+      (69878.57388316152, 0.5914943218231201) +- (0.11854474246501923,0.11854474246501923)
+      (74233.90106007067, 0.6241846680641174) +- (0.1272871345281601,0.1272871345281601)
+      (77989.69867060562, 0.6133634448051453) +- (0.1402067393064499,0.1402067393064499)
+      (82030.64427480916, 0.6063210964202881) +- (0.17285984754562378,0.17285984754562378)
+      (86000.5987933635, 0.6055595278739929) +- (0.20112822949886322,0.20112822949886322)
+      (90098.17037037037, 0.686475932598114) +- (0.19338952004909515,0.19338952004909515)
+      (93881.48888888888, 0.5622369647026062) +- (0.2505538761615753,0.2505538761615753)
+      (98061.09816971714, 0.569052517414093) +- (0.26824629306793213,0.26824629306793213)
+      };\label{test_set}
+      
+          \addplot[only marks,mark=o,color=black]
+            coordinates{
+      (1982.0199443413728, 0.6462764739990234) +- (0.2512509226799011,0.2512509226799011)
+      (5978.758321933425, 0.6189908385276794) +- (0.2340804934501648,0.2340804934501648)
+      (9902.487074030552, 0.5953881144523621) +- (0.22232778370380402,0.22232778370380402)
+      (14307.361990950227, 0.6325339078903198) +- (0.19089166820049286,0.19089166820049286)
+      (18004.98867240598, 0.6146559119224548) +- (0.17392544448375702,0.17392544448375702)
+      (21806.290449438202, 0.603556752204895) +- (0.15489085018634796,0.15489085018634796)
+      (25894.420545746387, 0.5976948142051697) +- (0.1361941397190094,0.1361941397190094)
+      (29980.35864022663, 0.5823514461517334) +- (0.12486264109611511,0.12486264109611511)
+      (33985.87261146497, 0.578705906867981) +- (0.10141576081514359,0.10141576081514359)
+      (38000.94506476106, 0.5942217111587524) +- (0.06816687434911728,0.06816687434911728)
+      (41999.57528089888, 0.5835291147232056) +- (0.055270206183195114,0.055270206183195114)
+      (45996.97393689986, 0.5826137065887451) +- (0.0386173278093338,0.0386173278093338)
+      (49984.56206737425, 0.5810558199882507) +- (0.03277594968676567,0.03277594968676567)
+      (53996.78541569902, 0.5815796256065369) +- (0.040436532348394394,0.040436532348394394)
+      (57971.61578449905, 0.5827121138572693) +- (0.05864390358328819,0.05864390358328819)
+      (62001.87233054782, 0.5853626132011414) +- (0.07834165543317795,0.07834165543317795)
+      (66026.0411736867, 0.589715838432312) +- (0.10076970607042313,0.10076970607042313)
+      (69899.80461711712, 0.5951372981071472) +- (0.11936279386281967,0.11936279386281967)
+      (74265.74804570054, 0.6281706094741821) +- (0.12839582562446594,0.12839582562446594)
+      (77984.103948026, 0.6186800599098206) +- (0.1424257755279541,0.1424257755279541)
+      (81995.44253770151, 0.6045624017715454) +- (0.17524945735931396,0.17524945735931396)
+      (86010.70334685598, 0.6146765351295471) +- (0.1952735334634781,0.1952735334634781)
+      (90092.59086444008, 0.6757708787918091) +- (0.20028313994407654,0.20028313994407654)
+      (93889.90120620333, 0.5717195272445679) +- (0.2455245852470398,0.2455245852470398)
+      (98082.11754874652, 0.5708103179931641) +- (0.26858896017074585,0.26858896017074585)
+            }; \label{train_set}
+          
+          \addplot[dashed][domain=1:100000]{0.6};\label{test_set_avg}
+          
+          \addlegendimage{/pgfplots/refstyle=test_set}\addlegendentry{Test set}
+          \addlegendimage{/pgfplots/refstyle=train_set}\addlegendentry{Train set}
+          \addlegendimage{/pgfplots/refstyle=test_set_avg}\addlegendentry{Test set (avg)}
+        \end{axis}
+      
+      \end{tikzpicture}
+    \caption[Accuracy vs. rank]{Mean accuracy of samples within a certain rank rages. To compute the data points, batches of samples of 4k ranks were grouped and the mean accuracy was computed. There is a clear tendency of samples in the middle to be harder to classify than samples on the extreme ends of the rank spectrum. The model used to create the plot is [baseline+avg], its performance on the entire test set is indicated by the dashed line. The train set points tends to behave similarly as the test set points. At low ranks, the model is significantly better on the training data which may be attributed to the rank dependent weighting function (see Section \ref{sec:loss}).}
+    \label{fig:accvsrank}
+\end{figure}
 
 In summary, we can strongly assume that a correlation between page rank and visual features exists. Our model was able to learn these features and make use of them to solve the pairwise ranking task with an accuracy of xx.x\%. Based on the assumption that an upper limit below 70\% exists, which cannot be exceeded by purely vision-based models, the outcomes of our trainings are a success.
 
