@@ -296,7 +296,7 @@ The loss asymptotes to a linear function. According to \cite{Burges:learningtora
 
 We introduce the additional weighting factor
 \begin{equation}\label{eq:weightingfactor}
-    w_b(r)=\left(\frac{\log\left(r\times r_\text{max}\right)}{\log r_\text{max}}-1\right)^b\,,
+    w_b(r)=1-\left(\frac{\log\left(r\times r_\text{max}\right)}{\log r_\text{max}}-1\right)^b\,,
 \end{equation}which counteracts the imbalance of samples for high and low ranks: The first 10,000 samples are presumably more distinctive than e.g. the samples from 80,000 to 90,000. Therefore the samples with high ranks should also have a higher contribution to the loss. The hyperparameter $b$ balances this favoring. $r_\text{max}$ is the maximum rank in the dataset, in our case $r_\text{max}=100,000$. Equation \ref{eq:weightingfactor} is plotted for several values of $b$ in Figure \ref{fig:weightingfactor}.
 
 \begin{figure}\centering
@@ -313,7 +313,8 @@ We introduce the additional weighting factor
             ]
             \addplot[][domain=1:100000]{1-pow(ln(x*100000) / ln(100000) - 1., 1)};
             \addlegendentry{$b=1$}
-            \addplot[style=dashed][domain=1:100000]{1-pow(ln(x*100000) / ln(100000) - 1., 2)};
+            \addplot[style=dashed][domain=1:100000]{
+                1-pow(ln(x*100000) / ln(100000) - 1., 2)};
             \addlegendentry{$b=2$}
             \addplot[style=dotted][domain=1:100000]{1-pow(ln(x*100000) / ln(100000) - 1., 10)};
             \addlegendentry{$b=10$}
@@ -324,6 +325,12 @@ We introduce the additional weighting factor
     \end{tikzpicture}
     \caption{Weighting factor $w_b$ plotted for several values of $b$}\label{fig:weightingfactor}
 \end{figure}
+
+It is noteworthy that a change of $b$ will also affect the average magnitude of the loss and thereby the effective step size. When comparing different weighting factors with each other, the loss term should therefore be divided by
+\begin{equation}\label{eq:losswnormalization}
+\frac{2}{r_\text{max}}\int_1^{r_\text{max}}w_b(r)dr\,,
+\end{equation}
+which evaluates to $\approx0.95$ for $b=10$ and $\approx0.17$ for $b=1$. Intuitively, the loss must be scaled up more (divided by a lower value) if the area under curve is lower. For $b=1$ it is lower than it is e.g. for $b=10$ (see Figure \ref{fig:weightingfactor}).
 
 During training, the gradient induced by the loss term (Equation \ref{eq:loss}) can be approximated with fewer than $N$ samples, so called mini-batches. This is less costly than computing the gradient for the exact problem and has a regularizing effect, see \cite{DBLP:journals/corr/KeskarMNST16}.
 
