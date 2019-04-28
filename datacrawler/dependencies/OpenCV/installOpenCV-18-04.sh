@@ -1,4 +1,5 @@
 #!/bin/bash
+# CREDITS TO learnOpenCV.com
 
 ############## WELCOME #############
 # Clean build directories
