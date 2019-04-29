@@ -74,8 +74,8 @@ For [woft] we attach a linear layer to the screenshot feature extractor and trai
         \textbf{Training} & \textbf{Accuracy} & \textbf{Wall-clock time}\\\hline
         \textbf{[e2e]} & $xx.x\%$ & xx h\\
         \textbf{[wft]} & $xx.x\%$ & xx h\\
-        \textbf{[woft]} & $xx.x\%$ & xx h\\
-        \textbf{[woft] + GN} & $xx.x\%$ & xx h\\
+        \textbf{[woft]} & $58.30\%$ & xx h\\
+        \textbf{[woft] + GN} & $60.54\%$ & xx h\\
     \end{tabular}
     \caption[Model training method comparison]{Model training method comparison: end-to-end training [e2e], pre-training without fine-tuning [woft], pre-training with fine-tuning [wft]. The accuracy is reported on the held-out test set; wall-clock time is the time per epoch.}
     \label{tab:trainmethodcomparison}
@@ -108,15 +108,16 @@ We compare the following GN variants to each other, all trained in [woft] fashio
 
 \begin{table}
     \centering
-    \begin{tabular}{lrrr}
-        \textbf{GN variant} & \textbf{Test acc.} & \textbf{Train acc.} & \textbf{\#Blocks}\\\hline
-        \textbf{[baseline+avg]} & $xx.x\%$ & $xx.x\%$ & 1\\
-        \textbf{[baseline+max]} & $xx.x\%$ & $xx.x\%$ & 1\\
-        \textbf{[1-core]} & $xx.x\%$ & $xx.x\%$ & 3\\
-        \textbf{[3-core]} & $xx.x\%$ & $xx.x\%$ & 5\\
-        \textbf{[3-core-shared]} & $xx.x\%$ & $xx.x\%$ & 5\\
+    \begin{tabular}{lrrrr}
+        \textbf{GN variant} & \textbf{Accuracy} & \textbf{Relative} & \textbf{\#Params} & \textbf{\#Blocks}\\\hline
+        \textbf{[woft]} & $58.30\%$ & $+0\%$ & $0$ & 0 \\
+        \textbf{[baseline+avg]} & $60.00\%$ & $+20.5\%$ & $xxx$ & 1\\
+        \textbf{[baseline+max]} & $59.81\%$ & $+18.2\%$ & $xxx$ & 1\\
+        \textbf{[1-core]} & $60.30\%$ & $+24.1\%$ & $41,217$ & 3\\
+        \textbf{[3-core]} & $\bm{60.54\%}$ & $+27.0\%$ & $123,521$ & 5\\
+        \textbf{[3-core-shared]} & $60.44\%$ & $+25.8\%$ & $41,217$ & 5\\
     \end{tabular}
-    \caption[Comparison of GN variants]{Comparison of GN variants}
+    \caption[Comparison of GN variants]{Comparison of GN variants. [woft] is the CNN applied per image. An accuracy of $50\%$ corresponds to random guessing which is why we compare the model's relative differences, where [woft] has $8.30\%$ and e.g. [baseline+avg] improves over it by $20.5\%$ by being $10\%$ above random guessing. The number of parameters is for the GN only, the CNN is omitted. The number of blocks are GN blocks. The best model is a GN with three core blocks which do not share weights.}
     \label{tab:gnvariantscomparison}
 \end{table}
 
