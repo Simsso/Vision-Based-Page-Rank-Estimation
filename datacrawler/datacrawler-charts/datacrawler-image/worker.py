@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# From https://kubernetes.io/docs/tasks/job/fine-parallel-processing-work-queue/
 import subprocess
 import rediswq
 import os
