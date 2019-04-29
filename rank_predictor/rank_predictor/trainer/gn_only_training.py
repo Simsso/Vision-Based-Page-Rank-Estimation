@@ -10,7 +10,7 @@ from rank_predictor.trainer.ranking.probabilistic_loss import ProbabilisticLoss
 from sacred import Experiment
 from sacred.observers import MongoObserver
 
-name = 'gn_only_fe_08_deep_07'
+name = 'gn0_avg_wb_10'
 ex = Experiment(name)
 
 ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred'))
@@ -19,20 +19,21 @@ ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred')
 @ex.config
 def run_config():
     learning_rate: float = 5e-6
-    batch_size = 8
-    pairwise_batch_size = 8
-    epochs = 20
+    batch_size = 12
+    pairwise_batch_size = 12
+    epochs = 10
     optimizer = 'adam'
     train_ratio, valid_ratio = .6, .2
-    model_name = 'GNDeep'
+    model_name = 'GNAvg'
     loss = 'ProbabilisticLoss'
-    weighting = 'c_ij = c_ij'
+    weighting = 'c_ij = c_ij & scaling_fac'
     logrank_b = 10
-    drop_p = 0.1
-    num_core_blocks = 6
+    drop_p = 0
+    num_core_blocks = 0
     share_core_weights = False
     lr_scheduler = 'None'
     lr_scheduler_gamma = None
+    loss_scaling_fac = 1/0.95
     feat_extr_weights_path = os.path.expanduser('~/dev/pagerank/models/featextr_08_0010.pt')
 
 
@@ -40,7 +41,7 @@ def run_config():
 def train(learning_rate: float, batch_size: int, pairwise_batch_size: int, epochs: int, optimizer: str,
           train_ratio: float, valid_ratio: float, model_name: str, loss: str, logrank_b: float, drop_p: float,
           num_core_blocks: int, lr_scheduler: str, lr_scheduler_gamma: float, feat_extr_weights_path: str,
-          share_core_weights: bool) -> str:
+          share_core_weights: bool, loss_scaling_fac: float) -> str:
 
     assert pairwise_batch_size >= batch_size, "Pairwise batch size most be greater than or equal to the batch size"
 
@@ -69,7 +70,7 @@ def train(learning_rate: float, batch_size: int, pairwise_batch_size: int, epoch
         raise ValueError("Unknown optimizer '{}'".format(optimizer))
 
     if loss == 'ProbabilisticLoss':
-        loss = ProbabilisticLoss()
+        loss = ProbabilisticLoss(loss_scaling_fac)
     else:
         raise ValueError("Unknown loss '{}'".format(loss))
 

@@ -4,8 +4,12 @@ from torch import Tensor
 
 class ProbabilisticLoss:
 
-    def __init__(self) -> None:
+    def __init__(self, scaling_fac: float = 1.0) -> None:
+        """
+        :param scaling_fac: Factor by which the loss will be scaled.
+        """
         super().__init__()
+        self.scaling_fac = scaling_fac
 
     @staticmethod
     def ground_truth_matrix(r: Tensor) -> Tensor:
@@ -110,5 +114,7 @@ class ProbabilisticLoss:
 
         # compute total cost (normalize by n**2)
         c = torch.sum(c_ij) / (n**2)
+
+        c *= self.scaling_fac
 
         return c
