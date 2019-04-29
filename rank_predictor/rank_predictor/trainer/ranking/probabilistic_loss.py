@@ -110,7 +110,7 @@ class ProbabilisticLoss:
 
         # weighting of each prediction is w_i * w_j
         # w_ij = w * w_t
-        c_ij = c_ij * w   # apply weighting
+        c_ij = c_ij   # apply weighting
 
         # compute total cost (normalize by n**2)
         c = torch.sum(c_ij) / (n**2)
