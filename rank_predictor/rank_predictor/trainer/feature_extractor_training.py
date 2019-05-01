@@ -9,7 +9,7 @@ from rank_predictor.data.v2.pagerank_dataset import DatasetV2Screenshots
 from rank_predictor.model.graph_extractor_full import ScreenshotsFeatureExtractorWithHead
 from rank_predictor.trainer.training_run import FeatureExtractorTrainingRun
 
-name = 'featextr_08'
+name = 'featextr_08_wob'
 ex = Experiment(name)
 
 ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred'))
@@ -23,16 +23,18 @@ def run_config():
     optimizer = 'adam'
     train_ratio, valid_ratio = .6, .2
     loss = 'ProbabilisticLoss'
-    weighting = 'c_ij = c_ij'
+    weighting = 'c_ij = c_ij !* w'
     logrank_b = 10
     drop_p = 0.1
     lr_scheduler = 'None'
     lr_scheduler_gamma = 0
+    loss_scaling_fac = 1/2
 
 
 @ex.main
 def train(learning_rate: float, batch_size: int, epochs: int, optimizer: str, train_ratio: float, valid_ratio: float,
-          loss: str, logrank_b: float, drop_p: float, lr_scheduler: str, lr_scheduler_gamma: float) -> str:
+          loss: str, logrank_b: float, drop_p: float, lr_scheduler: str, lr_scheduler_gamma: float,
+          loss_scaling_fac: float) -> str:
 
     logger = setup_custom_logger('default')
 
@@ -52,7 +54,7 @@ def train(learning_rate: float, batch_size: int, epochs: int, optimizer: str, tr
         raise ValueError("Unknown optimizer '{}'".format(optimizer))
 
     if loss == 'ProbabilisticLoss':
-        loss = ProbabilisticLoss()
+        loss = ProbabilisticLoss(loss_scaling_fac)
     else:
         raise ValueError("Unknown loss '{}'".format(loss))
 
