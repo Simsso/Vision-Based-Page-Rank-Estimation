@@ -10,7 +10,7 @@ from rank_predictor.trainer.ranking.probabilistic_loss import ProbabilisticLoss
 from sacred import Experiment
 from sacred.observers import MongoObserver
 
-name = '10wob_avg_01'
+name = '10wob_max_01'
 ex = Experiment(name)
 
 ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred'))
@@ -24,7 +24,7 @@ def run_config():
     epochs = 10
     optimizer = 'adam'
     train_ratio, valid_ratio = .6, .2
-    model_name = 'GNAvg'
+    model_name = 'GNMax'
     loss = 'ProbabilisticLoss'
     weighting = 'c_ij = c_ij !*w & scaling_fac'
     logrank_b = 10
