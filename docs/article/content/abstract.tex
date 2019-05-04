@@ -1,10 +1,15 @@
 \begin{abstract}
 \section*{Abstract}\label{sec:abstract}
-%\addcontentsline{toc}{subsection}{\nameref{sec:abstract}}
-xxx
+\addcontentsline{toc}{subsection}{\nameref{sec:abstract}}
+
+Based on an available list of the top 100k most popular domains on the web, we define a novel vision-based page rank estimation task: A model is asked to predict the rank of a given web domain purely based on screenshots of its web pages and information about the web link graph that interconnects them.
+
+We create a page rank dataset containing screenshots and link graph structure using a data crawler specially developed for this purpose. With this work we open-source the dataset for future research.
+
+Our best performing model on the page rank estimation task is a graph network used in combination with a convolutional neural network for image feature extraction. It is trained with SGD on a pairwise ranking loss. We describe our model architecture, analyze its performance and compare it to human performance on the task, and investigate how the model can be utilized to better understand the correlation between web page rank and look.
 
 \vspace{2em}
 
-{\bfseries Keywords}: Graph networks, learning to rank, webpage ranking
+{\bfseries Keywords}: Graph networks, learning to rank, web page ranking
 \end{abstract}
 \cleardoublepage
