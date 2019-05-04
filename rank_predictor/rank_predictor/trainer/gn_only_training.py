@@ -10,7 +10,7 @@ from rank_predictor.trainer.ranking.probabilistic_loss import ProbabilisticLoss
 from sacred import Experiment
 from sacred.observers import MongoObserver
 
-name = '10wob_deep_01'
+name = '10wob_deep_02_share'
 ex = Experiment(name)
 
 ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred'))
@@ -29,8 +29,8 @@ def run_config():
     weighting = 'c_ij = c_ij !*w & scaling_fac'
     logrank_b = 10
     drop_p = .1
-    num_core_blocks = 1
-    share_core_weights = False
+    num_core_blocks = 3
+    share_core_weights = True
     lr_scheduler = 'None'
     lr_scheduler_gamma = None
     loss_scaling_fac = 1/2
