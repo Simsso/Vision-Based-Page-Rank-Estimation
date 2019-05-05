@@ -44,10 +44,30 @@ set(CEFSIMPLE_SRCS
         datamodules/screenshot-datamodule/ScreenshotHandler.h
         datamodules/DataBase.cpp
         datamodules/DataBase.h
-        datamodules/screenshot-datamodule/ScreenshotData.cpp
-        datamodules/screenshot-datamodule/ScreenshotData.h
         datamodules/screenshot-datamodule/Screenshot.cpp
-        datamodules/screenshot-datamodule/Screenshot.h)
+        datamodules/screenshot-datamodule/Screenshot.h
+        datamodules/screenshot-datamodule/ScreenshotRequestHandler.cpp
+        datamodules/screenshot-datamodule/ScreenshotRequestHandler.h
+        datamodules/url-datamodule/UrlDataModule.cpp
+        datamodules/url-datamodule/UrlDataModule.h
+        datamodule-configs/UrlConfiguration.cpp
+        datamodule-configs/UrlConfiguration.h
+        datamodules/url-datamodule/UrlClient.cpp
+        datamodules/url-datamodule/UrlClient.h
+        datamodules/url-datamodule/UrlLoadHandler.cpp
+        datamodules/url-datamodule/UrlLoadHandler.h
+        datamodules/url-datamodule/UrlRenderHandler.cpp
+        datamodules/url-datamodule/UrlRenderHandler.h
+        datamodules/url-datamodule/UrlDOMVisitor.cpp
+        datamodules/url-datamodule/UrlDOMVisitor.h
+        DatacrawlerApp.cpp
+        DatacrawlerApp.h
+        DatacrawlerRenderProcessHandler.cpp
+        DatacrawlerRenderProcessHandler.h
+        datamodules/url-datamodule/Url.cpp
+        datamodules/url-datamodule/Url.h
+        datamodules/url-datamodule/UrlCollection.cpp
+        datamodules/url-datamodule/UrlCollection.h GraphOutput.cpp GraphOutput.h datamodules/screenshot-datamodule/ScreenshotLoadhandler.cpp datamodules/screenshot-datamodule/ScreenshotLoadhandler.h datamodules/url-datamodule/UrlRequestHandler.cpp datamodules/url-datamodule/UrlRequestHandler.h datamodules/url-datamodule/UrlResponseFilter.cpp datamodules/url-datamodule/UrlResponseFilter.h datamodules/url-datamodule/UrlDisplayHandler.cpp datamodules/url-datamodule/UrlDisplayHandler.h)
 
 APPEND_PLATFORM_SOURCES(CEFSIMPLE_HELPER_SRCS)
 source_group(cefsimple FILES ${CEFSIMPLE_HELPER_SRCS})
@@ -79,14 +99,14 @@ if(OS_LINUX)
   target_link_libraries(${CEF_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
 
   # Add OpenCV-3.4.1
-  # SET(OpenCV_DIR "${CEF_ROOT}/OpenCV/installation/OpenCV-3.4.1/share/OpenCV/")
-  # find_package(OpenCV OPTIONAL)
-  # target_link_libraries(${CEF_TARGET} ${OpenCV_LIBS})
+  SET(OpenCV_DIR "${CEF_ROOT}/OpenCV/installation/OpenCV-3.4.1/share/OpenCV/")
+  find_package(OpenCV)
+  target_link_libraries(${CEF_TARGET} ${OpenCV_LIBS})
 
 
   # Copy OpenCV resources to target
-  # SET(OPENCV_RESOURCE_DIR "${CEF_ROOT}/OpenCV/installation/OpenCV-3.4.1/lib/")
-  # SET(OPENCV_RESOURCE_FILES  libopencv_imgproc.so.3.4 libopencv_imgcodecs.so.3.4 libopencv_core.so.3.4)
+  SET(OPENCV_RESOURCE_DIR "${CEF_ROOT}/OpenCV/installation/OpenCV-3.4.1/lib/")
+  SET(OPENCV_RESOURCE_FILES  libopencv_imgproc.so.3.4 libopencv_imgcodecs.so.3.4 libopencv_core.so.3.4)
 
   # Set rpath so that libraries can be placed next to the executable.
   set_target_properties(${CEF_TARGET} PROPERTIES INSTALL_RPATH "$ORIGIN")

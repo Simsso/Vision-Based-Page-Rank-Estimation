@@ -17,6 +17,6 @@ DataModuleBase::DataModuleBase(){
  * @param url, which shall be processed by the given DataModule
  * @return nullptr if not implemented, otherwise DataBase of the specific DataModule instance
  */
-DataBase* DataModuleBase::process(CefMainArgs* mainArgs, std::string url){
+DataBase* DataModuleBase::process(std::string url){
     return nullptr;
 }

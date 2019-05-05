@@ -1,19 +1,22 @@
 #ifndef DATACRAWLER_PROJECT_NODEELEMENT_H
 #define DATACRAWLER_PROJECT_NODEELEMENT_H
 
+#include <list>
+
 #include "../datamodules/DataBase.h"
-#include <vector>
 
 class NodeElement {
 
 private:
-   std::vector<DataBase*>* data;
+   std::vector<DataBase*> data;
+   bool startNode;
 
 public:
     void addData(DataBase*);
-    std::vector<DataBase*> * getData();
+    std::vector<DataBase*>* getData();
+    bool isStartNode();
 
-    NodeElement();
+    NodeElement(bool);
     ~NodeElement();
 };
 

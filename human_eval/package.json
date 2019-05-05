@@ -1,0 +1,27 @@
+{
+  "name": "pagerank_human_eval",
+  "version": "0.1.0",
+  "description": "Pagerank dataset human evaluation tool",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Simsso/Pagerank-Estimation-Deep-Graph-Networks.git"
+  },
+  "author": "Timo Denk, Samed Güner",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Simsso/Pagerank-Estimation-Deep-Graph-Networks/issues"
+  },
+  "homepage": "https://github.com/Simsso/Pagerank-Estimation-Deep-Graph-Networks#readme",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "dotenv": "^7.0.0",
+    "express": "^4.16.4",
+    "lowdb": "^1.0.0",
+    "morgan": "^1.9.1",
+    "uuid": "^3.3.2"
+  }
+}

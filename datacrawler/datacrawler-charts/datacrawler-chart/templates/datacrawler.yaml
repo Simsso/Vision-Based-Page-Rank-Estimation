@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: datacrawler-job
+spec:
+  parallelism: 30
+  template:
+    metadata:
+      labels:
+        name: datacrawler
+    spec:
+      containers:
+      - name: datacrawler
+        image: gcr.io/projects-220919/datacrawler:latest
+        resources:
+          requests:
+            cpu: 500m
+            memory: 500Mi
+        volumeMounts:
+        - name: datacrawler-output
+          mountPath: /opt/apt/output
+        securityContext:
+          allowPrivilegeEscalation: true
+      restartPolicy: OnFailure
+      volumes:
+      - name: datacrawler-output
+        persistentVolumeClaim:
+           claimName: datacrawler-output-claim

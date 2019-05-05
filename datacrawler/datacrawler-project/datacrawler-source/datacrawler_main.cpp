@@ -1,27 +1,50 @@
 #include "datacrawler.h"
 
-#define DATASET_VERSION_1
-
 Logger *Logger::instance = 0;
 
-#ifdef DATASET_VERSION_1
+#include "stdlib.h"
+#include "GraphOutput.h"
+#include "DatacrawlerApp.h"
 
 int main(int argc, char *argv[]) {
-
-    CefMainArgs mainArgs(argc, argv);
-    CefExecuteProcess(mainArgs, NULL, NULL);
-
+    setenv("LOG_LEVEL", "LOG_ALL", true);
     Logger *logger = Logger::getInstance();
+    CefMainArgs mainArgs(argc, argv);
 
-    logger->info("Starting Datacrawler !");
+    CefRefPtr<DatacrawlerApp> datacrawlerApp(new DatacrawlerApp());
 
-    char *url = std::getenv("URL");
+    int exitCode = CefExecuteProcess(mainArgs, datacrawlerApp, NULL);
+    if (exitCode >= 0) {
+        // The sub-process terminated, exit now.
+        return exitCode;
+    }
+    CefSettings cefSettings;
+    cefSettings.windowless_rendering_enabled = true;
 
-    Datacrawler datacrawler(&mainArgs);
+    if(CefInitialize(mainArgs, cefSettings, NULL, NULL))
+        logger->info("Initializing CEF finished .. !");
+    else {
+        logger->fatal("Initializing has failed!");
+    }
+
+    string url = std::getenv("URL");
+    string rank = std::getenv("RANK");
+    Datacrawler datacrawler;
     datacrawler.init();
 
-    datacrawler.process(url);
-    logger->info("Datacrawler execution finished!");
-}
+    map<string, NodeElement*> * graph;
+    GraphOutput* graphOutput;
 
-#endif // DATASET_VERSION_1
+    graph = datacrawler.process(url);
+    graphOutput = new GraphOutput(graph, rank);
+    graphOutput->generateGraph();
+
+    for(auto x: *graph)
+        delete x.second;
+
+    delete graph;
+    delete graphOutput;
+
+    logger->info("Datacrawler execution finished!");
+    CefShutdown();
+}
