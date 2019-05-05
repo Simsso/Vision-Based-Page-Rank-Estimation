@@ -1,4 +1,5 @@
 \section{Discussion and Analysis}
+\label{sec:discussion}
 
 In this section we discuss our results and compare them to the human score. We elaborate on potential limiting factors, which may be capping the maximum achievable accuracy. Furthermore, we analyze the model internals, try to interpret them, and distinguish between hard and easy samples in the dataset.
 
@@ -143,11 +144,11 @@ Hard and easy samples have qualitative meaning because they are representative f
 
 We split the test dataset ranks into 25 bins (each containing 4k samples) and search for the hardest and easiest sample in each of those bins. The first desktop screenshot of each of those samples is depicted in Figure \ref{fig:hardandeasysamples} (50 screenshots in total). We have noticed that samples in the middle of the spectrum had accuracies much closer to 50\%. For instance, the easiest sample in the bin $r^{(i)}\in{\left\{44000, \dots, 47999\right\}}$ (which is $i=44064$) has an accuracy of just $62.83\%$. All maximum/mininum accuracies vs. ranks can be seen in Figure \ref{fig:minmaxaccvsrank}.
 
-\begin{figure}
-    \floatbox[{\capbeside\thisfloatsetup{capbesideposition={left,top},capbesidewidth=4cm}}]{figure}[\FBwidth]
-    {\caption[Easy and hard samples across all ranks]{Easy (left) and hard (right) samples across all ranks from high (top) to low (bottom); best seen on a computer screen. The images are the hardest/easiest samples in rank-bins of size $4000$. Each image corresponds to one cross-mark in Figure \ref{fig:minmaxaccvsrank}.}\label{fig:hardandeasysamples}}
-    {\includegraphics[height=\textheight]{resources/hard-easy.jpg}}
-\end{figure}
+%\begin{figure}
+%    \floatbox[{\capbeside\thisfloatsetup{capbesideposition={left,top},capbesidewidth=4cm}}]{figure}[\FBwidth]
+%    {\caption[Easy and hard samples across all ranks]{Easy (left) and hard (right) samples across all ranks from high (top) to low (bottom); best seen on a computer screen. The images are the hardest/easiest samples in rank-bins of size $4000$. Each image corresponds to one cross-mark in Figure \ref{fig:minmaxaccvsrank}.}\label{fig:hardandeasysamples}}
+%    {\includegraphics[height=\textheight]{resources/hard-easy.jpg}}
+%\end{figure}
 
 \begin{figure}
     \centering

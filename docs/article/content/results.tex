@@ -1,4 +1,5 @@
 \section{Results}
+\label{sec:results}
 
 We report results on the pairwise page rank estimation task and compare several variants of our models with each other. As a reference point we consider the human score on the task as well.
 
@@ -15,7 +16,8 @@ Unless indicated otherwise, we train with the following configuration:
     \item Parameters are updated by the Adam optimizer \cite{kingma2014:adam}, parameterized with learning rate $\eta=5\times10^{-6}$, $\beta_1=0.9$, $\beta_2=0.999$, and $\epsilon=10^{-8}$. We do not use weight decay as overfitting was not an issue. The learning rate is kept constant throughout the training.
     \item We employ dropout \cite{srivastava2014:dropout} at a rate of $p_\text{drop}=0.1$.
     \item Screenshots, both desktop and mobile, are normalized across all three channels (RGB) to have a mean of $0.5$ and standard deviation of $0.5$. No other data augmentation is used.
-    \item The weighting function's base is set to $b=10$.
+    \item The weighting function is disabled, i.e. $w_b=1$.
+    \item The feature vector dimensionality is set to $d_\text{featvec}=32$.
     \item The training machine is equipped with an AMD Ryzen 5 1600 six-core processor and a Nvidia GeForce GTX 970 with 4039 MB of RAM.
 \end{itemize}
 

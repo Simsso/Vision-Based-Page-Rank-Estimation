@@ -2,11 +2,13 @@
 \section*{Abstract}\label{sec:abstract}
 \addcontentsline{toc}{subsection}{\nameref{sec:abstract}}
 
-Based on an available list of the top 100k most popular domains on the web, we define a novel vision-based page rank estimation task: A model is asked to predict the rank of a given web domain purely based on screenshots of its web pages and information about the web link graph that interconnects them.
+Based on an available list of the top 100k most popular domains on the web, we define a novel vision-based page rank estimation task: A model is asked to predict the rank of a given web domain purely based on screenshots of its web pages and information about the web link graph that interconnects them. This work is a feasibility study seeking to determine to what extent a website's ranking can be inferred from its look.
 
-We create a page rank dataset containing screenshots and link graph structure using a data crawler specially developed for this purpose. With this work we open-source the dataset for future research.
+In order to find out, we create a page rank dataset containing screenshots and link graph structure using a data crawler specially developed for this purpose. With this work we open-source the dataset for future research.
 
-Our best performing model on the page rank estimation task is a graph network used in combination with a convolutional neural network for image feature extraction. It is trained with SGD on a pairwise ranking loss. We describe our model architecture, analyze its performance and compare it to human performance on the task, and investigate how the model can be utilized to better understand the correlation between web page rank and look.
+We combine a graph network with a convolutional neural network for image feature extraction. It is trained with SGD on a pairwise ranking loss. We describe our model architecture, analyze its performance and compare it to human performance on the task, and investigate how the model can be utilized to better understand the correlation between web page rank and look.
+
+The best performing model has an accuracy of 63\% at choosing the higher ranked page given a tuple of two unseen web pages, thereby exceeding the human baseline by 5\%. The clear deviation from random guessing (50\%) indicates a correlation between rank and visual appearance of the top 100k most popular domains.
 
 \vspace{2em}
 
