@@ -5,7 +5,7 @@ This section describes our approach to solving the page rank estimation problem.
 
 The pagerank estimation problem is, given a webpage represented as an attributed graph with screenshots, to estimate the global popularity of that webpage.
 Our ground-truth for \textit{popularity} is a list containing 100,000 webpages, created by Open PageRank.
-More details can be found in Section \ref{OpenPageRank}.
+More details can be found in Section~\ref{OpenPageRank}.
 The given data has several characteristics which have influenced our way of tackling the problem:
 
 \begin{itemize}
@@ -18,7 +18,7 @@ The given data has several characteristics which have influenced our way of tack
 
 Motivated by the stated observations, we use a combination of CNN and graph network (GN), trained with ranking loss functions, to predict page ranks.
 
-Learning features as opposed to hand-engineering them seems reasonable, because it is unknown to us what the visual elements are that distinguish popular and unpopular webpages and whether they exist at all. Until this point is is unknown to us whether it is feasible to predict a domain's rank based on the visual appearance of its web pages. A dataset containing more than 1,000,000 images provides more than enough training data to work with high-capacity, deep models, capable of learning complex features.
+Learning features as opposed to hand-engineering them seems reasonable, because it is unknown to us what the visual elements are that distinguish popular and unpopular webpages and whether they exist at all. Until this point is is unknown to us whether it is feasible to predict a domain's rank based on the visual appearance of its web pages. A dataset containing more than 1,000,000 images provides enough training data to work with high-capacity, deep models, capable of learning complex features.
 
 CNNs are the most common choice for image processing in the deep learning domain. While many of today's CNN-papers deal with natural images, e.g. \cite{gu2018ava,szegedy2017inception,openai:learningdexterity}, there have been applications with computer generated images as well: \cite{beltramelli:pix2code} converts a screenshot into a fixed size feature vector to infer the design layout of given user interface from a screenshot. This work as well as the general attention CNNs get indicate that they are a suitable choice for web page screenshot processing and feature extraction.
 
@@ -35,11 +35,11 @@ While our dataset contains webpages from domains which are (or have been) public
 
     \includegraphics[scale=0.55]{resources/model-architecture}
     \caption[Illustration of the model processing pipeline]{Illustration of the web page rank estimation model processing pipeline. Input to the model is a graph representing the web pages of a domain (1). Each node is attributed with two screenshots and the nodes are interconnected by web links. A screenshot feature extractor CNN is (2) applied node-wise, thereby converting the screenshot graph into a graph with feature vectors (3). The feature vector graph is the input to a (4) graph network which looks at the graph as a whole (as opposed to node-wise processing). It compresses the graph into a single scalar (5) from which the relative ranking can be inferred.\\
-    The internals of module (2) are explained in Section \ref{sec:screenshotfeatextr}; the ones of (4) in Section \ref{sec:gnblocks}.}
+    The internals of module (2) are explained in Section~\ref{sec:screenshotfeatextr}; the ones of (4) in Section~\ref{sec:gnblocks}.}
     \label{fig:methodcomponents}
 \end{figure}
 
-The remainder of this section describes the components of our model in greater detail; Figure \ref{fig:methodcomponents} gives an overview of the model's internal processing pipeline. We also introduce our loss function and the evaluation metric we use to measure the performance of our model. The dataset is described separately in Section \ref{sec:datasets}.
+The remainder of this section describes the components of our model in greater detail; Figure~\ref{fig:methodcomponents} gives an overview of the model's internal processing pipeline. We also introduce our loss function and the evaluation metric we use to measure the performance of our model. The dataset is described separately in Section~\ref{sec:datasets}.
 
 \subsection{Screenshot Feature Extractor}
 \label{sec:screenshotfeatextr}
@@ -128,7 +128,7 @@ f_\text{dm}:\left(\mathbb{R}^{480\times270\times3},\mathbb{R}^{187\times333\time
     \label{fig:featextr}
 \end{figure}
 
-We model the function $f_\text{dm}$ with a CNN. The high-level architecture is described and visualized in Figure \ref{fig:featextr}. Each \textbf{Block} consists of the following components:
+We model the function $f_\text{dm}$ with a CNN. The high-level architecture is described and visualized in Figure~\ref{fig:featextr}. Each \textbf{Block} consists of the following components:
 \begin{enumerate}
     \item 2D convolutional layer with $n_\text{filters}$ filters, preserving the spatial size of the tensor and increasing the number of channels.
     \item ReLU activation function, $\operatorname{relu}(x)=\max(0,x)$.
@@ -151,9 +151,9 @@ The parameters of the feature extraction model can be trained with backpropagati
 \subsection{Graph Network Blocks}
 \label{sec:gnblocks}
 
-After converting the graph of screenshots into a graph of feature vectors, the entire graph is fed into the graph network (GN); component (4) in Figure \ref{fig:methodcomponents}. The GN module is an integral component of our model: It utilizes the graph structure of the dataset samples and outputs the actual model prediction, thereby converting a graph into a scalar.
+After converting the graph of screenshots into a graph of feature vectors, the entire graph is fed into the graph network (GN); component (4) in Figure~\ref{fig:methodcomponents}. The GN module is an integral component of our model: It utilizes the graph structure of the dataset samples and outputs the actual model prediction, thereby converting a graph into a scalar.
 
-The GN consists of several GN blocks, which were introduced in \cite{deepmind:graphnets}. A summary of the most important aspects as well as the notation we use in the following can be found in Section \ref{sec:graphnetworks}.
+The GN consists of several GN blocks, which were introduced in \cite{deepmind:graphnets}. A summary of the most important aspects as well as the notation we use in the following can be found in Section~\ref{sec:graphnetworks}.
 
 Formally, the GN module converts a graph into a scalar, i.e. \begin{equation}
     \label{eq:gnmodule}
@@ -167,7 +167,7 @@ Our \textbf{encoder block} $\text{GN}_\text{enc}$ converts the raw input graph i
     \rho^{e\rightarrow u}_\text{enc}\left(\mathbb{E}'\right)_j=&\operatorname{avg}\left(\left\{x_j:\bm{x}\in\mathbb{E}'\right\}\right)\label{eq:enc:edgeaggreforu}\\
     \phi^v_\text{enc}\left(\bm{\overline{e}}'_i,\bm{v}_i,\bm{u}\right)=&\bm{v}_i\label{eq:enc:nodeupdate}\\
     \phi^u_\text{enc}\left(\bm{\overline{e}}',\bm{\overline{v}},\bm{u}\right)=&\bm{\overline{e}}'\label{eq:enc:uupdate}\,,
-\end{align}where $\rho^{e\rightarrow v}$ and $\rho^{v\rightarrow u}$ remain undefined because they are not needed. The edges are initially populated with the feature vector of the sender node (Equation \ref{eq:enc:edgeupdate}). Equation \ref{eq:enc:edgeaggreforu}, the edge aggregation for the global state, is an element-wise averaging of the edge vectors. To ensure there is at least one element in $\mathbb{E}'$ we add reflexive edges to the graph so every node has at least one outgoing (and incoming) edge, namely the one pointing to itself. The node attributes remain unchanged, Equation \ref{eq:enc:nodeupdate} is an identity mapping. The global state is set to be the aggregation of all edges (Equation \ref{eq:enc:uupdate}). Alternatively, the node aggregation $\bm{\overline{v}}$ could be chosen.
+\end{align}where $\rho^{e\rightarrow v}$ and $\rho^{v\rightarrow u}$ remain undefined because they are not needed. The edges are initially populated with the feature vector of the sender node (Equation~\ref{eq:enc:edgeupdate}). Equation~\ref{eq:enc:edgeaggreforu}, the edge aggregation for the global state, is an element-wise averaging of the edge vectors. To ensure there is at least one element in $\mathbb{E}'$ we add reflexive edges to the graph so every node has at least one outgoing (and incoming) edge, namely the one pointing to itself. The node attributes remain unchanged, Equation~\ref{eq:enc:nodeupdate} is an identity mapping. The global state is set to be the aggregation of all edges (Equation~\ref{eq:enc:uupdate}). Alternatively, the node aggregation $\bm{\overline{v}}$ could be chosen.
 
 Intuitively, the encoder block can be seen as a preparation stage. It transforms the graph into the desired state and adds missing attributes. In fact, the entire feature extractor can be seen as an encoder block, too: It is a node-wise application of the CNN: $\phi^v_\text{core}\left(\bm{\overline{e}}'_i,\bm{v}_i,\bm{u}\right)=f_\text{dm}(\bm{v}_i)$, where $\bm{v}_i$ is a tuple made up of desktop and mobile screenshot. We chose not to formulate the overall model that way to aid understanding, but it illustrates the expressive power of the GN framework.
 
@@ -175,7 +175,7 @@ Before applying the encoder block we concatenate desktop and mobile feature vect
 
 Our \textbf{core block} $\text{GN}_\text{core}$ performs the graph \textit{understanding} part by performing the \textit{message passing} (see Section 4.3 in \cite{deepmind:graphnets}). It may be stacked $M$ times. 
 
-We choose the aggregation functions $\rho^{e\rightarrow v}\left(\mathbb{E}'_i\right)$, $\rho^{e\rightarrow u}\left(\mathbb{E}'\right)$, $\rho^{v\rightarrow u}\left(\mathbb{V}'\right)$ to average the vectors element-wise, analogous to Equation \ref{eq:enc:edgeaggreforu}. Alternatively, max-pooling could be used.
+We choose the aggregation functions $\rho^{e\rightarrow v}\left(\mathbb{E}'_i\right)$, $\rho^{e\rightarrow u}\left(\mathbb{E}'\right)$, $\rho^{v\rightarrow u}\left(\mathbb{V}'\right)$ to average the vectors element-wise, analogous to Equation~\ref{eq:enc:edgeaggreforu}. Alternatively, max-pooling could be used.
 
 The update functions for node attribute, edge attributes, and the global state are fully-connected layers with bias, followed by a ReLU activation function ($\operatorname{ReLU}(x) = \max(0,x)$) and dropout (see \cite{srivastava2014:dropout}; denoted by the function $\operatorname{drop}(\cdot)$). The exact definitions are the following:
 \begin{align}
@@ -193,7 +193,7 @@ The update functions for node attribute, edge attributes, and the global state a
         \right)\right)\,,
 \end{align}where $\begin{bmatrix}\cdot\end{bmatrix}$ denotes concatenation into a row vector. The core block can be repeated $M$ times. The trainable weight matrices $\bm{W}$ and biases $\bm{b}$ may either be shared between the $M$ core block replicas or different matrices/vectors can be used.
 
-Our \textbf{decoder block} $\text{GN}_\text{dec}$ converts the graph returned from the last core block into the desired output. In our case the output of the GN module is a scalar (see Equation \ref{eq:gnmodule}). We extract a scalar from the graph by muliplying the global state vector $u$ of the last core block with a weight vector of matching size and add a bias:
+Our \textbf{decoder block} $\text{GN}_\text{dec}$ converts the graph returned from the last core block into the desired output. In our case the output of the GN module is a scalar (see Equation~\ref{eq:gnmodule}). We extract a scalar from the graph by muliplying the global state vector $u$ of the last core block with a weight vector of matching size and add a bias:
 \begin{equation}
     \label{eq:dec:nodeupdate}
     \phi^u_\text{dec}\left(\bm{\overline{e}}',\bm{\overline{v}},\bm{u}\right)=\bm{w}_\text{dec}\cdot\bm{u}+\bm{b}_\text{dec}\,.
@@ -243,12 +243,12 @@ The loss is defined as
     \right)\,,
 \end{equation}where $w_b:\mathbb{N}\rightarrow\mathbb{R}$ is a rank-dependent weighting function, which is explained below. The loss term can be understood as a computation of the pairwise loss for each pair of samples in the dataset, denoted by $C_{i,j}$. The leading factor $\frac{1}{N^2}$ normalizes so the number of samples $N$ does not affect the loss magnitude.
 
-The loss asymptotes to a linear function. According to \cite{Burges:learningtorankwithsgd}, this is likely to be more robust with noisy labels than a quadratic cost. This behavior is illustrated in Figure \ref{fig:costfn}.
+The loss asymptotes to a linear function. According to \cite{Burges:learningtorankwithsgd}, this is likely to be more robust with noisy labels than a quadratic cost. This behavior is illustrated in Figure~\ref{fig:costfn}.
 
 We introduce the additional weighting factor
 \begin{equation}\label{eq:weightingfactor}
     w_b(r)=1-\left(\frac{\log\left(r\times r_\text{max}\right)}{\log r_\text{max}}-1\right)^b\,,
-\end{equation}which counteracts the imbalance of samples for high and low ranks: The first 10,000 samples are presumably more distinctive than e.g. the samples from 80,000 to 90,000. Therefore the samples with high ranks should also have a higher contribution to the loss. The hyperparameter $b$ balances this favoring. $r_\text{max}$ is the maximum rank in the dataset, in our case $r_\text{max}=100,000$. Equation \ref{eq:weightingfactor} is plotted for several values of $b$ in Figure \ref{fig:weightingfactor}.
+\end{equation}which counteracts the imbalance of samples for high and low ranks: The first 10,000 samples are presumably more distinctive than e.g. the samples from 80,000 to 90,000. Therefore the samples with high ranks should also have a higher contribution to the loss. The hyperparameter $b$ balances this favoring. $r_\text{max}$ is the maximum rank in the dataset, in our case $r_\text{max}=100,000$. Equation~\ref{eq:weightingfactor} is plotted for several values of $b$ in Figure~\ref{fig:weightingfactor}.
 
 \begin{figure}
 \begin{minipage}[t]{.45\textwidth}
@@ -317,9 +317,9 @@ It is noteworthy that a change of $b$ will also affect the average magnitude of 
 \begin{equation}\label{eq:losswnormalization}
 \frac{2}{r_\text{max}}\int_1^{r_\text{max}}w_b(r)dr\,,
 \end{equation}
-which evaluates to $\approx0.95$ for $b=10$ and $\approx0.17$ for $b=1$. Intuitively, the loss must be scaled up more (divided by a lower value) if the area under curve is lower. For $b=1$ it is lower than it is e.g. for $b=10$ (see Figure \ref{fig:weightingfactor}).
+which evaluates to $\approx0.95$ for $b=10$ and $\approx0.17$ for $b=1$. Intuitively, the loss must be scaled up more (divided by a lower value) if the area under curve is lower. For $b=1$ it is lower than it is e.g. for $b=10$ (see Figure~\ref{fig:weightingfactor}).
 
-During training, the gradient induced by the loss term (Equation \ref{eq:loss}) can be approximated with fewer than $N$ samples, so called mini-batches. This is less costly than computing the gradient for the exact problem and has a regularizing effect, see \cite{DBLP:journals/corr/KeskarMNST16}.
+During training, the gradient induced by the loss term (Equation~\ref{eq:loss}) can be approximated with fewer than $N$ samples, so called mini-batches. This is less costly than computing the gradient for the exact problem and has a regularizing effect, see \cite{DBLP:journals/corr/KeskarMNST16}.
 
 Note that this is single scalar supervision (or binary classification) and it effectively trains a CNN plus GN successfully.
 
@@ -328,13 +328,13 @@ Note that this is single scalar supervision (or binary classification) and it ef
 
 During training we evaluate the performance of our model by computing an \textbf{accuracy} metric. Given all possible $N\times N$ pairs of samples in the dataset, the accuracy is the percentage of pairs the model ranks correctly. It is defined as \begin{equation}\label{eq:acc}
     \frac{1}{N^2-N}\left(\sum_{i=1}^N\sum_{j=1}^N\bm{1}\left[\left(O_{i,j}<0\land P_{i,j}=0\right)\lor\left(O_{i,j}>0\land P_{i,j}=1\right)\right]\right)\,,
-\end{equation}with $\bm{O}$ being the output matrix (defined in Equation \ref{eq:outputmatrix}) and $\bm{P}$ being the ground truth (defined in Equation \ref{eq:groundtruthmatrix}). $\bm{1}\left[\cdot\right]$ is $1$ if the boolean expression enclosed in the brackets is true, $0$ otherwise. The additional $(-N)$ term in the denominator of the leading normalization factor accounts for the main diagonal of the matrix which is always correctly ranked because $O_{i,i}=0$, so we disregard it.
+\end{equation}with $\bm{O}$ being the output matrix (defined in Equation~\ref{eq:outputmatrix}) and $\bm{P}$ being the ground truth (defined in Equation~\ref{eq:groundtruthmatrix}). $\bm{1}\left[\cdot\right]$ is $1$ if the boolean expression enclosed in the brackets is true, $0$ otherwise. The additional $(-N)$ term in the denominator of the leading normalization factor accounts for the main diagonal of the matrix which is always correctly ranked because $O_{i,i}=0$, so we disregard it. For performance purposes the symmetric property of the matrix may be exploited. The evaluation of the lower triangular part suffices to compute the accuracy score with adjusted normalization factor.
 
 Verbally described, the accuracy measure is the percentage of correct pairwise rankings. It is easy to interpret and can be computed for humans as well, by showing them the sample pairs and requesting a ranking.
 
 The accuracy evaluation metric has the downside of not taking the difficulty into consideration: Ranking e.g. sample \#55000 relative to sample \#54590 is presumably much harder than samples \#100 and \#40000, because the sample ranks are closer together.
 
-\textbf{Inference} can be done in two ways: (1) absolute and (2) relative:
+In our setup, \textbf{inference} can be done in two ways: (1) absolute and (2) relative. In our experiments we do not need the rank inference mode (1) because the accuracy on validation and test set can be computed with Equation~\ref{eq:acc}. We present both modes anyways for use in future research or in applications.
 
 (1) A single sample $G$ can be ranked with respect to the samples of the dataset $\mathbb{D}$. This can be done by computing $f_G=f_\text{model}(G)$ and comparing it to all entries in the vector $\bm{f}$. The estimated rank of $G$ is \begin{equation}
     \label{eq:inference}

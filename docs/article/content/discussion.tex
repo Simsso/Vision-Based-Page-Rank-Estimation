@@ -13,7 +13,7 @@ Another aspect of difficulty is noise in the dataset: When crawling and screensh
 
 It is noteworthy that the dataset size was sufficient to prevent our CNN architecture from overfitting. We saw no need to make use of regularization methods such as weight decay or data augmentation because the accuracy on training and validation data was almost the same throughout all training runs. We therefore suspect that a model with greater capacity might be able to capture more fine-grained details of screenshots, thereby achieving a higher accuracy.
 
-The accuracy score as proposed in Equation \ref{eq:acc} has some \textit{unfairness} to it, because the distance of two compared samples is disregarded. For example, a erroneous assessment of the relative ranking of two samples with ranks \#12,000 and \#12,001 is contributing to the accuracy just like the confusion of samples with ranks \#1,000 and \#25,000, even though the latter should presumably be easier to disentangle. Figure \ref{fig:accvsrank} supports this hypothesis by plotting the mean accuracy against the sample rank. Samples at the end of the spectrum tend to have considerably higher accuracy scores than the ones in the middle, because on average they are juxtaposed to samples with a rank further away from them than samples in the middle. Note that an improvement from 58\% to 64\% is an improvement by a factor of two, because random guessing is at 50\%.
+The accuracy score as proposed in Equation~\ref{eq:acc} has some \textit{unfairness} to it, because the distance of two compared samples is disregarded. For example, a erroneous assessment of the relative ranking of two samples with ranks \#12,000 and \#12,001 is contributing to the accuracy just like the confusion of samples with ranks \#1,000 and \#25,000, even though the latter should presumably be easier to disentangle. Figure~\ref{fig:accvsrank} supports this hypothesis by plotting the mean accuracy against the sample rank. Samples at the end of the spectrum tend to have considerably higher accuracy scores than the ones in the middle, because on average they are juxtaposed to samples with a rank further away from them than samples in the middle. Note that an improvement from 58\% to 64\% is an improvement by a factor of two, because random guessing is at 50\%.
 Alternative accuracy metric formulations could take the difficulty of a pairwise comparison into account.
 
 \begin{figure}
@@ -97,7 +97,7 @@ Alternative accuracy metric formulations could take the difficulty of a pairwise
         \end{axis}
       
       \end{tikzpicture}
-    \caption[Accuracy vs. rank]{Mean accuracy of samples within a certain rank rages. To compute the data points, batches of samples of 4k ranks were grouped and the mean accuracy was computed. There is a clear tendency of samples in the middle to be harder to classify than samples on the extreme ends of the rank spectrum. The model used to create the plot is [baseline+avg], its performance on the entire test set is indicated by the dashed line. The train set points tends to behave similarly as the test set points. At low ranks, the model is significantly better on the training data which may be attributed to the rank dependent weighting function (see Section \ref{sec:loss}).}
+    \caption[Accuracy vs. rank]{Mean accuracy of samples within a certain rank rages. To compute the data points, batches of samples of 4k ranks were grouped and the mean accuracy was computed. There is a clear tendency of samples in the middle to be harder to classify than samples on the extreme ends of the rank spectrum. The model used to create the plot is [baseline+avg], its performance on the entire test set is indicated by the dashed line. The train set points tends to behave similarly as the test set points. At low ranks, the model is significantly better on the training data which may be attributed to the rank dependent weighting function (see Section~\ref{sec:loss}).}
     \label{fig:accvsrank}
 \end{figure}
 
@@ -109,9 +109,9 @@ Besides ranking websites our model has the practical purpose of yielding somewha
 
 While it is a common method to look at the kernels of CNNs (see e.g. Figure 3 in \cite{krizhevsky:imagenet}), this approach is not reasonably applicable to our architecture because our filter tensors have a spatial dimension of at most $3\times3$. Instead, we analyze the CNN feature maps, retrieve hard and easy samples, and compute the gradient of the output with respect to the input.
 
-\textbf{Activation maps} are internal representations (latent variables) of an input at intermediate stages of a deep model. Specifically, we consider the input as such, and activations of the CNN blocks Block1, Block2, Block3, and Block4 (before pooling and application of the ReLU function). The sizes of these tensors are listed in Table \ref{tab:activationmaptensors}.
+\textbf{Activation maps} are internal representations (latent variables) of an input at intermediate stages of a deep model. Specifically, we consider the input as such, and activations of the CNN blocks Block1, Block2, Block3, and Block4 (before pooling and application of the ReLU function). The sizes of these tensors are listed in Table~\ref{tab:activationmaptensors}.
 
-A qualitative analysis of the activation maps suggests that the model learns to discriminate different elements of webpages such as natural images or text. We have observed some filters to get excited by layout elements such as edges and corners. Figure \ref{fig:activationmaps} shows some cherry-picked filters from all layers.
+A qualitative analysis of the activation maps suggests that the model learns to discriminate different elements of webpages such as natural images or text. We have observed some filters to get excited by layout elements such as edges and corners. Figure~\ref{fig:activationmaps} shows some cherry-picked filters from all layers.
 
 \begin{table}
     \centering
@@ -138,15 +138,15 @@ A qualitative analysis of the activation maps suggests that the model learns to 
     \label{fig:activationmaps}
 \end{figure}
 
-We introduce the notion of \textbf{hard and easy samples}. A hard sample from the dataset is characterized by the property that a given model's estimation of its rank diverges significantly from its actual rank. This can be quantized by evaluating Equation \ref{eq:inference} (inference) and comparing the inferred rank with the ground-truth rank. Samples for which the difference is large are considered hard, because the model has trouble estimating their rank properly. Easy samples are the opposite: Relative to the other samples in the dataset, the model is capable of predicting the correct ranking relatively often.
+We introduce the notion of \textbf{hard and easy samples}. A hard sample from the dataset is characterized by the property that a given model's estimation of its rank diverges significantly from its actual rank. This can be quantized by evaluating Equation~\ref{eq:inference} (inference) and comparing the inferred rank with the ground-truth rank. Samples for which the difference is large are considered hard, because the model has trouble estimating their rank properly. Easy samples are the opposite: Relative to the other samples in the dataset, the model is capable of predicting the correct ranking relatively often.
 
 Hard and easy samples have qualitative meaning because they are representative for websites of their particular rank: Give for instance an easy sample with a high rank, it can be assumed that this sample is representative for high ranked websites. A hard sample with a high rank might have attained its rank for reasons other than its look. On the other hand, easy samples with low rank are representative for websites with a low rank. By comparing easy samples with high/low rank we can distill the visual difference between high and low ranked websites. Note that this is more sophisticated than looking only at the pure dataset, i.e. comparing high-ranked samples with low-ranked samples, because the model acts as a filter, extracting the visually representative samples.
 
-We split the test dataset ranks into 25 bins (each containing 4k samples) and search for the hardest and easiest sample in each of those bins. The first desktop screenshot of each of those samples is depicted in Figure \ref{fig:hardandeasysamples} (50 screenshots in total). We have noticed that samples in the middle of the spectrum had accuracies much closer to 50\%. For instance, the easiest sample in the bin $r^{(i)}\in{\left\{44000, \dots, 47999\right\}}$ (which is $i=44064$) has an accuracy of just $62.83\%$. All maximum/mininum accuracies vs. ranks can be seen in Figure \ref{fig:minmaxaccvsrank}.
+We split the test dataset ranks into 25 bins (each containing 4k samples) and search for the hardest and easiest sample in each of those bins. The first desktop screenshot of each of those samples is depicted in Figure~\ref{fig:hardandeasysamples} (50 screenshots in total). We have noticed that samples in the middle of the spectrum had accuracies much closer to 50\%. For instance, the easiest sample in the bin $r^{(i)}\in{\left\{44000, \dots, 47999\right\}}$ (which is $i=44064$) has an accuracy of just $62.83\%$. All maximum/mininum accuracies vs. ranks can be seen in Figure~\ref{fig:minmaxaccvsrank}.
 
 %\begin{figure}
 %    \floatbox[{\capbeside\thisfloatsetup{capbesideposition={left,top},capbesidewidth=4cm}}]{figure}[\FBwidth]
-%    {\caption[Easy and hard samples across all ranks]{Easy (left) and hard (right) samples across all ranks from high (top) to low (bottom); best seen on a computer screen. The images are the hardest/easiest samples in rank-bins of size $4000$. Each image corresponds to one cross-mark in Figure \ref{fig:minmaxaccvsrank}.}\label{fig:hardandeasysamples}}
+%    {\caption[Easy and hard samples across all ranks]{Easy (left) and hard (right) samples across all ranks from high (top) to low (bottom); best seen on a computer screen. The images are the hardest/easiest samples in rank-bins of size $4000$. Each image corresponds to one cross-mark in Figure~\ref{fig:minmaxaccvsrank}.}\label{fig:hardandeasysamples}}
 %    {\includegraphics[height=\textheight]{resources/hard-easy.jpg}}
 %\end{figure}
 
@@ -243,7 +243,7 @@ Our last model analysis method is the computation of the \textbf{gradient $\tens
     \tensorsym{G}=\frac{\partial f\left(\tensorsym{I}\right)}{\partial\tensorsym{I}}\,,
 \end{equation}where $\tensorsym{I}$ can be either a desktop or a mobile image. In the following, the function $f$ is a screenshot feature extractor without graph network. To ensure the gradient is meaningful, we chose only samples which the model classifies with high accuracy, i.e. easy ones.
 
-Figure \ref{fig:gradwrtinput} shows $\tensorsym{G}$ for an easy sample. Interpretation xxx.
+Figure~\ref{fig:gradwrtinput} shows $\tensorsym{G}$ for an easy sample. Interpretation xxx.
 
 \begin{figure}
     \centering

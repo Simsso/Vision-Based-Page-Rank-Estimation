@@ -3,7 +3,7 @@
 
 In our approach we propose a supervised machine learning algorithm to estimate the page rank using deep graph networks. For this purpose we require labeled data to develop, train, and validate our model.
 
-All dataset versions have OpenPage Rank (section \ref{OpenPageRank}) as ground truth. This means that we use the ordered list of domains from OpenPage Rank to enrich them with more information thus to generate our datasets.
+All dataset versions have OpenPage Rank (Section~\ref{OpenPageRank}) as ground truth. This means that we use the ordered list of domains from OpenPage Rank to enrich them with more information thus to generate our datasets.
 
 The dataset version 1 represents a subset of the dataset version 2. It was created to give us fast and rough estimate on how well CNNs perform on estimating a page rank of a website. The provided data was used to train and evaluate the performance of a CNN on page rank estimation. 
 
@@ -16,7 +16,7 @@ The dataset version 1 consists of 100,000 samples in total. We denote a sample f
 \begin{center}
 	$x  = (r, u)$
 	\begin{itemize}
-		\item[$r$] The global rank of the domain, according to Open PageRank (section \ref{OpenPageRank}), within $[1, 100000]$. 
+		\item[$r$] The global rank of the domain, according to Open PageRank (Section~\ref{OpenPageRank}), within $[1, 100000]$. 
 		\item[$u$] The URL of the domain. For example a string like \texttt{github.com}.
 	\end{itemize}
 \end{center}
@@ -37,7 +37,7 @@ A single sample $X$ in the dataset can be expressed as a tuple consisting of thr
 
 \subsubsection*{The Directed Graph $G$}
 \label{TheDirectedGraph}
-The directed graph provides a topological view on the given website by representing all associated web pages within the same domain as nodes and connections as arrows. Nodes and arrows of the graph are enriched with local information about the web pages. Figure \ref{fig:PartialDirectedGraph_timodenk.com} exemplary illustrates the partial directed graph for the domain \texttt{timodenk.com} with three webpages represented as nodes with corresponding attributes and edges.
+The directed graph provides a topological view on the given website by representing all associated web pages within the same domain as nodes and connections as arrows. Nodes and arrows of the graph are enriched with local information about the web pages. Figure~\ref{fig:PartialDirectedGraph_timodenk.com} exemplary illustrates the partial directed graph for the domain \texttt{timodenk.com} with three webpages represented as nodes with corresponding attributes and edges.
 
 The directed graph $G$ is characterized by a set of nodes $\mathbb{V}$ and edges $\mathbb{A}$. We limit the number of nodes in a graph to $8$, since we are not able to express a website in its entirety as a graph and want to keep the dataset in a feasible size. Each node $v \in \mathbb{V}$ represents a web page of the given domain associated with the graph. A node is characterized by the following tuple:
 

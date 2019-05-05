@@ -8,11 +8,12 @@ We report results on the pairwise page rank estimation task and compare several 
 In the \textbf{pairwise page rank estimation task}, the model (or human) is asked to make a guess about the relative ordering of two samples $G^{(i)}$ and $G^{(j)}$ drawn from a subset of the dataset.
 There are three possible answers: (1) both samples have the same rank, (2) sample $G^{(i)}$ has a higher rank than $G^{(j)}$, and (3) sample $G^{(j)}$ has a lower rank than $G^{(i)}$. A guess is either right or wrong, depending on the ground truth, i.e. $r^{(i)}$ and $r^{(j)}$.
 
-Given multiple answers to pairwise ranking questions, the accuracy can be computed as described in Equation \ref{eq:acc}. This accuracy is the main evaluation metric we report in this section and the comparison of models is also based on it. We disregard answer (1) because it is trivial to the model (and to a human). The accuracy metric works accordingly.
+Given multiple answers to pairwise ranking questions, the accuracy can be computed as described in Equation~\ref{eq:acc}. This accuracy is the main evaluation metric we report in this section and the comparison of models is also based on it. We disregard answer (1) because it is trivial to the model (and to a human). The accuracy metric works accordingly.
 
 Unless indicated otherwise, we train with the following configuration:
 \begin{itemize}
-    \item Dataset version 2 (Section \ref{DatasetVersion2}), split into train, validation, and test split. We train on 60\% of the dataset, tune hyperparameters on 20\% (validation), and use the remaining 20\% for final performance reporting. The samples are assigned to the dataset splits across all ranks. E.g. we do not use a specific range of ranks as our test set. See Listing \ref{lst:getthreefold} for the dataset splitting algorithm. All accuracy scores are computed on unseen test samples; exceptions are specified.
+    \item Dataset version 2 (Section~\ref{DatasetVersion2}), split into train, validation, and test split. We train on 60\% of the dataset, tune hyperparameters on 20\% (validation), and use the remaining 20\% for final performance reporting. The samples are assigned to the dataset splits across all ranks. E.g. we do not use a specific range of ranks as our test set. See Listing \ref{lst:getthreefold} for the dataset splitting algorithm. All accuracy scores are computed on unseen test samples; exceptions are specified.\\
+    We report results on version 2 because the first version served the purpose of finding architectures for the feature extractor and experimenting with different ranking losses. Version 1 can be seen as a subset of version 2 and is therefore of less interest.
     \item Parameters are updated by the Adam optimizer \cite{kingma2014:adam}, parameterized with learning rate $\eta=5\times10^{-6}$, $\beta_1=0.9$, $\beta_2=0.999$, and $\epsilon=10^{-8}$. We do not use weight decay as overfitting was not an issue. The learning rate is kept constant throughout the training.
     \item We employ dropout \cite{srivastava2014:dropout} at a rate of $p_\text{drop}=0.1$.
     \item Screenshots, both desktop and mobile, are normalized across all three channels (RGB) to have a mean of $0.5$ and standard deviation of $0.5$. No other data augmentation is used.
@@ -66,9 +67,9 @@ The human evaluation gives us a human baseline to compare our model to. It is al
 
 \subsection{Methods of Training}
 
-When introducing our model in Section \ref{sec:method} we have already enumerated three different methods of training it (end-to-end training [e2e], pre-training without fine-tuning [woft], and pre-training with fine-tuning [wft]). Due to GPU memory constraints, the training modes [e2e] and [wft] allow for a maximum batch size of two, which we is seemingly harmful to proper gradient approximation. Besides that, both training modes require gradient propagation through the GN part of the model which is relatively slow. Except for the comparison of the three approaches, which can be found in Table \ref{tab:trainmethodcomparison} we have used [woft] for all experiments.
+When introducing our model in Section~\ref{sec:method} we have already enumerated three different methods of training it (end-to-end training [e2e], pre-training without fine-tuning [woft], and pre-training with fine-tuning [wft]). Due to GPU memory constraints, the training modes [e2e] and [wft] allow for a maximum batch size of two, which we is seemingly harmful to proper gradient approximation. Besides that, both training modes require gradient propagation through the GN part of the model which is relatively slow. Except for the comparison of the three approaches, which can be found in Table~\ref{tab:trainmethodcomparison} we have used [woft] for all experiments.
 
-For [woft] we attach a linear layer to the screenshot feature extractor and train it to output a scalar that ranks webpages. That way the model has only access to individual images without any context, i.e. screenshots of other pages, mobile/desktop in parallel, or graph edges. The loss function from Equation \ref{eq:loss} is slightly modified to account for the variable number of screenshots per dataset sample: We weigh the loss with the inverse number of screenshots so the rank prediction of a sample with a single webpage has the same contribution to the loss as a sample with e.g. eight screenshots combined. After convergence of the feature extractor we compute all feature vectors for the entire dataset and use them as input to the GN part of our model. That way we reduce the computational overhead significantly by bypassing the CNN in the GN training. This gives us headroom for a greater number of experiments with GN variants.
+For [woft] we attach a linear layer to the screenshot feature extractor and train it to output a scalar that ranks webpages. That way the model has only access to individual images without any context, i.e. screenshots of other pages, mobile/desktop in parallel, or graph edges. The loss function from Equation~\ref{eq:loss} is slightly modified to account for the variable number of screenshots per dataset sample: We weigh the loss with the inverse number of screenshots so the rank prediction of a sample with a single webpage has the same contribution to the loss as a sample with e.g. eight screenshots combined. After convergence of the feature extractor we compute all feature vectors for the entire dataset and use them as input to the GN part of our model. That way we reduce the computational overhead significantly by bypassing the CNN in the GN training. This gives us headroom for a greater number of experiments with GN variants.
 
 \begin{table}
     \centering
@@ -85,7 +86,7 @@ For [woft] we attach a linear layer to the screenshot feature extractor and trai
 
 \subsection{Weighting Function}
 
-Our loss term contains a weighting function (Equation \ref{eq:weightingfactor}) $w_b$. We evaluate its importance by fine tuning a graph network attached to a pre-trained feature extractor. For computation reasons, the feature extractor is pre-trained with $w_{10}$, so $b$ is only varied for the GN training. The results can be found in Table \ref{tab:weightingbase}.
+Our loss term contains a weighting function (Equation~\ref{eq:weightingfactor}) $w_b$. We evaluate its importance by fine tuning a graph network attached to a pre-trained feature extractor. For computation reasons, the feature extractor is pre-trained with $w_{10}$, so $b$ is only varied for the GN training. The results can be found in Table~\ref{tab:weightingbase}.
 
 \begin{table}
     \centering
@@ -105,8 +106,8 @@ The model trained with $b=xxx$ achieves the best accuracy on the test set. + Int
 
 \subsection{GN Variants}
 
-We compare several GN variants each other. The GN framework introduced in Section \ref{sec:graphnetworks} allows for great flexibility. We have decided to use a combination of encoder, core, and decoder, presented in Section \ref{sec:gnblocks}.
-We compare the following GN variants to each other, all trained in [woft] fashion. Results are listed in Table \ref{tab:gnvariantscomparison}.
+We compare several GN variants each other. The GN framework introduced in Section~\ref{sec:graphnetworks} allows for great flexibility. We have decided to use a combination of encoder, core, and decoder, presented in Section~\ref{sec:gnblocks}.
+We compare the following GN variants to each other, all trained in [woft] fashion. Results are listed in Table~\ref{tab:gnvariantscomparison}.
 
 \begin{table}
     \centering
@@ -125,10 +126,10 @@ We compare the following GN variants to each other, all trained in [woft] fashio
 
 \begin{itemize}
     \item \textbf{[baseline+avg]}. The baseline multiplies a weight matrix with all node feature vectors in the graph independently, converting them into scalars. The scalars are then averaged, yielding the global state, which is the network's output.\\
-    Mathematically spoken, the node update function is the one stated in Equation \ref{eq:dec:nodeupdate}, the node aggregation is $\rho^{v\rightarrow u}\left(\mathbb{V}'\right)=\operatorname{avg}\left(\mathbb{V}'\right)$, and the final global state is computed as $\phi^u\left(\bm{\overline{e}}',\overline{v},\bm{u}\right)=\overline{v}$.\\
+    Mathematically spoken, the node update function is the one stated in Equation~\ref{eq:dec:nodeupdate}, the node aggregation is $\rho^{v\rightarrow u}\left(\mathbb{V}'\right)=\operatorname{avg}\left(\mathbb{V}'\right)$, and the final global state is computed as $\phi^u\left(\bm{\overline{e}}',\overline{v},\bm{u}\right)=\overline{v}$.\\
     This architecture can be seen as a baseline because it does not exploit any graph information and merges the information extracted from the pages in the simplest possible way. Each pages is regarded separately and the final website score is an average of the page-wise estimates.
     \item \textbf{[baseline+max]}. Same as [baseline+avg] except the node aggregation is $\rho^{v\rightarrow u}\left(\mathbb{V}'\right)=\operatorname{max}\left(\mathbb{V}'\right)$. Both [baseline+avg] and this variant do not make use of graph structure information, i.e. edges or number of nodes.
-    \item \textbf{[1-core]}. GN with encoder, single core, and decoder block; as described in Section \ref{sec:gnblocks}.
+    \item \textbf{[1-core]}. GN with encoder, single core, and decoder block; as described in Section~\ref{sec:gnblocks}.
     \item \textbf{[3-core]}. Same as [1-core], except the core block is repeated three times without weight sharing.
     \item \textbf{[3-core-shared]}. Same as [3-core], except the core blocks share their weights.
 \end{itemize}
@@ -137,7 +138,7 @@ We compare the following GN variants to each other, all trained in [woft] fashio
 
 \subsection{Graph Structure Usage}
 
-We seek to understand the extent of graph structure usage. Recall that the GN variants [baseline+avg] and [baseline+max] do not make use of edge information. We want to analyze to which extent the graph structure aids correct page rank estimations. The graphs as yielded by the dataset contain directed edges connecting websites that link to each other. Besides that every graph is extended with reflexive edges, i.e. every node points to itself, for the sake of preventing a division by zero when averaging. We alter the graph structure to analyze its impact on ranking accuracy. We use the model [3-core] for these experiments because with its depth of three core blocks it is capable of performing message passing between nodes. The results of these experiments are in Table \ref{tab:edgecomparison}.
+We seek to understand the extent of graph structure usage. Recall that the GN variants [baseline+avg] and [baseline+max] do not make use of edge information. We want to analyze to which extent the graph structure aids correct page rank estimations. The graphs as yielded by the dataset contain directed edges connecting websites that link to each other. Besides that every graph is extended with reflexive edges, i.e. every node points to itself, for the sake of preventing a division by zero when averaging. We alter the graph structure to analyze its impact on ranking accuracy. We use the model [3-core] for these experiments because with its depth of three core blocks it is capable of performing message passing between nodes. The results of these experiments are in Table~\ref{tab:edgecomparison}.
 
 \begin{table}
     \centering
