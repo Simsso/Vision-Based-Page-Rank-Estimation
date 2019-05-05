@@ -1,4 +1,6 @@
 import torch
+from graph_nets.data_structures.edge import Edge
+
 from graph_nets.functions.aggregation import AvgAggregation, MaxAggregation
 from graph_nets.block import GNBlock
 from graph_nets.data_structures.graph import Graph
@@ -70,8 +72,12 @@ class GNDeep(nn.Module):
         self.dec = GNBlock(phi_u=DecoderGlobalStateUpdate())  # maps global state from vec to scalar
 
     def forward(self, g: Graph) -> torch.Tensor:
-        g.remove_all_edges()
-        g.add_all_edges(reflexive=True)
+        new_edges = set()
+        for e in g.edges:
+            new_edges.add(Edge(sender=e.receiver, receiver=e.sender, attr=e.attr))
+        g.add_reflexive_edges()
+        for e in new_edges:
+            g.edges.add(e)
 
         g = self.enc(g)
         for core in self.core_blocks:

@@ -10,7 +10,7 @@ from rank_predictor.trainer.ranking.probabilistic_loss import ProbabilisticLoss
 from sacred import Experiment
 from sacred.observers import MongoObserver
 
-name = '10wob_deep_03_add_all'
+name = '10wob_deep_04_bidir'
 ex = Experiment(name)
 
 ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred'))
@@ -35,7 +35,7 @@ def run_config():
     lr_scheduler_gamma = None
     loss_scaling_fac = 1/2
     feat_extr_weights_path = os.path.expanduser('~/dev/pagerank/models/featextr_08_wob_0010.pt')
-    edges = 'add_all'
+    edges = 'bi_directional'
 
 
 @ex.main
