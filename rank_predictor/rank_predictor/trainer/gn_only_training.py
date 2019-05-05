@@ -10,7 +10,7 @@ from rank_predictor.trainer.ranking.probabilistic_loss import ProbabilisticLoss
 from sacred import Experiment
 from sacred.observers import MongoObserver
 
-name = '10wob_deep_02_share'
+name = '10wob_deep_03_add_all'
 ex = Experiment(name)
 
 ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred'))
@@ -30,18 +30,19 @@ def run_config():
     logrank_b = 10
     drop_p = .1
     num_core_blocks = 3
-    share_core_weights = True
+    share_core_weights = False
     lr_scheduler = 'None'
     lr_scheduler_gamma = None
     loss_scaling_fac = 1/2
     feat_extr_weights_path = os.path.expanduser('~/dev/pagerank/models/featextr_08_wob_0010.pt')
+    edges = 'add_all'
 
 
 @ex.main
 def train(learning_rate: float, batch_size: int, pairwise_batch_size: int, epochs: int, optimizer: str,
           train_ratio: float, valid_ratio: float, model_name: str, loss: str, logrank_b: float, drop_p: float,
           num_core_blocks: int, lr_scheduler: str, lr_scheduler_gamma: float, feat_extr_weights_path: str,
-          share_core_weights: bool, loss_scaling_fac: float) -> str:
+          share_core_weights: bool, loss_scaling_fac: float, edges: str) -> str:
 
     assert pairwise_batch_size >= batch_size, "Pairwise batch size most be greater than or equal to the batch size"
 

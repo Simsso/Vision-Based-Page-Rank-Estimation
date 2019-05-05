@@ -70,7 +70,8 @@ class GNDeep(nn.Module):
         self.dec = GNBlock(phi_u=DecoderGlobalStateUpdate())  # maps global state from vec to scalar
 
     def forward(self, g: Graph) -> torch.Tensor:
-        g.add_reflexive_edges()
+        g.remove_all_edges()
+        g.add_all_edges(reflexive=True)
 
         g = self.enc(g)
         for core in self.core_blocks:
