@@ -116,24 +116,24 @@ A qualitative analysis of the activation maps suggests that the model learns to 
 \begin{table}
     \centering
     \begin{tabular}{lrr}
-        \textbf{Activation map} & \textbf{Spatial size (desktop, mobile)} & \textbf{Depth}\\\hline
-        \textbf{Input} & $480\times270\mid480\times270$ & $3$\\
-        \textbf{Block1} & $480\times270$ & $3$\\
-        \textbf{Block2} & $480\times270$ & $3$\\
-        \textbf{Block3} & $480\times270$ & $3$\\
-        \textbf{Block4} & $480\times270$ & $3$\\
+        \textbf{Activation map} & \textbf{Desktop size} & \textbf{Mobile size}\\\hline
+        \textbf{Input} & $270\times480\times3$ & $333\times187\times3$\\
+        \textbf{Block1} & $266\times476\times32$ & $329\times183\times32$\\
+        \textbf{Block2} & $129\times234\times64$ & $160\times87\times64$\\
+        \textbf{Block3} & $39\times74\times128$ & $49\times25\times128$\\
+        \textbf{Block4} & $9\times20\times256$ & $12\times4\times256$\\
     \end{tabular}
-    \caption[Activation maps of the screenshot feature extractor]{Activation maps of the screenshot feature extractor + to be updated; depth indicates the number of non-linearities the data went through.}
+    \caption[Size of feature extractor activation maps]{Size of the feature extractor activation feature maps for mobile and desktop screenshots. Dimensions are listed in order $h\times w\times c$, where $h$ is the height, $w$ the width, and $c$ the number of channels.}
     \label{tab:activationmaptensors}
 \end{table}
 
 \begin{figure}
     \centering
-    \includegraphics[clip,width=\columnwidth]{resources/analysis/feat-map-0.png}\\
-    \includegraphics[clip,width=\columnwidth]{resources/analysis/feat-map-1.png}\\
-    \includegraphics[clip,width=\columnwidth]{resources/analysis/feat-map-2.png}\\
-    \includegraphics[clip,width=\columnwidth]{resources/analysis/feat-map-3.png}\\
-    \includegraphics[clip,width=\columnwidth]{resources/analysis/feat-map-4.png}\\
+    \includegraphics[clip,width=\columnwidth]{resources/analysis/feat-map-28073-0.png}\\
+    \includegraphics[clip,width=\columnwidth]{resources/analysis/feat-map-28073-1.png}\\
+    \includegraphics[clip,width=\columnwidth]{resources/analysis/feat-map-28073-2.png}\\
+    \includegraphics[clip,width=\columnwidth]{resources/analysis/feat-map-28073-3.png}\\
+    \includegraphics[clip,width=\columnwidth]{resources/analysis/feat-map-28073-4.png}\\
     \caption[Activation maps of the CNN]{Activation maps of the CNN. Top to bottom: Input, Block1, Block2, Block3, and Block4. + This figure will be updated and the caption will describe it.}
     \label{fig:activationmaps}
 \end{figure}
