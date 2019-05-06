@@ -46,6 +46,7 @@ class DatasetV2(Dataset):
 
         self.page_paths = sorted(list(page_paths))
         self.logrank_b = logrank_b
+        self.ranks = list(map(folder_to_rank, self.page_paths))
 
     def __getitem__(self, index) -> Dict[str, Union[int, Graph]]:
         page_path = self.page_paths[index]
@@ -143,6 +144,9 @@ class DatasetV2(Dataset):
         images = list(map(lambda x: x[1], images))  # remove keys
 
         return images
+
+    def get_by_rank(self, rank: int) -> Dict[str, Union[int, Graph]]:
+        return self[self.ranks.index(rank)]
 
     @staticmethod
     def get_page_paths(root_dir: str) -> Set[str]:

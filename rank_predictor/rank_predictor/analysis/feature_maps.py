@@ -13,23 +13,26 @@ import numpy as np
 from tqdm import tqdm
 from graph_nets.data_structures.graph import Graph
 from rank_predictor.analysis.utils import get_env_vars, restore_model, get_data
-from rank_predictor.model.graph_extractor_full import GraphExtractorFull, ScreenshotsFeatureExtractor
+from rank_predictor.model.graph_extractor_full import GraphExtractorFull, ScreenshotsFeatureExtractor, \
+    ScreenshotsFeatureExtractorWithHead
 import pickle
 
 
 env = get_env_vars()
-model: GraphExtractorFull = restore_model(env, GraphExtractorFull, {'num_core_blocks': 1, 'drop_p': 0.})
-data = get_data(env)
+model: ScreenshotsFeatureExtractor = restore_model(env, ScreenshotsFeatureExtractor, {'drop_p': 0})
+data_Loader, data_set = get_data(env)
 
-cnn: ScreenshotsFeatureExtractor = model.screenshot_feature_extractor
+cnn: ScreenshotsFeatureExtractor = model
 
 a_desktop = []  # desktop activation vectors/maps
 a_mobile = []  # mobile activation vectors/maps
 r = []  # rank vector
 
-iterator = tqdm(data)
-for batch in iterator:
-    sample = batch[0]
+# easy sample IDs
+ranks = [55, 4058, 8020, 12572, 16364, 20383, 24407, 28073, 32071, 36001, 40071, 44064, 51649, 55605, 59829, 63952, 67973,
+         71939, 75917, 79826, 83884, 87970, 90855, 95235, 99609]
+for rank in ranks:
+    sample = data_set.get_by_rank(rank)
     g: Graph = sample['graph']
     this_r: int = sample['rank']
 
