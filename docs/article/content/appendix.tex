@@ -1,10 +1,13 @@
 \clearpage
 \appendix
 
+\section{Appendix}
+
 \input{content/notation}\clearpage
+
 \input{content/datasetsamples}\clearpage
 
-\section{Source Code}
+\subsection{Source Code}
 
 \begin{lstlisting}[
     label={lst:getthreefold},
@@ -50,3 +53,28 @@ def get_threefold(klass: Type, sample_paths: List[str], train_ratio: float, vali
         valid=klass(valid_paths, logrank_b),
         test=klass(test_paths, logrank_b))
 \end{lstlisting}
+\clearpage
+
+\subsection{Activation Maps}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[clip,width=\columnwidth]{resources/analysis/feat-map-4058-0.png}\\
+    \includegraphics[clip,width=\columnwidth]{resources/analysis/feat-map-4058-1.png}\\
+    \includegraphics[clip,width=\columnwidth]{resources/analysis/feat-map-4058-2.png}\\
+    \includegraphics[clip,width=\columnwidth]{resources/analysis/feat-map-4058-3.png}\\
+    \includegraphics[clip,width=\columnwidth]{resources/analysis/feat-map-4058-4.png}\\
+    \caption[Activation maps of the CNN for sample \#4058]{Cherry-picked activation maps of the CNN for sample \#4058. Top to bottom: Input, Block1, Block2, Block3, and Block4.}
+    \label{fig:activationmaps2}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[clip,width=\columnwidth]{resources/analysis/feat-map-16364-0.png}\\
+    \includegraphics[clip,width=\columnwidth]{resources/analysis/feat-map-16364-1.png}\\
+    \includegraphics[clip,width=\columnwidth]{resources/analysis/feat-map-16364-2.png}\\
+    \includegraphics[clip,width=\columnwidth]{resources/analysis/feat-map-16364-3.png}\\
+    \includegraphics[clip,width=\columnwidth]{resources/analysis/feat-map-16364-4.png}\\
+    \caption[Activation maps of the CNN for sample \#16364]{Cherry-picked activation maps of the CNN for sample \#16364. Top to bottom: Input, Block1, Block2, Block3, and Block4.}
+    \label{fig:activationmaps3}
+\end{figure}

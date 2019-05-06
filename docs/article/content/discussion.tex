@@ -107,7 +107,7 @@ In summary, we can strongly assume that a correlation between page rank and visu
 
 Besides ranking websites our model has the practical purpose of yielding somewhat interpretable information. In this section we try to understand the model internals and its behavior, and deduce information therefrom.
 
-While it is a common method to look at the kernels of CNNs (see e.g. Figure 3 in \cite{krizhevsky:imagenet}), this approach is not reasonably applicable to our architecture because our filter tensors have a spatial dimension of at most $3\times3$. Instead, we analyze the CNN feature maps, retrieve hard and easy samples, and compute the gradient of the output with respect to the input.
+While it is a common method to look at the kernels of CNNs (see e.g. Figure 3 in \cite{krizhevsky:imagenet}), this approach is not reasonably applicable to our architecture because our filter tensors have a spatial dimension of at most $3\times3$. Instead, we analyze the CNN feature maps and retrieve hard and easy samples.
 
 \textbf{Activation maps} are internal representations (latent variables) of an input at intermediate stages of a deep model. Specifically, we consider the input as such, and activations of the CNN blocks Block1, Block2, Block3, and Block4 (before pooling and application of the ReLU function). The sizes of these tensors are listed in Table~\ref{tab:activationmaptensors}.
 
@@ -134,7 +134,7 @@ A qualitative analysis of the activation maps suggests that the model learns to 
     \includegraphics[clip,width=\columnwidth]{resources/analysis/feat-map-28073-2.png}\\
     \includegraphics[clip,width=\columnwidth]{resources/analysis/feat-map-28073-3.png}\\
     \includegraphics[clip,width=\columnwidth]{resources/analysis/feat-map-28073-4.png}\\
-    \caption[Activation maps of the CNN]{Activation maps of the CNN. Top to bottom: Input, Block1, Block2, Block3, and Block4. + This figure will be updated and the caption will describe it.}
+    \caption[Activation maps of the CNN for sample \#28073]{Cherry-picked activation maps of the CNN for sample \#28073. Top to bottom: Input, Block1, Block2, Block3, and Block4. The first row shows the three color channels of a desktop screenshot. The second rows (Block 1) resembles the original image still very much because the receptive field of the convolution has not grown very much yet. The right-most filter in Block 2 seems to detect the look of natural images. It gets excited in areas of text and where the center image is positioned on the website. In contrast, the filter in the middle gets fires at places where text is but has lower activation magnitudes at the image. The left-most filter in Block 3 is excited by text. The left-most filter in Block 4 was triggered by the column layout of the site. It has a column of white pixels in the area where the side-bar is located. The same filters are visualized for two other websites in the appendix in Figure \ref{fig:activationmaps2} and \ref{fig:activationmaps3}.}
     \label{fig:activationmaps}
 \end{figure}
 
@@ -144,11 +144,11 @@ Hard and easy samples have qualitative meaning because they are representative f
 
 We split the test dataset ranks into 25 bins (each containing 4k samples) and search for the hardest and easiest sample in each of those bins. The first desktop screenshot of each of those samples is depicted in Figure~\ref{fig:hardandeasysamples} (50 screenshots in total). We have noticed that samples in the middle of the spectrum had accuracies much closer to 50\%. For instance, the easiest sample in the bin $r^{(i)}\in{\left\{44000, \dots, 47999\right\}}$ (which is $i=44064$) has an accuracy of just $62.83\%$. All maximum/mininum accuracies vs. ranks can be seen in Figure~\ref{fig:minmaxaccvsrank}.
 
-%\begin{figure}
-%    \floatbox[{\capbeside\thisfloatsetup{capbesideposition={left,top},capbesidewidth=4cm}}]{figure}[\FBwidth]
-%    {\caption[Easy and hard samples across all ranks]{Easy (left) and hard (right) samples across all ranks from high (top) to low (bottom); best seen on a computer screen. The images are the hardest/easiest samples in rank-bins of size $4000$. Each image corresponds to one cross-mark in Figure~\ref{fig:minmaxaccvsrank}.}\label{fig:hardandeasysamples}}
-%    {\includegraphics[height=\textheight]{resources/hard-easy.jpg}}
-%\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[height=.85\textheight]{resources/hard-easy.jpg}
+    \caption[Easy and hard samples across all ranks]{Easy (left) and hard (right) samples across all ranks from high (top) to low (bottom); best seen on a computer screen. The images are the hardest/easiest samples in rank-bins of size $4000$. Each image corresponds to one cross-mark in Figure~\ref{fig:minmaxaccvsrank}.}\label{fig:hardandeasysamples}
+\end{figure}
 
 \begin{figure}
     \centering
@@ -237,17 +237,4 @@ We split the test dataset ranks into 25 bins (each containing 4k samples) and se
     \end{tikzpicture}
     \caption[Min/max accuracy against rank]{Min/max accuracy of samples in bins of size $4000$ plotted against their rank. It is apparent that the model struggles at estimating the rank of samples in the middle correctly, because it is harder. Take for instance the sample with the highest rank: The model could theoretically easily achieve 100\% accuracy by predicting a high value for it. Likewise, it can constantly predict a low value for it, making it a hard sample (accuracy 0\%). This \textit{trivial} predicting gets harder as the ranks diverge from the ends of the spectrum. The solid lines indicate where the trivial bound lies; for a randomly initialized model maximum and minimum would (in the expected value) lay on the trivial bound. Crosses exceeding the solid lines (i.e. crosses above or below the surface enclosed by them) are better than the trivial guessing. It is important to note though, that the samples are drawn from the test set, so the model has not seen them before. The horizontal, dashed line marks the average model performance on the test set.}
     \label{fig:minmaxaccvsrank}
-\end{figure}
-
-Our last model analysis method is the computation of the \textbf{gradient $\tensorsym{G}$ of the model output with respect to the input}. It highlights areas, which when changed, have strong influence on the assessment of the given sample. The mathematical formulation is\begin{equation}
-    \tensorsym{G}=\frac{\partial f\left(\tensorsym{I}\right)}{\partial\tensorsym{I}}\,,
-\end{equation}where $\tensorsym{I}$ can be either a desktop or a mobile image. In the following, the function $f$ is a screenshot feature extractor without graph network. To ensure the gradient is meaningful, we chose only samples which the model classifies with high accuracy, i.e. easy ones.
-
-Figure~\ref{fig:gradwrtinput} shows $\tensorsym{G}$ for an easy sample. Interpretation xxx.
-
-\begin{figure}
-    \centering
-    % include graphics
-    \caption[Areas with high influence on the model prediction]{Areas with high influence on the model prediction, xxx...}
-    \label{fig:gradwrtinput}
 \end{figure}
