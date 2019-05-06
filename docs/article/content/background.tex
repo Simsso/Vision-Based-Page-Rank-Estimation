@@ -159,11 +159,31 @@ The list offered by Open PageRank contains about 10 million domains ordered by t
 
 The list can be downloaded at \texttt{https://www.domcop.com/openpagerank/}.
 
+\begin{table}[]
+	\center
+	\begin{tabular}{r|r}
+		\textbf{Rank} & Website  \\ \hline \hline
+		\#1 & \url{fonts.googleapis.com} \\ \hline
+		\#2 & \url{facebook.com} \\ \hline
+		\#3 & \url{youtube.com} \\ \hline
+		\#4 & \url{twitter.com} \\ \hline
+		\#5 & \url{google.com} \\ \hline
+		\#6 & \url{plus.google.com} \\ \hline
+		\#7 & \url{instagram.com} \\ \hline
+		\#8 & \url{linkedin.com}\\ \hline
+		\#9 & \url{en.wikipedia.org}\\ \hline
+		\#10 & \url{maxcdn.bootstrapcdn.com}\\
+	\end{tabular}
+	\caption[List of top ten websites from \textit{Open PageRank}]{The top ten websites in the world according to \textit{Open PageRank}.}
+	\label{table_human_eval_results}
+\end{table}
+
+
 \subsection{Puppeeter}
 \label{puppeeter}
 \texttt{Puppeteer} is a open-source library for the JavaScript runtime \texttt{Node.js}, which provides a high-level API to control instances of the browsers \texttt{Chrome} or \texttt{Chromium}. One of the main goals of \texttt{Puppeteer} is to grow adoption in automated browser testing \cite{PuppeteerFAQ}.  For this purpose, it wraps the \texttt{Chrome DevTools Protocol} in JavaScript, which allows web developers to instrument, inspect and debug instances of \texttt{Chrome}. Technically, the protocol is HTTP-based and exposed as a RESTful API at the port for debugging by \texttt{Chrome}.
 
-The protocol offers a variety number of functionalities, which are grouped into domains \cite{DevToolsProtocol}. Some of the interesting domains for our use-case are:
+The protocol offers various of functionalities, which are grouped into domains \cite{DevToolsProtocol}. Some of the interesting domains for our use-case are:
 \begin{description}
 	\item[Page]: API to load and take a screenshot of the given website.
 	\item[DOM]: API to read and manipulate the DOM of the given website.
@@ -176,8 +196,8 @@ During start up \texttt{Puppeteer} starts an instance of \texttt{Chrome}, attach
 Puppeeter is available at \texttt{https://github.com/GoogleChrome/puppeteer}.
 
 \subsection{Chromium Embedded Framework}
-
-\texttt{CEF} was designed ground-up with performance and ease-use in mind. The framework exposes \texttt{C++} interfaces with default implementation for all features requiring little or no integration work. Furthermore, the community added wrappers for the base implementation to support a wide-range of operating systems and programming languages.
+\label{cef}
+\texttt{Chromium Embedded Framework} (short: \texttt{CEF})was designed ground-up with performance and ease-use in mind. The framework exposes \texttt{C++} interfaces with default implementation for all features requiring little or no integration work. Furthermore, the community added wrappers for the base implementation to support a wide-range of operating systems and programming languages.
 \texttt{CEF} has in total three versions, whereas \texttt{CEF 2} was abandoned due to the appearance of the \texttt{Chromium Content API} which will be discussed later. \texttt{CEF 1} is a single process implementation and based on the old \texttt{Chromium WebKit API}, due to deprecation of the \texttt{Chromium WebKit API} it is no longer supported and developed. \texttt{CEF 3} is a multi process implementation and based on the current \texttt{Chromium Content API}.
 
 \subsection{Kubernetes}
