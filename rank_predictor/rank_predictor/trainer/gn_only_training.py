@@ -10,7 +10,7 @@ from rank_predictor.trainer.ranking.probabilistic_loss import ProbabilisticLoss
 from sacred import Experiment
 from sacred.observers import MongoObserver
 
-name = '10wob_deep_04_bidir'
+name = '10wob_deep_05_none'
 ex = Experiment(name)
 
 ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred'))
@@ -35,14 +35,14 @@ def run_config():
     lr_scheduler_gamma = None
     loss_scaling_fac = 1/2
     feat_extr_weights_path = os.path.expanduser('~/dev/pagerank/models/featextr_08_wob_0010.pt')
-    edges = 'bi_directional'
+    edge_mode = 'no_edges'
 
 
 @ex.main
 def train(learning_rate: float, batch_size: int, pairwise_batch_size: int, epochs: int, optimizer: str,
           train_ratio: float, valid_ratio: float, model_name: str, loss: str, logrank_b: float, drop_p: float,
           num_core_blocks: int, lr_scheduler: str, lr_scheduler_gamma: float, feat_extr_weights_path: str,
-          share_core_weights: bool, loss_scaling_fac: float, edges: str) -> str:
+          share_core_weights: bool, loss_scaling_fac: float, edge_mode: str) -> str:
 
     assert pairwise_batch_size >= batch_size, "Pairwise batch size most be greater than or equal to the batch size"
 
@@ -56,7 +56,7 @@ def train(learning_rate: float, batch_size: int, pairwise_batch_size: int, epoch
     elif model_name == 'GNMax':
         net = GNMax()
     elif model_name == 'GNDeep':
-        net = GNDeep(drop_p, num_core_blocks, shared_weights=share_core_weights)
+        net = GNDeep(drop_p, num_core_blocks, edge_mode, shared_weights=share_core_weights)
     else:
         raise ValueError("Unknown model name '{}'".format(model_name))
     logging.info(net)

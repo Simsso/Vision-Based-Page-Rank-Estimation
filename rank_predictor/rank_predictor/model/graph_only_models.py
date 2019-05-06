@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 import torch
 from graph_nets.data_structures.edge import Edge
 
@@ -42,10 +44,20 @@ class GNMax(nn.Module):
 class GNDeep(nn.Module):
     """[n-core(-shared)]"""
 
-    def __init__(self, drop_p: float, num_core_blocks: int, shared_weights: bool = False):
+    def __init__(self, drop_p: float, num_core_blocks: int, edge_mode: str, shared_weights: bool = False):
         super().__init__()
 
         self.drop_p = drop_p
+
+        self.edge_fns = {
+            'default': GNDeep.default,
+            'bi_directional': GNDeep.bi_directional,
+            'no_edges': GNDeep.no_edges,
+            'all_edges': GNDeep.all_edges
+        }
+
+        assert edge_mode in self.edge_fns, "Invalid edge mode; not in [default, bi_directional, no_edges, all_edges]"
+        self.edge_mode = edge_mode
 
         self.enc = GNBlock(
             phi_e=EncoderEdgeUpdate(),
@@ -72,12 +84,9 @@ class GNDeep(nn.Module):
         self.dec = GNBlock(phi_u=DecoderGlobalStateUpdate())  # maps global state from vec to scalar
 
     def forward(self, g: Graph) -> torch.Tensor:
-        new_edges = set()
-        for e in g.edges:
-            new_edges.add(Edge(sender=e.receiver, receiver=e.sender, attr=e.attr))
-        g.add_reflexive_edges()
-        for e in new_edges:
-            g.edges.add(e)
+
+        # add/remove/keep edges
+        g = self.edge_fns[self.edge_mode](g)
 
         g = self.enc(g)
         for core in self.core_blocks:
@@ -85,3 +94,36 @@ class GNDeep(nn.Module):
         g: Graph = self.dec(g)
 
         return g.attr.val
+
+    @staticmethod
+    def no_edges(g: Graph) -> Graph:
+        g = deepcopy(g)
+        g.remove_all_edges()
+        g.add_reflexive_edges()
+        return g
+
+    @staticmethod
+    def all_edges(g: Graph) -> Graph:
+        g = deepcopy(g)
+        g.remove_all_edges()
+        g.add_all_edges(reflexive=True)
+        return g
+
+    @staticmethod
+    def default(g: Graph) -> Graph:
+        g = deepcopy(g)
+        g.add_reflexive_edges()
+        return g
+
+    @staticmethod
+    def bi_directional(g: Graph) -> Graph:
+        g = deepcopy(g)
+
+        new_edges = set()
+        for e in g.edges:
+            new_edges.add(Edge(sender=e.receiver, receiver=e.sender, attr=e.attr))
+        g.add_reflexive_edges()
+        for e in new_edges:
+            g.edges.add(e)
+
+        return g
