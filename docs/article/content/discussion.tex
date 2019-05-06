@@ -123,7 +123,7 @@ A qualitative analysis of the activation maps suggests that the model learns to 
         \textbf{Block3} & $480\times270$ & $3$\\
         \textbf{Block4} & $480\times270$ & $3$\\
     \end{tabular}
-    \caption[Comparison of GN variants]{Comparison of GN variants + to be updated}
+    \caption[Activation maps of the screenshot feature extractor]{Activation maps of the screenshot feature extractor + to be updated; depth indicates the number of non-linearities the data went through.}
     \label{tab:activationmaptensors}
 \end{table}
 
@@ -235,7 +235,7 @@ We split the test dataset ranks into 25 bins (each containing 4k samples) and se
         \end{axis}
 
     \end{tikzpicture}
-    \caption[Min/max accuracy vs. rank]{Min/max accuracy of samples in bins of size $4000$ vs. their rank. It is apparent that the model struggles at estimating the rank of samples in the middle correctly, because it is harder. Take for instance the sample with the highest rank: The model could theoretically easily achieve 100\% accuracy by predicting a high value for it. Likewise, it can constantly predict a low value for it, making it a hard sample (accuracy 0\%). This \textit{trivial} predicting gets harder as the ranks diverge from the ends of the spectrum. The solid lines indicate where the trivial bound lies; for a randomly initialized model maximum and minimum would (in the expected value) lay on the trivial bound. Crosses exceeding the solid lines (i.e. crosses above or below the surface enclosed by them) are better than the trivial guessing. It is important to note though, that the samples are drawn from the test set, so the model has not seen them before. The horizontal, dashed line marks the average model performance on the test set.}
+    \caption[Min/max accuracy against rank]{Min/max accuracy of samples in bins of size $4000$ plotted against their rank. It is apparent that the model struggles at estimating the rank of samples in the middle correctly, because it is harder. Take for instance the sample with the highest rank: The model could theoretically easily achieve 100\% accuracy by predicting a high value for it. Likewise, it can constantly predict a low value for it, making it a hard sample (accuracy 0\%). This \textit{trivial} predicting gets harder as the ranks diverge from the ends of the spectrum. The solid lines indicate where the trivial bound lies; for a randomly initialized model maximum and minimum would (in the expected value) lay on the trivial bound. Crosses exceeding the solid lines (i.e. crosses above or below the surface enclosed by them) are better than the trivial guessing. It is important to note though, that the samples are drawn from the test set, so the model has not seen them before. The horizontal, dashed line marks the average model performance on the test set.}
     \label{fig:minmaxaccvsrank}
 \end{figure}
 
