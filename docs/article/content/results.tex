@@ -67,60 +67,63 @@ The human evaluation gives us a human baseline to compare our model to. It is al
 
 \subsection{Methods of Training}
 
-When introducing our model in Section~\ref{sec:method} we have already enumerated three different methods of training it (end-to-end training [e2e], pre-training without fine-tuning [woft], and pre-training with fine-tuning [wft]). Due to GPU memory constraints, the training modes [e2e] and [wft] allow for a maximum batch size of two, which we is seemingly harmful to proper gradient approximation. Besides that, both training modes require gradient propagation through the GN part of the model which is relatively slow. Except for the comparison of the three approaches, which can be found in Table~\ref{tab:trainmethodcomparison} we have used [woft] for all experiments.
+When introducing our model in Section~\ref{sec:method} we have already enumerated three different methods of training it (end-to-end training [e2e], pre-training without fine-tuning [woft], and pre-training with fine-tuning [wft]). Due to GPU memory constraints, the training modes [e2e] and [wft] allow for a maximum batch size of two, which we is seemingly harmful to proper gradient approximation. Besides that, both training modes require gradient propagation through the GN part of the model which is relatively slow. We therefore use [woft] for all experiments.
 
 For [woft] we attach a linear layer to the screenshot feature extractor and train it to output a scalar that ranks webpages. That way the model has only access to individual images without any context, i.e. screenshots of other pages, mobile/desktop in parallel, or graph edges. The loss function from Equation~\ref{eq:loss} is slightly modified to account for the variable number of screenshots per dataset sample: We weigh the loss with the inverse number of screenshots so the rank prediction of a sample with a single webpage has the same contribution to the loss as a sample with e.g. eight screenshots combined. After convergence of the feature extractor we compute all feature vectors for the entire dataset and use them as input to the GN part of our model. That way we reduce the computational overhead significantly by bypassing the CNN in the GN training. This gives us headroom for a greater number of experiments with GN variants.
 
+The results of [woft] and [woft] with GN are compared to the human baseline in Table~\ref{tab:accuracyonv2}.
+
 \begin{table}
     \centering
-    \begin{tabular}{lrrr}
-        \textbf{Training} & \textbf{Accuracy} & \textbf{Wall-clock time}\\\hline
-        \textbf{[e2e]} & $xx.x\%$ & xx h\\
-        \textbf{[wft]} & $xx.x\%$ & xx h\\
-        \textbf{[woft]} & $58.30\%$ & xx h\\
-        \textbf{[woft] + GN} & $60.54\%$ & xx h\\
+    \begin{tabular}{lr}
+        \textbf{Mode} & \textbf{Accuracy}\\\hline
+        \textbf{Human} & $57.8\%$\\
+        \textbf{[woft]} & $60.7\%$\\
+        \textbf{[woft] + GN} & $\bm{62.6}\%$\\
     \end{tabular}
-    \caption[Model training method comparison]{Model training method comparison: end-to-end training [e2e], pre-training without fine-tuning [woft], pre-training with fine-tuning [wft]. The accuracy is reported on the held-out test set; wall-clock time is the time per epoch.}
-    \label{tab:trainmethodcomparison}
+    \caption[Performance on dataset version 2]{Performance on dataset version 2. Human is the human baseline we compare to. Pre-training without fine-tuning [woft] is CNN-based per-image estimation of ranks. [woft] + GN is a combination of CNN feature extraction and GN, which achieves the best results.}
+    \label{tab:accuracyonv2}
 \end{table}
 
 \subsection{Weighting Function}
 
-Our loss term contains a weighting function (Equation~\ref{eq:weightingfactor}) $w_b$. We evaluate its importance by fine tuning a graph network attached to a pre-trained feature extractor. For computation reasons, the feature extractor is pre-trained with $w_{10}$, so $b$ is only varied for the GN training. The results can be found in Table~\ref{tab:weightingbase}.
+Our loss term contains a weighting function $w_b$ (Equation~\ref{eq:weightingfactor}), parameterized by $b$. We evaluate its effect and helpfulness by fine tuning a graph network attached to a pre-trained feature extractor. For computation reasons, the feature extractor is pre-trained with $w_{10}$, so $b$ is only varied for the GN training. We initially expected the weighting function to aid generalization, however, results indicated it was rather useless. We therefore ran another training of the feature extractor with a constant weighting of $w_b=1$ for all samples, which exceeded the feature extractor with weighting function by more than two percent. The results can be found in Table~\ref{tab:weightingbase}.
+
+It can be concluded that a rank-based weighting as defined in Equation~\ref{eq:weightingfactor} does neither improve accuracy, nor generalization, as measured by our particular definition of accuracy. It must, however, be noted that in practical applications the correct relative ranking of higher ranked samples is often more important, see e.g. \cite{tfranking}. In such cases usage of the weighting function should be considered.
 
 \begin{table}
     \centering
     \begin{tabular}{lrrr}
-        \textbf{Weighting $b$} & \textbf{Accuracy}\\\hline
-        $w_b=1$ & $xx.x\%$\\
-        $b=1$ & $xx.x\%$\\
-        $b=2$ & $xx.x\%$\\
-        $b=10$ & $xx.x\%$\\
-        $b=100$ & $xx.x\%$\\
+        \textbf{Feat. extr.} & \textbf{Weighting} & \textbf{Accuracy}\\\hline
+        & $w_b=1$ & $59.79\%$\\
+        & $b=1$ & $59.83\%$\\
+        $b=10$ & $b=2$ & $59.80\%$\\
+        & $b=10$ & $59.85\%$\\
+        & $b=100$ & $59.82\%$\\\hline
+        $w_b=1$ & $w_b=1$ & $62.55\%$\\
+        
     \end{tabular}
-    \caption[Effect of the sample weighting function]{Effect of the sample weighting function}
+    \caption[Effect of the sample weighting function]{Effect of the sample weighting function. The accuracies were determined in a two step procedure: (1) training of a screenshot feature extractor with a certain weighting function (left column) and subsequent (2) training of a GN attached to it with another weighting function (middle column). The best accuracy is achieved when setting the weighting function to be $w_b(\cdot)=1$ for all samples. }
     \label{tab:weightingbase}
 \end{table}
 
-The model trained with $b=xxx$ achieves the best accuracy on the test set. + Interpretation once the results are there.
-
 \subsection{GN Variants}
 
-We compare several GN variants each other. The GN framework introduced in Section~\ref{sec:graphnetworks} allows for great flexibility. We have decided to use a combination of encoder, core, and decoder, presented in Section~\ref{sec:gnblocks}.
+We compare several GN variants with each other. The GN framework introduced in Section~\ref{sec:graphnetworks} allows for great flexibility. We have decided to use a combination of encoder, core, and decoder, as presented in Section~\ref{sec:gnblocks}.
 We compare the following GN variants to each other, all trained in [woft] fashion. Results are listed in Table~\ref{tab:gnvariantscomparison}.
 
 \begin{table}
     \centering
     \begin{tabular}{lrrrr}
         \textbf{GN variant} & \textbf{Accuracy} & \textbf{Relative} & \textbf{\#Params} & \textbf{\#Blocks}\\\hline
-        \textbf{[woft]} & $xx\%$ $xx\%$ & $0$ & 0 \\
-        \textbf{[baseline+avg]} & $xx\%$ & $+xx\%$ & $65$ & 1\\
-        \textbf{[baseline+max]} & $xx\%$ & $+xx\%$ & $65$ & 1\\
-        \textbf{[1-core]} & $xx\%$ & $+xx\%$ & $41,217$ & 3\\
-        \textbf{[3-core]} & $xx\%$ & $+xx\%$ & $123,521$ & 5\\
-        \textbf{[3-core-shared]} & $xx\%$ & $+xx\%$ & $41,217$ & 5\\
+        \textbf{[woft]}         & $60.65\%$ & $0\%$ & $0$ & 0 \\
+        \textbf{[baseline+avg]} & $62.20\%$ & $+14.55\%$ & $65$ & 1\\
+        \textbf{[baseline+max]} & $61.87\%$ & $+11.46\%$ & $65$ & 1\\
+        \textbf{[1-core]}       & $62.50\%$ & $+17.37\%$ & $41,217$ & 3\\
+        \textbf{[3-core]}       & $\bm{62.55\%}$ & $\bm{+17.84\%}$ & $123,521$ & 5\\
+        \textbf{[3-core-shared]}& $62.51\%$ & $+17.46\%$ & $41,217$ & 5\\
     \end{tabular}
-    \caption[Comparison of GN variants]{Comparison of GN variants. [woft] is the CNN applied per image. An accuracy of $50\%$ corresponds to random guessing which is why we compare the model's relative differences, where [woft] has $8.30\%$ and e.g. [baseline+avg] improves over it by $20.5\%$ by being $10\%$ above random guessing. The number of parameters is for the GN only, the CNN is omitted. The number of blocks are GN blocks. The best model is a GN with three core blocks which do not share weights.}
+    \caption[Comparison of GN variants]{Comparison of GN variants. [woft] is the CNN applied per image. An accuracy of $50\%$ corresponds to random guessing which is why we compare the model's relative differences, where [woft] has $10.65\%$ and e.g. [baseline+avg] improves over it by $17.84\%$ by being $62.55\%$ above random guessing. The number of parameters is for the GN only, the CNN is omitted. The number of blocks are GN blocks. The best model is a GN with three core blocks which do not share weights. Edges were left as-is, i.e. [default], see Section \ref{sec:graphstructureusage}.}
     \label{tab:gnvariantscomparison}
 \end{table}
 
@@ -134,21 +137,22 @@ We compare the following GN variants to each other, all trained in [woft] fashio
     \item \textbf{[3-core-shared]}: Same as [3-core], except the core blocks share their weights.
 \end{itemize}
 
-+ Quick wrap-up of results once they are available.
+The best performing GN is a encoder-core-decoder architecture with three core blocks. The core blocks do not share their weights. The model improves over the [woft] baseline by a relative $17.84\%$.
 
 \subsection{Graph Structure Usage}
+\label{sec:graphstructureusage}
 
-We seek to understand the extent of graph structure usage. Recall that the GN variants [baseline+avg] and [baseline+max] do not make use of edge information. An edge corresponds to a hyperlink between two nodes. We analyze to which extent the graph structure aids correct page rank estimations.
+We seek to understand the extent of graph structure usage. Recall that the GN variants [baseline+avg] and [baseline+max] do not make use of edge information. An edge corresponds to a hyperlink between two nodes. We analyze how much the graph structure aids correct page rank estimation.
 
-The graphs as yielded by the dataset contain directed edges connecting websites that link to each other. Besides that every graph is extended with reflexive edges, i.e. every node points to itself, for the sake of preventing a division by zero when averaging. We alter the graph structure to analyze its impact on ranking accuracy. We use the model [3-core] for these experiments because with its depth of three core blocks it is capable of performing message passing between nodes. The results of these experiments are in Table~\ref{tab:edgecomparison}.
+The graphs, as yielded by the dataset, contain directed edges connecting web pages that link to each other. Besides that every graph is extended with reflexive edges, i.e. every node points to itself, to prevent a division by zero when averaging. We alter the graph structure to analyze its impact on ranking accuracy. We use the model [3-core] for these experiments because with its depth of three core blocks it is capable of performing message passing between nodes. The results of these experiments are in Table~\ref{tab:edgecomparison}.
 
 \begin{table}
     \centering
     \begin{tabular}{lrr}
         \textbf{Edge information} & \textbf{Test acc.} & \textbf{Train acc.}\\\hline
-        \textbf{[no-edges]} & $62.57\%$ & $62.95\%$\\
+        \textbf{[no-edges]} & $\bm{62.57\%}$ & $\bm{62.95\%}$\\
         \textbf{[default]} & $62.55\%$ & $62.94\%$\\
-        \textbf{[bi-directional]} & $xx.x\%$ & $xx.x\%$\\
+        \textbf{[bi-directional]} & $62.56\%$ & $62.92\%$\\
         \textbf{[full]} & $62.55\%$ & $62.94\%$\\
     \end{tabular}
     \caption[Comparison of trainings with different edge information]{Comparison of trainings with different edge information. The four versions differ insignificantly, suggesting the GN cannot use the hyperlink information to improve the accuracy score.}
