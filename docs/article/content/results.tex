@@ -125,13 +125,13 @@ We compare the following GN variants to each other, all trained in [woft] fashio
 \end{table}
 
 \begin{itemize}
-    \item \textbf{[baseline+avg]}. The baseline multiplies a weight matrix with all node feature vectors in the graph independently, converting them into scalars. The scalars are then averaged, yielding the global state, which is the network's output.\\
+    \item \textbf{[baseline+avg]}: The baseline multiplies a weight matrix with all node feature vectors in the graph independently, converting them into scalars. The scalars are then averaged, yielding the global state, which is the network's output.\\
     Mathematically spoken, the node update function is the one stated in Equation~\ref{eq:dec:nodeupdate}, the node aggregation is $\rho^{v\rightarrow u}\left(\mathbb{V}'\right)=\operatorname{avg}\left(\mathbb{V}'\right)$, and the final global state is computed as $\phi^u\left(\bm{\overline{e}}',\overline{v},\bm{u}\right)=\overline{v}$.\\
     This architecture can be seen as a baseline because it does not exploit any graph information and merges the information extracted from the pages in the simplest possible way. Each pages is regarded separately and the final website score is an average of the page-wise estimates.
-    \item \textbf{[baseline+max]}. Same as [baseline+avg] except the node aggregation is $\rho^{v\rightarrow u}\left(\mathbb{V}'\right)=\operatorname{max}\left(\mathbb{V}'\right)$. Both [baseline+avg] and this variant do not make use of graph structure information, i.e. edges or number of nodes.
-    \item \textbf{[1-core]}. GN with encoder, single core, and decoder block; as described in Section~\ref{sec:gnblocks}.
-    \item \textbf{[3-core]}. Same as [1-core], except the core block is repeated three times without weight sharing.
-    \item \textbf{[3-core-shared]}. Same as [3-core], except the core blocks share their weights.
+    \item \textbf{[baseline+max]}: Same as [baseline+avg] except the node aggregation is $\rho^{v\rightarrow u}\left(\mathbb{V}'\right)=\operatorname{max}\left(\mathbb{V}'\right)$. Both [baseline+avg] and this variant do not make use of graph structure information, i.e. edges or number of nodes.
+    \item \textbf{[1-core]}: GN with encoder, single core, and decoder block; as described in Section~\ref{sec:gnblocks}.
+    \item \textbf{[3-core]}: Same as [1-core], except the core block is repeated three times without weight sharing.
+    \item \textbf{[3-core-shared]}: Same as [3-core], except the core blocks share their weights.
 \end{itemize}
 
 + Quick wrap-up of results once they are available.
@@ -144,8 +144,8 @@ We seek to understand the extent of graph structure usage. Recall that the GN va
     \centering
     \begin{tabular}{lrr}
         \textbf{Edge information} & \textbf{Test acc.} & \textbf{Train acc.}\\\hline
-        \textbf{[no-edges]} & $xx.x\%$ & $xx.x\%$\\
-        \textbf{[default]} & $xx.x\%$ & $xx.x\%$\\
+        \textbf{[no-edges]} & $62.57\%$ & $62.95\%$\\
+        \textbf{[default]} & $62.55\%$ & $62.94\%$\\
         \textbf{[bi-directional]} & $xx.x\%$ & $xx.x\%$\\
         \textbf{[full]} & $xx.x\%$ & $xx.x\%$\\
     \end{tabular}
@@ -154,10 +154,10 @@ We seek to understand the extent of graph structure usage. Recall that the GN va
 \end{table}
 
 \begin{itemize}
-    \item \textbf{[no-edges]}. Remove all but the reflexive edges from the graph.
-    \item \textbf{[default]}. Use directed edges. This is the default variant as the graphs yielded by the dataset are not altered except for the mandatory addition of reflexive edges.
-    \item \textbf{[bi-directional]}. For every edge, add a directed edge pointing into the opposite direction. That way nodes are not only affected by who is referencing them but also by who they reference. The graph is still directed but every connection between two nodes is bi-directional.
-    \item \textbf{[full]}. The graph is fully connected, i.e. every node points to every other node.
+    \item \textbf{[no-edges]}: Remove all but the reflexive edges from the graph.
+    \item \textbf{[default]}: Use directed edges. This is the default variant as the graphs yielded by the dataset are not altered except for the mandatory addition of reflexive edges.
+    \item \textbf{[bi-directional]}: For every edge, add a directed edge pointing into the opposite direction. That way nodes are not only affected by who is referencing them but also by who they reference. The graph is still directed but every connection between two nodes is bi-directional.
+    \item \textbf{[full]}: The graph is fully connected, i.e. every node points to every other node.
 \end{itemize}
 
 \subsection{Best Accuracy}

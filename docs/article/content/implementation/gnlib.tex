@@ -1,7 +1,7 @@
 \subsection{GraphNets Library}
 \label{sec:gnlib}
 
-Our GraphNets library is an implementation of the graph network (GN) framework introduced by \cite{deepmind:graphnets}. It can be used to implement and train GNs in combination with the deep learning platform PyTorch. Its primary use-case is research in the field of GNs. We have developed it within the scope of this work. The framework is, however, not influenced by the pagerank aspects. It is generic and could, as-is, be used for any problem that requires GNs.
+Our GraphNets library is an implementation of the graph network (GN) framework introduced by \cite{deepmind:graphnets}. It can be used to implement and train GNs in combination with the deep learning platform PyTorch. Its primary use-case is research in the field of GNs. We have developed it within the scope of this work. The framework is, however, not influenced by the page rank aspects. It is generic and could, as-is, be used for any problem that requires GNs.
 
 The researchers at DeepMind have implemented their own framework and have open-sourced it\footnote{GitHub repository deepmind/graph\_nets: \url{https://github.com/deepmind/graph_nets}} in late 2018. Opposed to our solution it is based on the deep learning framework TensorFlow. We chose not to use it because the development of a custom solution gave us more flexibility, a learning opportunity, and the free framework choice (PyTorch vs. TensorFlow).
 
@@ -20,7 +20,7 @@ The \texttt{Graph} class stores references to all contained nodes and edges. The
 
 An \texttt{Edge} requires two nodes (sender and receiver) to be passed to its constructor. The edge adds itself to the \texttt{receiving\_edges} set of the receiver and \texttt{sending\_edges} set of the sender. \texttt{Edge} objects must therefore be created after \texttt{Node}s.
 
-All three, \texttt{Graph}, \texttt{Node}, and \texttt{Edge} have in common that they have an attribute \texttt{attr} of type \texttt{Attr}. An attribute can hold any value in its \texttt{val} attribute. In the pagerank example, the \texttt{val} of an attribute may for instance be a tuple of screenshots.
+All three, \texttt{Graph}, \texttt{Node}, and \texttt{Edge} have in common that they have an attribute \texttt{attr} of type \texttt{Attr}. An attribute can hold any value in its \texttt{val} attribute. In the page rank example, the \texttt{val} of an attribute may for instance be a tuple of screenshots.
 
 \subsubsection{Aggregation and Update Functions}
 

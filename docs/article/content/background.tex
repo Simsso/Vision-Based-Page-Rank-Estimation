@@ -114,10 +114,10 @@ The functions are being evaluated in a specific sequence, visualized in Figure~\
 
 Graph networks in related forms have been applied to a variety of different problems from different domains:
 \begin{itemize}
-    \item \textbf{Social sciences}. \cite{graphnetsreddit} apply graph networks to post data from the social network Reddit. Like we do, \cite{graphnetscitationgraph} use convolutional graph networks. They run experiments on citation networks and on a knowledge graph dataset.
-    \item \textbf{Physics}. \cite{graphnetsphysicsengine} and \cite{graphnetsphysics2} train graph networks that focus on the modelling of physical relationships between objects.
-    \item \textbf{Medicine}. \cite{graphnetsproteininterface} consider the prediction of interfaces between proteins, a challenging problem with important applications in drug discovery and design.
-    \item \textbf{Algorithms}. See e.g. \cite{selsam:satsolver} and \cite{dai:graphnetscombinatorialalgo}.
+    \item \textbf{Social sciences}: \cite{graphnetsreddit} apply graph networks to post data from the social network Reddit. Like we do, \cite{graphnetscitationgraph} use convolutional graph networks. They run experiments on citation networks and on a knowledge graph dataset.
+    \item \textbf{Physics}: \cite{graphnetsphysicsengine} and \cite{graphnetsphysics2} train graph networks that focus on the modelling of physical relationships between objects.
+    \item \textbf{Medicine}: \cite{graphnetsproteininterface} consider the prediction of interfaces between proteins, a challenging problem with important applications in drug discovery and design.
+    \item \textbf{Algorithms}: See e.g. \cite{selsam:satsolver} and \cite{dai:graphnetscombinatorialalgo}.
 \end{itemize}
 
 Graph networks can be trained with stochastic gradient descent (SGD), since they are fully differentiable, if aggregation and attribute update functions are differentiable.
@@ -143,9 +143,9 @@ We decide to use CNNs as feature extractors for the website screenshots as well.
 
 \subsection{Open PageRank}
 \label{OpenPageRank}
-\textit{Open PageRank} \cite{OpenPageRank} is an initiative, which has the goal to enable webmasters to determine the pagerank for their domains and easily compare with other domains. The initiative was constituted after Google had shut down the \textit{PageRank}-toolbar, leaving a void in the industry. The Open PageRank initiative provides freely available data that was built on top of \textit{Common Crawl} \cite{CommonCrawl}, which provides high quality crawl data of webpages since 2013.
+\textit{Open PageRank} \cite{OpenPageRank} is an initiative, which has the goal to enable webmasters to determine the page rank for their domains and easily compare with other domains. The initiative was constituted after Google had shut down the \textit{PageRank}-toolbar, leaving a void in the industry. The Open PageRank initiative provides freely available data that was built on top of \textit{Common Crawl} \cite{CommonCrawl}, which provides high quality crawl data of webpages since 2013.
 
-Open PageRank uses the number of backlinks of a domain found in \textit{Common Crawl} to calculate the pagerank. The greater the number of links, different domains use to refer to the given domain, the better the pagerank of the given domain according to Open PageRank.
+Open PageRank uses the number of backlinks of a domain found in \textit{Common Crawl} to calculate the page rank. The greater the number of links, different domains use to refer to the given domain, the better the page rank of the given domain according to Open PageRank.
 
 The list offered by Open PageRank contains about 10 million domains ordered by their page rank. Each entry in the list consists of following comma-separated attributes:
 

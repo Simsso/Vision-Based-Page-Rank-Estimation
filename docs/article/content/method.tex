@@ -3,7 +3,7 @@
 
 This section describes our approach to solving the page rank estimation problem. We present our methodology as we have applied it to the problem at hand, as opposed to extracting the generic, underlying principles, as these are mostly covered in the background section of this document.
 
-The pagerank estimation problem is, given a webpage represented as an attributed graph with screenshots, to estimate the global popularity of that webpage.
+The page rank estimation problem is, given a webpage represented as an attributed graph with screenshots, to estimate the global popularity of that webpage.
 Our ground-truth for \textit{popularity} is a list containing 100,000 webpages, created by Open PageRank.
 More details can be found in Section~\ref{OpenPageRank}.
 The given data has several characteristics which have influenced our way of tackling the problem:
@@ -144,7 +144,7 @@ The \textbf{Dense} blocks each contain a fully connected layer followed by ReLU 
 The parameters of the feature extraction model can be trained with backpropagation. The following modes of training are conceivable:
 \begin{itemize}
     \item \textbf{End-to-end training [e2e]}. The feature extractor is trained alongside with the other components of the model, gradients are computed by backpropagating through the following components. This method will train the CNN such that the extracted vectors contain features most helpful/relevant for the overall task. The downside is the additional computational complexity introduced by backpropagating through a graph network.
-    \item \textbf{Pre-training without fine-tuning [woft]}. The weights of the feature extractor are learned on a separate auxiliary task and transferred to be used for the actual problem. This method requires an auxiliary task, which (in this setting) may be the prediction of a pagerank based solely on a single desktop-mobile screenshot tuple. If the model parameters are kept frozen, i.e. are not being fine-tuned, the feature vectors for the dataset can be cached, once the entire model is trained on the main task. That way the computational overhead of passing images through the CNN can be omitted, greatly increasing the training speed and decreasing GPU memory requirements. Even though the described auxiliary task is similar to the pagerank prediction based on an entire graph of screenshots, its difference may lead to slightly less meaningful feature vectors.
+    \item \textbf{Pre-training without fine-tuning [woft]}. The weights of the feature extractor are learned on a separate auxiliary task and transferred to be used for the actual problem. This method requires an auxiliary task, which (in this setting) may be the prediction of a page rank based solely on a single desktop-mobile screenshot tuple. If the model parameters are kept frozen, i.e. are not being fine-tuned, the feature vectors for the dataset can be cached, once the entire model is trained on the main task. That way the computational overhead of passing images through the CNN can be omitted, greatly increasing the training speed and decreasing GPU memory requirements. Even though the described auxiliary task is similar to the page rank prediction based on an entire graph of screenshots, its difference may lead to slightly less meaningful feature vectors.
     \item \textbf{Pre-training with fine-tuning [wft]}. Same as \textit{pre-training without fine-tuning} except the weights are kept trainable and are fine-tuned on the main task as well. Caching of feature vectors is not possible.
 \end{itemize}
 
