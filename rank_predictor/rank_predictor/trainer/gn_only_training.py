@@ -10,7 +10,7 @@ from rank_predictor.trainer.ranking.probabilistic_loss import ProbabilisticLoss
 from sacred import Experiment
 from sacred.observers import MongoObserver
 
-name = '10wob_deep_05_none'
+name = '10wob_deepest'
 ex = Experiment(name)
 
 ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred'))
@@ -18,18 +18,18 @@ ex.observers.append(MongoObserver.create(url='mongodb://localhost:27017/sacred')
 
 @ex.config
 def run_config():
-    learning_rate: float = 5e-6
+    learning_rate: float = 2e-6
     batch_size = 12
     pairwise_batch_size = 12
-    epochs = 10
+    epochs = 30
     optimizer = 'adam'
     train_ratio, valid_ratio = .6, .2
     model_name = 'GNDeep'
     loss = 'ProbabilisticLoss'
     weighting = 'c_ij = c_ij !*w & scaling_fac'
     logrank_b = 10
-    drop_p = .1
-    num_core_blocks = 3
+    drop_p = 0
+    num_core_blocks = 6
     share_core_weights = False
     lr_scheduler = 'None'
     lr_scheduler_gamma = None
