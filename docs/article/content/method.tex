@@ -151,7 +151,7 @@ The parameters of the feature extraction model can be trained with backpropagati
 \subsection{Graph Network Blocks}
 \label{sec:gnblocks}
 
-After converting the graph of screenshots into a graph of feature vectors, the entire graph is fed into the graph network (GN); component (4) in Figure~\ref{fig:methodcomponents}. The GN module is an integral component of our model: It utilizes the graph structure of the dataset samples and outputs the actual model prediction, thereby converting a graph into a scalar.
+After converting the graph of screenshots into a graph of feature vectors, the entire graph is fed into the graph network (GN); component (4) in Figure~\ref{fig:methodcomponents}. The GN module is an integral component of our model: It utilizes the graph structure of the dataset samples and outputs the actual model prediction, thereby converting a graph into a continuous scalar, interpretable as a rank estimation.
 
 The GN consists of several GN blocks, which were introduced in \cite{deepmind:graphnets}. A summary of the most important aspects as well as the notation we use in the following can be found in Section~\ref{sec:graphnetworks}.
 
@@ -160,14 +160,14 @@ Formally, the GN module converts a graph into a scalar, i.e. \begin{equation}
     f_\text{gn}:\mathbb{G}\rightarrow\mathbb{R}\,,
 \end{equation} where $\mathbb{G}$ denotes the set of all possible graphs. The input graph represents a website and consists of up to eight nodes. Each node contains two feature vectors which are the screenshot feature extractor's output. The directed edges point from nodes to nodes which contain hyperlinks. Initially, the edges are (opposed to the nodes which contain feature vectors) not attributed.
 
-On a semantic level the GN module consists of three different types of blocks: encoder, core, and decoder. For each of these blocks variants can be used but the role remains the same. This idea is dubbed \textit{encode-process-decode} and depicted in Figure 6 (b) in \cite{deepmind:graphnets}.
+On a semantic level the GN module consists of three different types of blocks: encoder, core, and decoder. For each of these blocks variants can be used but the role remains the same. This idea is dubbed \textit{encode-process-decode} and depicted in Figure~\ref{fig:gn-enc-proc-dec}.
 
 Our \textbf{encoder block} $\text{GN}_\text{enc}$ converts the raw input graph into a homogeneous graph where nodes, edges, and global state are all attributed with a single vector. In our case this is achieved by defining the following update and aggregation functions for the encoder:\begin{align}
     \phi^e_\text{enc}\left(\bm{e}_k,\bm{v}_{r_k},\bm{v}_{s_k},\bm{u}\right)=&\bm{v}_{s_k}\label{eq:enc:edgeupdate}\\
     \rho^{e\rightarrow u}_\text{enc}\left(\mathbb{E}'\right)_j=&\operatorname{avg}\left(\left\{x_j:\bm{x}\in\mathbb{E}'\right\}\right)\label{eq:enc:edgeaggreforu}\\
     \phi^v_\text{enc}\left(\bm{\overline{e}}'_i,\bm{v}_i,\bm{u}\right)=&\bm{v}_i\label{eq:enc:nodeupdate}\\
     \phi^u_\text{enc}\left(\bm{\overline{e}}',\bm{\overline{v}},\bm{u}\right)=&\bm{\overline{e}}'\label{eq:enc:uupdate}\,,
-\end{align}where $\rho^{e\rightarrow v}$ and $\rho^{v\rightarrow u}$ remain undefined because they are not needed. The edges are initially populated with the feature vector of the sender node (Equation~\ref{eq:enc:edgeupdate}). Equation~\ref{eq:enc:edgeaggreforu}, the edge aggregation for the global state, is an element-wise averaging of the edge vectors. To ensure there is at least one element in $\mathbb{E}'$ we add reflexive edges to the graph so every node has at least one outgoing (and incoming) edge, namely the one pointing to itself. The node attributes remain unchanged, Equation~\ref{eq:enc:nodeupdate} is an identity mapping. The global state is set to be the aggregation of all edges (Equation~\ref{eq:enc:uupdate}). Alternatively, the node aggregation $\bm{\overline{v}}$ could be chosen.
+\end{align}where $\rho^{e\rightarrow v}$ and $\rho^{v\rightarrow u}$ remain undefined because they are not needed. The edges are initially populated with the feature vector of the sender node (Equation~\ref{eq:enc:edgeupdate}). Equation~\ref{eq:enc:edgeaggreforu}, the edge aggregation for the global state, is an element-wise averaging of the edge vectors. To ensure there is at least one element in $\mathbb{E}'$ we add reflexive edges to the graph so every node has at least one outgoing (and incoming) edge, namely the one pointing to itself. The node attributes remain unchanged, Equation~\ref{eq:enc:nodeupdate} is an identity mapping. The global state is set to be the aggregation of all edges (Equation~\ref{eq:enc:uupdate}). Alternatively, the node aggregation $\bm{\overline{v}}$ could be chosen; both options are equally valid and we did not perform experiments comparing both options within the scope of this work.
 
 Intuitively, the encoder block can be seen as a preparation stage. It transforms the graph into the desired state and adds missing attributes. In fact, the entire feature extractor can be seen as an encoder block, too: It is a node-wise application of the CNN: $\phi^v_\text{core}\left(\bm{\overline{e}}'_i,\bm{v}_i,\bm{u}\right)=f_\text{dm}(\bm{v}_i)$, where $\bm{v}_i$ is a tuple made up of desktop and mobile screenshot. We chose not to formulate the overall model that way to aid understanding, but it illustrates the expressive power of the GN framework.
 
@@ -175,7 +175,7 @@ Before applying the encoder block we concatenate desktop and mobile feature vect
 
 Our \textbf{core block} $\text{GN}_\text{core}$ performs the graph \textit{understanding} part by performing the \textit{message passing} (see Section 4.3 in \cite{deepmind:graphnets}). It may be stacked $M$ times. 
 
-We choose the aggregation functions $\rho^{e\rightarrow v}\left(\mathbb{E}'_i\right)$, $\rho^{e\rightarrow u}\left(\mathbb{E}'\right)$, $\rho^{v\rightarrow u}\left(\mathbb{V}'\right)$ to average the vectors element-wise, analogous to Equation~\ref{eq:enc:edgeaggreforu}. Alternatively, max-pooling could be used.
+We choose the aggregation functions $\rho^{e\rightarrow v}\left(\mathbb{E}'_i\right)$, $\rho^{e\rightarrow u}\left(\mathbb{E}'\right)$, $\rho^{v\rightarrow u}\left(\mathbb{V}'\right)$ to average the vectors element-wise, analogous to Equation~\ref{eq:enc:edgeaggreforu}. Alternatively, max-pooling could be used; we did not perform experiments comparing both options within the scope of this work.
 
 The update functions for node attribute, edge attributes, and the global state are fully-connected layers with bias, followed by a ReLU activation function ($\operatorname{ReLU}(x) = \max(0,x)$) and dropout (see \cite{srivastava2014:dropout}; denoted by the function $\operatorname{drop}(\cdot)$). The exact definitions are the following:
 \begin{align}
@@ -277,7 +277,7 @@ We introduce the additional weighting factor
 
     \end{tikzpicture}
   }
-  \captionof{figure}{The loss function plotted for three values of the target probability (source \cite{Burges:learningtorankwithsgd})}
+  \captionof{figure}[Loss function plotted values of the target probability]{The loss function plotted for three different values of the target probability \cite{Burges:learningtorankwithsgd}}
   \label{fig:costfn}
 \end{minipage}\hfill%
 %
@@ -334,13 +334,12 @@ Verbally described, the accuracy measure is the percentage of correct pairwise r
 
 The accuracy evaluation metric has the downside of not taking the difficulty into consideration: Ranking e.g. sample \#55000 relative to sample \#54590 is presumably much harder than samples \#100 and \#40000, because the sample ranks are closer together.
 
-In our setup, \textbf{inference} can be done in two ways: (1) absolute and (2) relative. In our experiments we do not need the rank inference mode (1) because the accuracy on validation and test set can be computed with Equation~\ref{eq:acc}. We present both modes anyways for use in future research or in applications.
+In our setup, \textbf{inference} can be done in two ways: (1) absolute and (2) relative. In our experiments we do not need the rank inference mode (1) because the accuracy on validation and test set can be computed with Equation~\ref{eq:acc}. We present both modes anyways for use in future research or in applications. The two methods differ in that (1) requires the ground truth dataset $\mathbb{D}$, whereas (2) works with any set of two or more websites.
 
-(1) A single sample $G$ can be ranked with respect to the samples of the dataset $\mathbb{D}$. This can be done by computing $f_G=f_\text{model}(G)$ and comparing it to all entries in the vector $\bm{f}$. The estimated rank of $G$ is \begin{equation}
-    \label{eq:inference}
-    r^{(G)}\approx N-\sum_{i=1}^N\bm{1}\left[f_G>f_i\right]\,.
-\end{equation}
-
-(2) The relative inference compares a set of samples $\mathbb{S}$ relative to each other, where $\left\lvert\mathbb{S}\right\rvert\ge2$. Instead of computing the matrix $\bm{O}$ for samples in the dataset we compute it for $\mathbb{S}$. The entry at $O_{i,j}$ indicates how the samples with index $i$ and $j$ are ranked relative to each other.
-
-The two methods differ in that (1) requires the ground truth dataset $\mathbb{D}$, whereas (2) works with any set of two or more websites.
+\begin{enumerate}
+    \item[(1)] A single sample $G$ can be ranked with respect to the samples of the dataset $\mathbb{D}$. This can be done by computing $f_G=f_\text{model}(G)$ and comparing it to all entries in the vector $\bm{f}$. The estimated rank of $G$ is \begin{equation}
+        \label{eq:inference}
+        r^{(G)}\approx N-\sum_{i=1}^N\bm{1}\left[f_G>f_i\right]\,.
+    \end{equation}
+    \item[(2)] The relative inference compares a set of samples $\mathbb{S}$ relative to each other, where $\left\lvert\mathbb{S}\right\rvert\ge2$. Instead of computing the matrix $\bm{O}$ for samples in the dataset we compute it for $\mathbb{S}$. The entry at $O_{i,j}$ indicates how the samples with index $i$ and $j$ are ranked relative to each other.
+\end{enumerate}

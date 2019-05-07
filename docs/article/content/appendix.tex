@@ -1,13 +1,39 @@
 \clearpage
 \appendix
 
-\section{Appendix}
-
 \input{content/notation}\clearpage
+
+\section{Graph Networks}
+
+\newlength{\threesubht}
+\newsavebox{\threesubbox}
+\begin{figure}[h]
+    \centering
+    \sbox\threesubbox{
+      \resizebox{\dimexpr.95\textwidth-1em}{!}{
+        \includegraphics{resources/gn-stack-config}
+        \includegraphics{resources/gn-epd-config}
+        \includegraphics{resources/gn-rnn-config}
+      }
+    }
+    \setlength{\threesubht}{\ht\threesubbox}
+    \subcaptionbox{Composition of GN blocks\label{fig:gn-composition}}{%
+      \includegraphics[height=1\threesubht]{resources/gn-stack-config}%
+    }\quad
+    \subcaptionbox{Encode-process-decode\label{fig:gn-epd-config}}{%
+      \includegraphics[height=1\threesubht]{resources/gn-epd-config}%
+    }\quad
+    \subcaptionbox{Recurrent GN architecture\label{fig:gn-rnn-config}}{%
+      \includegraphics[height=1\threesubht]{resources/gn-rnn-config}%
+    }
+        \caption{(a) An example composing multiple GN blocks in sequence to form a GN ``core''. Here, the GN blocks can use shared weights, or they could be independent. (b) The \emph{encode-process-decode} architecture, which is a common choice for composing GN blocks. Here, a GN encodes an input graph, which is then processed by a GN core. The output of the core is decoded by a third GN block into an output graph, whose nodes, edges, and/or global attributes would be used for task-specific purposes. (c) The encode-process-decode architecture applied in a sequential setting in which the core is also unrolled over time (potentially using a GRU or LSTM architecture), in addition to being repeated within each time step. Here, merged lines indicate concatenation, and split lines indicate copying. Source \cite{deepmind:graphnets}}
+        \label{fig:gn-enc-proc-dec}
+\end{figure}
+\clearpage
 
 \input{content/datasetsamples}\clearpage
 
-\subsection{Source Code}
+\section{Source Code}
 
 \begin{lstlisting}[
     label={lst:getthreefold},
@@ -55,7 +81,7 @@ def get_threefold(klass: Type, sample_paths: List[str], train_ratio: float, vali
 \end{lstlisting}
 \clearpage
 
-\subsection{Activation Maps}
+\section{Activation Maps}
 
 \begin{figure}[h]
     \centering
@@ -78,3 +104,4 @@ def get_threefold(klass: Type, sample_paths: List[str], train_ratio: float, vali
     \caption[Activation maps of the CNN for sample \#16364]{Cherry-picked activation maps of the CNN for sample \#16364. Top to bottom: Input, Block1, Block2, Block3, and Block4.}
     \label{fig:activationmaps3}
 \end{figure}
+\clearpage

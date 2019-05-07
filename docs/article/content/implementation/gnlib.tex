@@ -3,7 +3,7 @@
 
 Our GraphNets library is an implementation of the graph network (GN) framework introduced by \cite{deepmind:graphnets}. It can be used to implement and train GNs in combination with the deep learning platform PyTorch. Its primary use-case is research in the field of GNs. We have developed it within the scope of this work. The framework is, however, not influenced by the page rank aspects. It is generic and could, as-is, be used for any problem that requires GNs.
 
-The researchers at DeepMind have implemented their own framework and have open-sourced it\footnote{GitHub repository deepmind/graph\_nets: \url{https://github.com/deepmind/graph_nets}} in late 2018. Opposed to our solution it is based on the deep learning framework TensorFlow. We chose not to use it because the development of a custom solution gave us more flexibility, a learning opportunity, and the free framework choice (PyTorch vs. TensorFlow).
+The researchers at DeepMind have implemented their own framework and have open-sourced it\footnote{GitHub repository deepmind/graph\_nets: \url{https://github.com/deepmind/graph_nets}}. Opposed to our solution it is based on the deep learning framework TensorFlow. We chose not to use it because the development of a custom solution gave us more flexibility, a learning opportunity, and the free framework choice (PyTorch vs. TensorFlow).
 
 In the remainder of this section we explain the components of our library and link it to the mathematical formulation of Section~\ref{sec:graphnetworks}. Furthermore, we mention specific details of the implementation which seem relevant. We close by naming potential future features and improvements.
 
@@ -106,6 +106,7 @@ g_processed = core_block(g)
 \end{lstlisting}
 
 \subsubsection{Future Features and Improvements}
+\label{sec:gnlibfuturefeatures}
 
 The current implementation of the library is processing each graph individually. Batches can not be processed in parallel, which is due to the nature of graphs: A single batch may contain many graphs of different size and shape. A performance boost could be gained by implementing CUDA kernels for the some common update and aggregation functions that handle batches.
 
