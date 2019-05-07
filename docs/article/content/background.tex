@@ -1,8 +1,6 @@
 \section{Background}
 \label{sec:background}
 
-!!! name the other website ranking paper from 2006 somewhere
-
 \subsection{Learning to Rank}
 \label{sec:learningtorank}
 
@@ -65,7 +63,7 @@ where $\mathbb{E}'_i=\left\{\left(\bm{e}'_k,r_k,s_k\right)\right\}_{r_k=i,k=1}^{
     \item $\phi^u$ is the \textbf{global attribute update function}. It takes both node and edge aggregation, as well as the previous global attribute $\bm{u}$, and computes a new global attribute $\bm{u}'$.
 \end{enumerate}
 
-The functions are being evaluated in a specific sequence, visualized in Figure \ref{fig:fullgraphblock}. GN blocks do not alter the structure of the graph, i.e. they convert a graph into another graph isomorphic to the input. In order to extract a fixed size representation from a GN block, the global attribute can be used.
+The functions are being evaluated in a specific sequence, visualized in Figure~\ref{fig:fullgraphblock}. GN blocks do not alter the structure of the graph, i.e. they convert a graph into another graph isomorphic to the input. In order to extract a fixed size representation from a GN block, the global attribute can be used.
 
 \begin{figure}
     \centering
@@ -116,10 +114,10 @@ The functions are being evaluated in a specific sequence, visualized in Figure \
 
 Graph networks in related forms have been applied to a variety of different problems from different domains:
 \begin{itemize}
-    \item \textbf{Social sciences}. \cite{graphnetsreddit} apply graph networks to post data from the social network Reddit. Like we do, \cite{graphnetscitationgraph} use convolutional graph networks. They run experiments on citation networks and on a knowledge graph dataset.
-    \item \textbf{Physics}. \cite{graphnetsphysicsengine} and \cite{graphnetsphysics2} train graph networks that focus on the modelling of physical relationships between objects.
-    \item \textbf{Medicine}. \cite{graphnetsproteininterface} consider the prediction of interfaces between proteins, a challenging problem with important applications in drug discovery and design.
-    \item \textbf{Algorithms}. See e.g. \cite{selsam:satsolver} and \cite{dai:graphnetscombinatorialalgo}.
+    \item \textbf{Social sciences}: \cite{graphnetsreddit} apply graph networks to post data from the social network Reddit. Like we do, \cite{graphnetscitationgraph} use convolutional graph networks. They run experiments on citation networks and on a knowledge graph dataset.
+    \item \textbf{Physics}: \cite{graphnetsphysicsengine} and \cite{graphnetsphysics2} train graph networks that focus on the modelling of physical relationships between objects.
+    \item \textbf{Medicine}: \cite{graphnetsproteininterface} consider the prediction of interfaces between proteins, a challenging problem with important applications in drug discovery and design.
+    \item \textbf{Algorithms}: See e.g. \cite{selsam:satsolver} and \cite{dai:graphnetscombinatorialalgo}.
 \end{itemize}
 
 Graph networks can be trained with stochastic gradient descent (SGD), since they are fully differentiable, if aggregation and attribute update functions are differentiable.
@@ -145,9 +143,9 @@ We decide to use CNNs as feature extractors for the website screenshots as well.
 
 \subsection{Open PageRank}
 \label{OpenPageRank}
-\textit{Open PageRank} \cite{OpenPageRank} is an initiative, which has the goal to enable webmasters to determine the pagerank for their domains and easily compare with other domains. The initiative was constituted after Google had shut down the \textit{PageRank}-toolbar, leaving a void in the industry. The Open PageRank initiative provides freely available data that was built on top of \textit{Common Crawl} \cite{CommonCrawl}, which provides high quality crawl data of webpages since 2013.
+\textit{Open PageRank} \cite{OpenPageRank} is an initiative, which has the goal to enable webmasters to determine the page rank for their domains and easily compare with other domains. The initiative was constituted after Google had shut down the \textit{PageRank}-toolbar, leaving a void in the industry. The Open PageRank initiative provides freely available data that was built on top of \textit{Common Crawl} \cite{CommonCrawl}, which provides high quality crawl data of webpages since 2013.
 
-Open PageRank uses the number of backlinks of a domain found in \textit{Common Crawl} to calculate the pagerank. The greater the number of links, different domains use to refer to the given domain, the better the pagerank of the given domain according to Open PageRank.
+Open PageRank uses the number of backlinks of a domain found in \textit{Common Crawl} to calculate the page rank. The greater the number of links, different domains use to refer to the given domain, the better the page rank of the given domain according to Open PageRank.
 
 The list offered by Open PageRank contains about 10 million domains ordered by their page rank. Each entry in the list consists of following comma-separated attributes:
 
@@ -157,7 +155,7 @@ The list offered by Open PageRank contains about 10 million domains ordered by t
 	\item calculated score by Open PageRank
 \end{itemize}
 
-The list can be downloaded at \texttt{https://www.domcop.com/openpagerank/}.
+The list can be downloaded from \texttt{https://www.domcop.com/openpagerank/}.
 
 \begin{table}[]
 	\center
@@ -183,7 +181,7 @@ The list can be downloaded at \texttt{https://www.domcop.com/openpagerank/}.
 \label{puppeeter}
 \texttt{Puppeteer} is a open-source library for the JavaScript runtime \texttt{Node.js}, which provides a high-level API to control instances of the browsers \texttt{Chrome} or \texttt{Chromium}. One of the main goals of \texttt{Puppeteer} is to grow adoption in automated browser testing \cite{PuppeteerFAQ}.  For this purpose, it wraps the \texttt{Chrome DevTools Protocol} in JavaScript, which allows web developers to instrument, inspect and debug instances of \texttt{Chrome}. Technically, the protocol is HTTP-based and exposed as a RESTful API at the port for debugging by \texttt{Chrome}.
 
-The protocol offers various of functionalities, which are grouped into domains \cite{DevToolsProtocol}. Some of the interesting domains for our use-case are:
+The protocol offers various functionalities, which are grouped into domains \cite{DevToolsProtocol}. Some of the interesting domains for our use-case are:
 \begin{description}
 	\item[Page]: API to load and take a screenshot of the given website.
 	\item[DOM]: API to read and manipulate the DOM of the given website.
