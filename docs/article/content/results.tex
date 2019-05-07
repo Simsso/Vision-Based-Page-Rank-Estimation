@@ -34,20 +34,20 @@ We evaluated a total of 11 test people regarding their performance on estimating
 
 Using a $Z$-test we ensure our test people are performing better than random guessing (which is equivalent to an accuracy of $50\%$) and the accuracies are not compromised by noise with a significance level of $p << 1\%$. In addition, we ensure the best model outperforms humans, using a Welch's $t$-student test with $p << 1\%$.
 
-\begin{table}[]
+\begin{table}
 	\center
-	\begin{tabular}{r|r|r}
-		\textbf{Person} & $n$ & \textbf{Accuracy} \\ \hline \hline
-		\#1 & $100$ & $60.00\%$ \\ \hline
-		\#2 & $100$ & $64.00\%$\\ \hline
-		\#3 & $100$ & $58.00\%$\\ \hline
-            & $100$ & $57.00\%$\\
+	\begin{tabular}{rrr}
+		\textbf{Person} & $n$ & \textbf{Accuracy} \\ \hline
+		\#1 & $100$ & $60.00\%$\\
+		\#2 & $100$ & $64.00\%$\\
+		\#3 & $100$ & $58.00\%$\\
+        \#4 & $100$ & $57.00\%$\\
         \#4 & $100$ & $62.00\%$\\
-            & $500$ & $56.80\%$\\ \hline
-		\#5 & $100$ & $56.00\%$\\ \hline
-		\#6 & $100$ & $60.00\%$\\ \hline
-		\#7 & $300$ & $51.67\%$\\ \hline
-		\#8 & $200$ & $57.00\%$\\ \hline
+        \#4 & $500$ & $56.80\%$\\
+		\#5 & $100$ & $56.00\%$\\
+		\#6 & $100$ & $60.00\%$\\
+		\#7 & $300$ & $51.67\%$\\
+		\#8 & $200$ & $57.00\%$\\
 		\#9 & $200$ & $54.00\%$\\
 	\end{tabular}
 	\caption[Experimental results of humans on the page rank estimation task]{Experimental results of humans on page the rank estimation task. The scores range from $51.67\%$ to $64\%$; the mean score over all people is $57.8\%$.}
@@ -113,12 +113,12 @@ We compare the following GN variants to each other, all trained in [woft] fashio
     \centering
     \begin{tabular}{lrrrr}
         \textbf{GN variant} & \textbf{Accuracy} & \textbf{Relative} & \textbf{\#Params} & \textbf{\#Blocks}\\\hline
-        \textbf{[woft]} & $58.30\%$ & $+0\%$ & $0$ & 0 \\
-        \textbf{[baseline+avg]} & $60.00\%$ & $+20.5\%$ & $xxx$ & 1\\
-        \textbf{[baseline+max]} & $59.81\%$ & $+18.2\%$ & $xxx$ & 1\\
-        \textbf{[1-core]} & $60.30\%$ & $+24.1\%$ & $41,217$ & 3\\
-        \textbf{[3-core]} & $\bm{60.54\%}$ & $+27.0\%$ & $123,521$ & 5\\
-        \textbf{[3-core-shared]} & $60.44\%$ & $+25.8\%$ & $41,217$ & 5\\
+        \textbf{[woft]} & $xx\%$ $xx\%$ & $0$ & 0 \\
+        \textbf{[baseline+avg]} & $xx\%$ & $+xx\%$ & $65$ & 1\\
+        \textbf{[baseline+max]} & $xx\%$ & $+xx\%$ & $65$ & 1\\
+        \textbf{[1-core]} & $xx\%$ & $+xx\%$ & $41,217$ & 3\\
+        \textbf{[3-core]} & $xx\%$ & $+xx\%$ & $123,521$ & 5\\
+        \textbf{[3-core-shared]} & $xx\%$ & $+xx\%$ & $41,217$ & 5\\
     \end{tabular}
     \caption[Comparison of GN variants]{Comparison of GN variants. [woft] is the CNN applied per image. An accuracy of $50\%$ corresponds to random guessing which is why we compare the model's relative differences, where [woft] has $8.30\%$ and e.g. [baseline+avg] improves over it by $20.5\%$ by being $10\%$ above random guessing. The number of parameters is for the GN only, the CNN is omitted. The number of blocks are GN blocks. The best model is a GN with three core blocks which do not share weights.}
     \label{tab:gnvariantscomparison}
@@ -138,7 +138,9 @@ We compare the following GN variants to each other, all trained in [woft] fashio
 
 \subsection{Graph Structure Usage}
 
-We seek to understand the extent of graph structure usage. Recall that the GN variants [baseline+avg] and [baseline+max] do not make use of edge information. We want to analyze to which extent the graph structure aids correct page rank estimations. The graphs as yielded by the dataset contain directed edges connecting websites that link to each other. Besides that every graph is extended with reflexive edges, i.e. every node points to itself, for the sake of preventing a division by zero when averaging. We alter the graph structure to analyze its impact on ranking accuracy. We use the model [3-core] for these experiments because with its depth of three core blocks it is capable of performing message passing between nodes. The results of these experiments are in Table~\ref{tab:edgecomparison}.
+We seek to understand the extent of graph structure usage. Recall that the GN variants [baseline+avg] and [baseline+max] do not make use of edge information. An edge corresponds to a hyperlink between two nodes. We analyze to which extent the graph structure aids correct page rank estimations.
+
+The graphs as yielded by the dataset contain directed edges connecting websites that link to each other. Besides that every graph is extended with reflexive edges, i.e. every node points to itself, for the sake of preventing a division by zero when averaging. We alter the graph structure to analyze its impact on ranking accuracy. We use the model [3-core] for these experiments because with its depth of three core blocks it is capable of performing message passing between nodes. The results of these experiments are in Table~\ref{tab:edgecomparison}.
 
 \begin{table}
     \centering
@@ -147,9 +149,9 @@ We seek to understand the extent of graph structure usage. Recall that the GN va
         \textbf{[no-edges]} & $62.57\%$ & $62.95\%$\\
         \textbf{[default]} & $62.55\%$ & $62.94\%$\\
         \textbf{[bi-directional]} & $xx.x\%$ & $xx.x\%$\\
-        \textbf{[full]} & $xx.x\%$ & $xx.x\%$\\
+        \textbf{[full]} & $62.55\%$ & $62.94\%$\\
     \end{tabular}
-    \caption[Comparison of trainings with different edge information]{Comparison of trainings with different edge information}
+    \caption[Comparison of trainings with different edge information]{Comparison of trainings with different edge information. The four versions differ insignificantly, suggesting the GN cannot use the hyperlink information to improve the accuracy score.}
     \label{tab:edgecomparison}
 \end{table}
 
@@ -159,6 +161,8 @@ We seek to understand the extent of graph structure usage. Recall that the GN va
     \item \textbf{[bi-directional]}: For every edge, add a directed edge pointing into the opposite direction. That way nodes are not only affected by who is referencing them but also by who they reference. The graph is still directed but every connection between two nodes is bi-directional.
     \item \textbf{[full]}: The graph is fully connected, i.e. every node points to every other node.
 \end{itemize}
+
+All four versions have an equal performance on both, test and train data. This strongly suggests that the hyperlink information, as present in our dataset, is not correlated with the rank, unless our GN was not capable of learning the correlation.
 
 \subsection{Best Accuracy}
 

@@ -7,7 +7,7 @@
 
 \newlength{\threesubht}
 \newsavebox{\threesubbox}
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \sbox\threesubbox{
       \resizebox{\dimexpr.95\textwidth-1em}{!}{
@@ -83,7 +83,7 @@ def get_threefold(klass: Type, sample_paths: List[str], train_ratio: float, vali
 
 \section{Activation Maps}
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[clip,width=\columnwidth]{resources/analysis/feat-map-4058-0.png}\\
     \includegraphics[clip,width=\columnwidth]{resources/analysis/feat-map-4058-1.png}\\
@@ -94,7 +94,7 @@ def get_threefold(klass: Type, sample_paths: List[str], train_ratio: float, vali
     \label{fig:activationmaps2}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[clip,width=\columnwidth]{resources/analysis/feat-map-16364-0.png}\\
     \includegraphics[clip,width=\columnwidth]{resources/analysis/feat-map-16364-1.png}\\
