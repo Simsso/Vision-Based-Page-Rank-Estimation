@@ -32,9 +32,8 @@ While our dataset contains webpages from domains which are (or have been) public
 
 \begin{figure}
     \centering
-
-    \includegraphics[scale=0.55]{resources/model-architecture}
-    \caption[Illustration of the model processing pipeline]{Illustration of the web page rank estimation model processing pipeline. Input to the model is a graph representing the web pages of a domain (1). Each node is attributed with two screenshots and the nodes are interconnected by web links. A screenshot feature extractor CNN is (2) applied node-wise, thereby converting the screenshot graph into a graph with feature vectors (3). The feature vector graph is the input to a (4) graph network which looks at the graph as a whole (as opposed to node-wise processing). It compresses the graph into a single scalar (5) from which the relative ranking can be inferred.\\
+    \includegraphics[scale=0.64]{resources/model-architecture}
+    \caption[Illustration of the model architecture]{Illustration of the web page rank estimation model architecture. Input to the model is a graph representing the web pages of a domain (1). Each node is attributed with two screenshots and the nodes are interconnected by web links. A screenshot feature extractor CNN is (2) applied node-wise, thereby converting the screenshot graph into a graph with feature vectors (3). The feature vector graph is the input to a (4) graph network which looks at the graph as a whole (as opposed to node-wise processing). It compresses the graph into a single scalar (5) from which the relative ranking can be inferred.\\
     The internals of module (2) are explained in Section~\ref{sec:screenshotfeatextr}; the ones of (4) in Section~\ref{sec:gnblocks}.}
     \label{fig:methodcomponents}
 \end{figure}
