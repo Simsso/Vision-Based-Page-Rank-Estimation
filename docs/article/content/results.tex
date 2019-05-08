@@ -79,7 +79,7 @@ The results of [woft] and [woft] with GN are compared to the human baseline in T
         \textbf{Mode} & \textbf{Accuracy}\\\hline
         \textbf{Human} & $57.8\%$\\
         \textbf{[woft]} & $60.7\%$\\
-        \textbf{[woft] + GN} & $\bm{62.6}\%$\\
+        \textbf{[woft] + GN} & $\bm{62.7}\%$\\
     \end{tabular}
     \caption[Performance on dataset version 2]{Performance on dataset version 2. Human is the human baseline we compare to. Pre-training without fine-tuning [woft] is CNN-based per-image estimation of ranks. [woft] + GN is a combination of CNN feature extraction and GN, which achieves the best results.}
     \label{tab:accuracyonv2}
@@ -120,10 +120,11 @@ We compare the following GN variants to each other, all trained in [woft] fashio
         \textbf{[baseline+avg]} & $62.20\%$ & $+14.55\%$ & $65$ & 1\\
         \textbf{[baseline+max]} & $61.87\%$ & $+11.46\%$ & $65$ & 1\\
         \textbf{[1-core]}       & $62.50\%$ & $+17.37\%$ & $41,217$ & 3\\
-        \textbf{[3-core]}       & $\bm{62.55\%}$ & $\bm{+17.84\%}$ & $123,521$ & 5\\
+        \textbf{[3-core]}       & $62.55\%$ & $+17.84\%$ & $123,521$ & 5\\
         \textbf{[3-core-shared]}& $62.51\%$ & $+17.46\%$ & $41,217$ & 5\\
+        \textbf{[6-core]}       & $\bm{62.68\%}$ & $\bm{+19.06\%}$ & $246,977$ & 8\\
     \end{tabular}
-    \caption[Comparison of GN variants]{Comparison of GN variants. [woft] is the CNN applied per image. An accuracy of $50\%$ corresponds to random guessing which is why we compare the model's relative differences, where [woft] has $10.65\%$ and e.g. [baseline+avg] improves over it by $17.84\%$ by being $62.55\%$ above random guessing. The number of parameters is for the GN only, the CNN is omitted. The number of blocks are GN blocks. The best model is a GN with three core blocks which do not share weights. Edges were left as-is, i.e. [default], see Section \ref{sec:graphstructureusage}.}
+    \caption[Comparison of GN variants]{Comparison of GN variants. [woft] is the CNN applied per image. An accuracy of $50\%$ corresponds to random guessing which is why we compare the model's relative differences, where [woft] has $10.65\%$ and e.g. [baseline+avg] improves over it by $17.84\%$ by being $62.55\%$ above random guessing. The number of parameters is for the GN only, the CNN is omitted. The number of blocks are GN blocks. The best model is a GN with six core blocks which do not share weights. Edges were left as-is, i.e. [default], see Section \ref{sec:graphstructureusage}, except for [6-core] they are removed, [no-edges].}
     \label{tab:gnvariantscomparison}
 \end{table}
 
@@ -135,9 +136,10 @@ We compare the following GN variants to each other, all trained in [woft] fashio
     \item \textbf{[1-core]}: GN with encoder, single core, and decoder block; as described in Section~\ref{sec:gnblocks}.
     \item \textbf{[3-core]}: Same as [1-core], except the core block is repeated three times without weight sharing.
     \item \textbf{[3-core-shared]}: Same as [3-core], except the core blocks share their weights.
+    \item \textbf{[6-core]}: Deeper version of [3-core] but with edges remove, i.e. [no-edges]. Further, this model was trained without dropout and a slightly lower learning rate of $\eta=2\times10^{-6}$.
 \end{itemize}
 
-The best performing GN is a encoder-core-decoder architecture with three core blocks. The core blocks do not share their weights. The model improves over the [woft] baseline by a relative $17.84\%$.
+The best performing GN is a encoder-core-decoder architecture with six core blocks. The core blocks do not share their weights. The model improves over the [woft] baseline by a relative $19.06\%$.
 
 \subsection{Graph Structure Usage}
 \label{sec:graphstructureusage}
@@ -170,6 +172,6 @@ All four versions have an equal performance on both, test and train data. This s
 
 \subsection{Best Accuracy}
 
-Our best model on dataset version 2 is xxx. It consists of xxx (short description). It achieved a test accuracy of xx.x\%. That is xx.x\% percentage points better than the human score and xx.x\% above random guessing.
+Our best model on dataset version 2 is a GN with six core blocks (dubbed [6-core] above). It is processing graphs with feature vector tuples of $d_\text{featvec}=32$ with an encoder, six core, and one decoder block. It achieved a test accuracy of $62.68\%$ (train accuracy is at $63.10\%$). That is $4.88\%$ percentage points better than the human score and $12.68\%$ above random guessing.
 
-The best accuracy we achieved on \textbf{dataset version 1} was xx.x \%. In favor of version 2 we did not perform extensive experiments and hyperparameter tuning. It served solely as our experimentation basis where we validated the usefulness of the feature extractor architecture. Most likely, more tuning would lead to an improvement.
+Our accuracies on \textbf{dataset version 1} were around $56\%$. In favor of version 2 we did not perform extensive experiments and hyperparameter tuning. It served solely as our experimentation basis where we validated the usefulness of the feature extractor architecture. Most likely, more tuning would lead to an improvement.
