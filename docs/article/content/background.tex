@@ -155,7 +155,7 @@ The list offered by Open PageRank contains about 10 million domains ordered by t
 	\item calculated score by Open PageRank
 \end{itemize}
 
-The list can be downloaded from \texttt{https://www.domcop.com/openpagerank/}.
+The list can be downloaded from \url{https://www.domcop.com/openpagerank/}.
 
 \begin{table}
 	\center
@@ -191,18 +191,21 @@ The protocol offers various functionalities, which are grouped into domains \cit
 
 During start up \texttt{Puppeteer} starts an instance of \texttt{Chrome}, attaches to the instances using the port for debugging and afterwards custom code of the user will be executed against the instance. The instance will be started in \texttt{headless}-mode meaning that no UI will be visible.
 
-Puppeeter is available at \texttt{https://github.com/GoogleChrome/puppeteer}.
+Puppeeter is available at \url{https://github.com/GoogleChrome/puppeteer}.
 
 \subsection{Chromium Embedded Framework}
 \label{cef}
-\texttt{Chromium Embedded Framework} (short: \texttt{CEF})was designed ground-up with performance and ease-use in mind. The framework exposes \texttt{C++} interfaces with default implementation for all features requiring little or no integration work. Furthermore, the community added wrappers for the base implementation to support a wide-range of operating systems and programming languages.
+\texttt{Chromium Embedded Framework} (short: \texttt{CEF}) was designed ground-up with performance and ease-use in mind. The framework exposes \texttt{C++} interfaces to control instances of the browsers \texttt{Chrome} or \texttt{Chromium} with default implementation for all features requiring little or no integration work. Furthermore, the community added wrappers for the base implementation to support a wide-range of operating systems and programming languages.
 \texttt{CEF} has in total three versions, whereas \texttt{CEF 2} was abandoned due to the appearance of the \texttt{Chromium Content API} which will be discussed later. \texttt{CEF 1} is a single process implementation and based on the old \texttt{Chromium WebKit API}, due to deprecation of the \texttt{Chromium WebKit API} it is no longer supported and developed. \texttt{CEF 3} is a multi process implementation and based on the current \texttt{Chromium Content API}.
 
+\texttt{CEF} is available at \url{https://bitbucket.org/chromiumembedded}.
 \subsection{Kubernetes}
 
 Kubernetes (K8s) is an open source container orchestration solution that was originally designed by \textit{Google} in 2014. It aims to provide a platform where containers and containerized applications can be deployed, scaled, and managed \cite{Wikik8s}. K8s orchestrates computing, networking, and storage infrastructure on behalf of user workloads. This means applications are automatically scaled depending on incoming workload.
 
 K8s is much of the simplicity of Platform as a Service with the flexibility of Infrastructure as a Service \cite{k8s}. K8s offers platform abstraction at container level. Therefore, developers are responsible for building their own application containers rather than only the application itself. This is rewarded with more freedom in application development, but comes at the cost of lower productivity.
+
+K8s is available at \url{https://kubernetes.io}.
 
 \subsubsection*{Kubernetes Components and Concepts}
 The most popular container runtime in the industry is \textit{Docker}. Container runtimes are responsible for serving the communication to the OS and the container environment, where applications can be configured and ran.
@@ -215,15 +218,15 @@ The most popular container runtime in the industry is \textit{Docker}. Container
 K8s consist of three main components \textit{kubectl}, \textit{master node}, and the \textit{worker nodes}. Kubectl represents the client interface to communicate with the master node, by sending requests against the API server. The master node represents the administrative entrypoint and is responsible for managing the whole K8s cluster \cite{K8sArch}. It consists of the \textit{API server}, \textit{etcd storage}, \textit{scheduler}, and \textit{controller manager}:
 
 \begin{itemize}
-	\item \textit{API server} represents the entry points for all incoming REST commands. It processes and executes them according to their business logic.
+	\item \textit{API server} represents the entry point for all incoming REST commands. It processes and executes them according to their business logic.
 	\item \textit{etcd storage} is a simple key-value store, where information about the \textit{pods} and the cluster is saved.
 	\item \textit{scheduler} is responsible for container distribution among the worker nodes by using information about the worker nodes. 
 	\item \textit{controller-manager} consists of several controllers such as the replication controller, which is responsible for monitoring pods and recreating crashed pods.
 \end{itemize}
-Beside the master node, a K8s cluster consists of one or more worker nodes, which are controller by the controllers of the master node. Each worker node consists of \textit{kubelet}, \textit{kubeproxy}, and \textit{pods}:
+Beside the master node, a K8s cluster consists of one or more worker nodes, which are controlled by the controllers of the master node. Each worker node consists of \textit{kubelet}, \textit{kubeproxy}, and \textit{pods}:
 
 \begin{itemize}
 	\item \textit{kubelet} communicates with the API server, ensuring the requested containers are up and running.
 	\item \textit{kube-proxy} acts as a proxy and load balancer on the worker node. It is responsible for the communication with the outside world.
-	\item \textit{pods} is the smallest unit in K8s. They encapsulate one or many other containers in the same shared context, which means that containers within the same pods share the same IP, storage, and memory.
+	\item \textit{pods} is the smallest unit in K8s. They encapsulate one or many other containers in the same shared context, which means that containers within the same pods share the same IP, storage and memory.
 \end{itemize}
