@@ -3,11 +3,11 @@
 
 \subsection{Summary}
 
-We have defined the novel task of vision-based page rank estimation, where a model has to output the rank of a given domain based on screenshots of its web pages and graph information of the hyperlink connecting them. Our concrete formulation was a pairwise comparison: Given two samples a model (or human) is asked to find the higher ranked one. In the beginning of our study it was unknown whether, and if so to what extent, the task could be solved at all. We consider our work a feasibility study, seeking to find a potential correlation between domain rank and web page look.
+We have defined the novel task of vision-based page rank estimation, where a model has to output the rank of a web domain based on screenshots of its web pages and graph information of the hyperlink connecting them. Our concrete formulation was a pairwise comparison: Given two samples a model (or human) is asked to find the higher ranked one. In the beginning of our study it was unknown to us whether, and if so to what extent, the task could be solved. We consider our work a feasibility study, seeking to find a potential correlation between domain rank and web page look.
 
 We have created a comprehensive data set and collected data for 87,629 of the top 100,000 global websites, according to Open PageRank. Each sample of the dataset corresponds to one domain, represented by a graph of up to eight web pages, attributed with screenshots in mobile and desktop format. For each hyperlink one edge is added to the graph. We support future research in the area of page rank estimation by open-sourcing the data set.
 
-Our best performing model achieves an accuracy of 62.68\% on the pairwise web page ranking task. The significant deviation from the trivial baseline of random guessing (50\%) indicates the existence of a correlation between rank and visual appearance. The model has super-human performance since it exceeds the human benchmark by 4.88\%.
+Our best performing model achieves an accuracy of 62.68\% on the pairwise web page ranking task. The significant deviation from the trivial baseline of random guessing (50\%) indicates the existence of a correlation between rank and visual appearance. The model has super-human performance in that it exceeds the human benchmark by 4.88\%.
 
 We have achieved the scores by combining convolutional neural networks for image feature extraction with graph networks. The latter handle the heterogenous, graph-like structure of data set samples gracefully. The combination of CNN and GN has proven to be a powerful way of dealing with feature rich, graph-like data.
 

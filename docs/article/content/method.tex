@@ -33,7 +33,7 @@ While our dataset contains webpages from domains which are (or have been) public
 \begin{figure}
     \centering
     \includegraphics[scale=0.64]{resources/model-architecture}
-    \caption[Illustration of the model architecture]{Illustration of the web page rank estimation model architecture. Input to the model is a graph representing the web pages of a domain (1). Each node is attributed with two screenshots and the nodes are interconnected by web links. A screenshot feature extractor CNN is (2) applied node-wise, thereby converting the screenshot graph into a graph with feature vectors (3). The feature vector graph is the input to a (4) graph network which looks at the graph as a whole (as opposed to node-wise processing). It compresses the graph into a single scalar (5) from which the relative ranking can be inferred.\\
+    \caption[Model architecture]{Web page rank estimation model architecture. Input to the model is a graph representing the web pages of a domain (1). Each node is attributed with two screenshots and the nodes are interconnected by web links. A screenshot feature extractor CNN is (2) applied node-wise, thereby converting the screenshot graph into a graph with feature vectors (3). The feature vector graph is the input to a (4) graph network which looks at the graph as a whole (as opposed to node-wise processing). It compresses the graph into a single scalar (5) from which the relative ranking can be inferred.\\
     The internals of module (2) are explained in Section~\ref{sec:screenshotfeatextr}; the ones of (4) in Section~\ref{sec:gnblocks}.}
     \label{fig:methodcomponents}
 \end{figure}
@@ -123,7 +123,7 @@ f_\text{dm}:\left(\mathbb{R}^{480\times270\times3},\mathbb{R}^{187\times333\time
     \draw[->] (dense2_m) -- (feat_m);
     
     \end{tikzpicture}
-    \caption[Illustration of the feature extractor]{Illustration of the feature extractor $f_\text{dm}$; inputs are at the bottom, outputs at the top. Blocks with double borders are parameterized, dashed arrows indicate parameter sharing. The weight sharing between inner layers allows for similar, yet different feature extraction because the weight matrices of the first convolutional block and the last dense block are not shared.}
+    \caption[Feature extractor]{Feature extractor $f_\text{dm}$; inputs are at the bottom, outputs at the top. Blocks with double borders are parameterized, dashed arrows indicate parameter sharing. The weight sharing between inner layers allows for similar, yet different feature extraction because the weight matrices of the first convolutional block and the last dense block are not shared.}
     \label{fig:featextr}
 \end{figure}
 
@@ -276,7 +276,7 @@ We introduce the additional weighting factor
 
     \end{tikzpicture}
   }
-  \captionof{figure}[Loss function plotted values of the target probability]{The loss function plotted for three different values of the target probability \cite{Burges:learningtorankwithsgd}}
+  \captionof{figure}[Loss function plotted for values of the target probability]{The loss function plotted for three different values of the target probability \cite{Burges:learningtorankwithsgd}}
   \label{fig:costfn}
 \end{minipage}\hfill%
 %

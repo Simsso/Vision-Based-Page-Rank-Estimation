@@ -11,7 +11,7 @@ In the remainder of this section we explain the components of our library and li
 
 \begin{figure}\centering
     \includegraphics[scale=0.65]{resources/graphnets-datastructs}
-    \caption[Class diagram of the graph network library data structure classes]{Class diagram of the graph network library data structure classes, representing a directed, attributed multigraph}\label{fig:classdiagramgndatastructs}
+    \caption[Class diagram of the GraphNets library data structure classes]{Class diagram of the GraphNets library data structure classes, representing a directed, attributed multigraph}\label{fig:classdiagramgndatastructs}
 \end{figure}
 
 The graph data structures are four classes, namely \texttt{Graph}, \texttt{Edge}, \texttt{Node}, and \texttt{Attribute}. They are the implementation of a directed, attributed multigraph\footnote{A multigraph is a graph which may have multiple edges (also called parallel edges). For example, there may be two edges pointing from a given node $v_1$ another node $v_2$.} with a global attribute. Here we follow the mathematical specification of \cite{deepmind:graphnets} closely. Figure~\ref{fig:classdiagramgndatastructs} depicts the classes with attributes and methods.
@@ -28,7 +28,7 @@ Aggregation functions serve the purpose of converting a set of attributes into a
 
 \begin{figure}\centering
     \includegraphics[scale=0.65]{resources/graphnets-functions-aggr}
-    \caption{Class diagram of the graph network library aggregation functions}\label{fig:classdiagramgnfunctionsaggr}
+    \caption{Class diagram of the GraphNets library aggregation functions}\label{fig:classdiagramgnfunctionsaggr}
 \end{figure}
 
 The \texttt{Aggregation} class is abstract and may be implemented by the user of our library. An aggregation can be used for nodes and edges alike. Several common, default implementations are provided, namely
@@ -44,7 +44,7 @@ The update functions are specific to edges, nodes, and the global state. Therefo
 
 \begin{figure}\centering
     \includegraphics[scale=0.65]{resources/graphnets-functions-update}
-    \caption{Class diagram of the graph network library update functions}\label{fig:classdiagramgnfunctionsupdate}
+    \caption{Class diagram of the GraphNets library update functions}\label{fig:classdiagramgnfunctionsupdate}
 \end{figure}
 
 For all three types of update functions, the library comes with two default implementations: First, the indepdendent update (\texttt{IndependentEdgeUpdate}, \texttt{IndependentNodeUpdate}, \texttt{IndependentGlobalStateUpdate}). An indepdentent update function takes a parameter called \texttt{mapping\_fn}. The result of a forward pass is the application of that mapping function $f_\text{map}$ to the previous edge (or node or global state) attribute. Mathematically that is \begin{align}
@@ -59,7 +59,7 @@ The identity update functions leave the attribute values unaltered.
 
 \begin{figure}\centering
     \includegraphics[scale=0.65]{resources/graphnets-block}
-    \caption{Class diagram of the graph network library GNBlock class}\label{fig:classdiagramgnblock}
+    \caption{Class diagram of the GraphNets library GNBlock class}\label{fig:classdiagramgnblock}
 \end{figure}
 
 The GN block is the core component of the library. It inherits from the PyTorch class \texttt{torch.nn.Module} (see class diagram in Figure~\ref{fig:classdiagramgnblock}). Its input is a graph and it outputs a transformed version of that graph, by passing it through the \texttt{forward} method. The implementation of \texttt{forward} is exactly matching the flow shown in Figure~\ref{fig:fullgraphblock}.

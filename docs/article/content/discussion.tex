@@ -97,7 +97,7 @@ Alternative accuracy metric formulations could take the difficulty of a pairwise
         \end{axis}
       
       \end{tikzpicture}
-    \caption[Accuracy vs. rank]{Mean accuracy of samples within a certain rank rages. To compute the data points, batches of samples of 4k ranks were grouped and the mean accuracy was computed. There is a clear tendency of samples in the middle to be harder to classify than samples on the extreme ends of the rank spectrum. The reason for the spike for ranks between 88k and 92k is unknown to us. The model used to create the plot is [baseline+avg], its performance on the entire test set is indicated by the dashed line. The train set points tends to behave similarly as the test set points. At low ranks, the model is significantly better on the training data which may be attributed to the rank dependent weighting function (see Section~\ref{sec:loss}).}
+    \caption[Accuracy plotted against rank]{Mean accuracy of samples within a certain rank rages. To compute the data points, batches of samples of 4k ranks were grouped and the mean accuracy was computed. There is a clear tendency of samples in the middle to be harder to classify than samples on the extreme ends of the rank spectrum. The reason for the spike for ranks between 88k and 92k is unknown to us. The model used to create the plot is [baseline+avg], its performance on the entire test set is indicated by the dashed line. The train set points tends to behave similarly as the test set points. At low ranks, the model is significantly better on the training data which may be attributed to the rank dependent weighting function (see Section~\ref{sec:loss}).}
     \label{fig:accvsrank}
 \end{figure}
 
