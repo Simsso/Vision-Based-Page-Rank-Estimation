@@ -189,7 +189,7 @@ During start up \texttt{Puppeteer} starts an instance of \texttt{Chrome}, attach
 \texttt{CEF} has a total of three versions, whereas \texttt{CEF 2} was abandoned due to the appearance of the \texttt{Chromium Content API} which will be discussed later. \texttt{CEF 1} is a single process implementation and based on the old \texttt{Chromium WebKit API}, due to the deprecation of the \texttt{Chromium WebKit API} it is no longer supported and developed. \texttt{CEF 3} is a multi process implementation and based on the current \texttt{Chromium Content API}.
 
 \subsection{Kubernetes}
-
+\label{k8s}
 Kubernetes\footnote{K8s is available at \url{https://kubernetes.io}.} (K8s) is an open source container orchestration solution that was originally designed by \textit{Google} in 2014. It aims to provide a platform where containers and containerized applications can be deployed, scaled, and managed \cite{Wikik8s}. K8s orchestrates computing, networking, and storage infrastructure on behalf of user workloads. This means applications are automatically scaled depending on incoming workload.
 
 K8s is much of the simplicity of Platform as a Service with the flexibility of Infrastructure as a Service \cite{k8s}. K8s offers platform abstraction at container level. Therefore, developers are responsible for building their own application containers rather than only the application itself. This is rewarded with more freedom in application development, but comes at the cost of lower productivity.
