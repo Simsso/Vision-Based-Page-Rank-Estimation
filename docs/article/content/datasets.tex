@@ -37,16 +37,16 @@ A single sample $X$ in the dataset can be expressed as a tuple consisting of thr
 
 \subsubsection*{The Directed Graph $G$}
 \label{TheDirectedGraph}
-The directed graph provides a topological view on the given website by representing all associated web pages within the same domain as nodes and connections as arrows. Nodes and arrows of the graph are enriched with local information about the web pages. Figure~\ref{fig:PartialDirectedGraph_timodenk.com} exemplary illustrates the partial directed graph for the domain \texttt{timodenk.com} with three webpages represented as nodes with corresponding attributes and edges.
+The directed graph provides a topological view on the given website by representing all associated web pages within the same domain as nodes and connections as arrows. Nodes and arrows of the graph are enriched with local information about the visited web pages. Figure~\ref{fig:PartialDirectedGraph_timodenk.com} exemplary illustrates the partial directed graph for the domain \texttt{timodenk.com} with three webpages represented as nodes with corresponding attributes and edges.
 
-The directed graph $G$ is characterized by a set of nodes $\mathbb{V}$ and edges $\mathbb{A}$. We limit the number of nodes in a graph to $8$, since we are not able to express a website in its entirety as a graph and want to keep the dataset in a feasible size. Each node $v \in \mathbb{V}$ represents a web page of the given domain associated with the graph. A node is characterized by the following tuple:
+The directed graph $G$ is characterized by a set of nodes $\mathbb{V}$ and edges $\mathbb{A}$. We limit the number of nodes in a graph to eight, since we are not able to express a website in its entirety as a graph and want to keep the dataset in a feasible size. Each node $v \in \mathbb{V}$ represents a web page of the given domain associated with the graph. A node is characterized by the following tuple:
 
 \begin{center}
 	$v = (u, \tensorsym{I}, \tensorsym{M},t, l, s, h)$
 	\begin{itemize}
 		\item[$u$] The exact URL of the web page. Example: \texttt{https://github.com/help}
 		\item[$\tensorsym{I}$] The screenshot of web page in image format JPEG and in the resolution $1920\times1080$. 
-		\item[$\tensorsym{M}$] The screenshot of web page in image format JPEG and in resolution $375\times 667$, which represents a screenshot taken from a mobile devices.
+		\item[$\tensorsym{M}$] The screenshot of web page in image format JPEG and in resolution $375\times 667$, which represents a screenshot taken from a mobile device.
 		\item[$t$] The title of web page as can be seen in the tabs bar of a common browser.
 		\item[$l$] The time it takes to download all data of web page from the web server in milliseconds.
 		\item[$s$] Number of kilobytes downloaded in total for web page (size).
