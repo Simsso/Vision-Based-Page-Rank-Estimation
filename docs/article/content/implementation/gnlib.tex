@@ -47,7 +47,7 @@ The update functions are specific to edges, nodes, and the global state. Therefo
     \caption{Class diagram of the GraphNets library update functions}\label{fig:classdiagramgnfunctionsupdate}
 \end{figure}
 
-For all three types of update functions, the library comes with two default implementations: First, the indepdendent update (\texttt{IndependentEdgeUpdate}, \texttt{IndependentNodeUpdate}, \texttt{IndependentGlobalStateUpdate}). An indepdentent update function takes a parameter called \texttt{mapping\_fn}. The result of a forward pass is the application of that mapping function $f_\text{map}$ to the previous edge (or node or global state) attribute. Mathematically that is \begin{align}
+For all three types of update functions, the library comes with two default implementations: First, the independent update (\texttt{IndependentEdgeUpdate}, \texttt{IndependentNodeUpdate}, \texttt{IndependentGlobalStateUpdate}). An independent update function takes a parameter called \texttt{mapping\_fn}. The result of a forward pass is the application of that mapping function $f_\text{map}$ to the previous edge (or node or global state) attribute. Mathematically that is \begin{align}
 \phi^e\left(\bm{e}_k,\bm{v}_{r_k},\bm{v}_{s_k},\bm{u}\right)=&f_\text{map}\left(\bm{e}_k\right)\\
 \phi^v\left(\bm{\overline{e}}'_i,\bm{v}_i,\bm{u}\right)=&f_\text{map}\left(\bm{v}_i\right)\\
 \phi^u\left(\bm{\overline{e}}',\bm{\overline{v}},\bm{u}\right)=&f_\text{map}\left(\bm{u}\right)\,.
@@ -84,7 +84,7 @@ An instantiation of a \texttt{GNBlock} object requires update and aggregation fu
     \label{tab:gnblockattrs}
 \end{table}
 
-The GN block simplifies the creation of a GN significantly. After specifying aggregation and update functions, a graph can be passed to a \texttt{GNBlock} instance is is processed by it. Listing \ref{lst:gnblock} shows this flow.
+The GN block simplifies the creation of a GN significantly. After specifying aggregation and update functions, a graph can be passed to a \texttt{GNBlock} instance and is processed by it. Listing \ref{lst:gnblock} shows this flow.
 
 \begin{lstlisting}[
     label={lst:gnblock},
@@ -108,8 +108,8 @@ g_processed = core_block(g)
 \subsubsection{Future Features and Improvements}
 \label{sec:gnlibfuturefeatures}
 
-The current implementation of the library is processing each graph individually. Batches can not be processed in parallel, which is due to the nature of graphs: A single batch may contain many graphs of different size and shape. A performance boost could be gained by implementing CUDA kernels for the some common update and aggregation functions that handle batches.
+The current implementation of the library is processing each graph individually. Batches can not be processed in parallel, which is due to the nature of graphs: A single batch may contain many graphs of different size and shape. A performance boost could be gained by providing gpu-optimized implementations (CUDA kernels) for the some common update and aggregation functions that handle batches.
 
-A useful feature would be a greater toolbox of implemented update and aggregation functions. Also, composition of GN blocks into actual networks could be simplified with pre-defined modules.
+A useful feature would be a greater toolbox of implemented update and aggregation functions. Also, composition of GN blocks into actual networks could be simplified with predefined modules.
 
 In our current implementation the critical features of the components are being unit tested. There is also an end-to-end test which trains a GN to learn the identity function, thereby ensuring PyTorch's automatic differentiation works through GN blocks. Before performing a greater refactoring (e.g. the implementation of CUDA kernels), a higher test coverage would be desirable.
