@@ -3,36 +3,40 @@
 
 We report results on the pairwise page rank estimation task and compare several variants of our models with each other. As a reference point we consider the human score on the task as well.
 
+Our best model on \textbf{dataset version~2} is a GN with six core blocks (dubbed [6-core] in the following). It is processing graphs with feature vector tuples of $d_\text{featvec}=32$ with an encoder, six core, and one decoder block. It achieved a test accuracy of $62.68\%$ (train accuracy is at $63.10\%$). That is $4.88\%$ percentage points better than the human score and $12.68\%$ above random guessing.
+
+Our accuracies on \textbf{dataset version 1} were around $56\%$. In favor of version 2 we did not perform extensive experiments and hyperparameter tuning. It served solely as our experimentation basis where we validated the usefulness of the feature extractor architecture and experimented with different ranking losses. Most likely, more tuning would lead to an improvement in accuracy.
+
 \subsection{Task and Setup}
 
-In the \textbf{pairwise page rank estimation task}, the model (or human) is asked to make a guess about the relative ordering of two samples $G^{(i)}$ and $G^{(j)}$ drawn from a subset of the dataset.
-There are three possible answers: (1) both samples have the same rank, (2) sample $G^{(i)}$ has a higher rank than $G^{(j)}$, and (3) sample $G^{(j)}$ has a lower rank than $G^{(i)}$. A guess is either right or wrong, depending on the ground truth, i.e. $r^{(i)}$ and $r^{(j)}$.
+In the \textbf{pairwise page rank estimation task}, the model (or human) is asked to make a guess about the relative ordering of two samples $G^{(i)}$ and $G^{(j)}$ drawn from a subset of the page rank dataset.
+There are three possible answers: (1) both samples have the same rank, (2) sample $G^{(i)}$ has a higher rank than $G^{(j)}$, and (3) sample $G^{(j)}$ has a lower rank than $G^{(i)}$. A guess is either right or wrong, depending on the rank ground truth, i.e. $r^{(i)}$ and $r^{(j)}$.
 
 Given multiple answers to pairwise ranking questions, the accuracy can be computed as described in Equation~\ref{eq:acc}. This accuracy is the main evaluation metric we report in this section and the comparison of models is also based on it. We disregard answer (1) because it is trivial to the model (and to a human). The accuracy metric works accordingly.
 
 Unless indicated otherwise, we train with the following configuration:
 \begin{itemize}
-    \item Dataset version 2 (Section~\ref{DatasetVersion2}), split into train, validation, and test split. We train on 60\% of the dataset, tune hyperparameters on 20\% (validation), and use the remaining 20\% for final performance reporting. The samples are assigned to the dataset splits across all ranks. E.g. we do not use a specific range of ranks as our test set. See Listing \ref{lst:getthreefold} for the dataset splitting algorithm. All accuracy scores are computed on unseen test samples; exceptions are specified.\\
+    \item Dataset version 2 (Section~\ref{DatasetVersion2}), split into train, validation, and test set. We train on 60\% of the dataset, tune hyperparameters on 20\% (validation), and use the remaining 20\% for final performance reporting. The samples are assigned to the dataset splits across all ranks. E.g. we do not use a specific range of ranks as our test set. See Listing \ref{lst:getthreefold} for the dataset splitting algorithm. All accuracy scores are computed on unseen test samples; exceptions are specified.\\
     We report results on version 2 because the first version served the purpose of finding architectures for the feature extractor and experimenting with different ranking losses. Version 1 can be seen as a subset of version 2 and is therefore of less interest.
     \item Parameters are updated by the Adam optimizer \cite{kingma2014:adam}, parameterized with learning rate $\eta=5\times10^{-6}$, $\beta_1=0.9$, $\beta_2=0.999$, and $\epsilon=10^{-8}$. We do not use weight decay as overfitting was not an issue. The learning rate is kept constant throughout the training.
     \item We employ dropout \cite{srivastava2014:dropout} at a rate of $p_\text{drop}=0.1$.
     \item Screenshots, both desktop and mobile, are normalized across all three channels (RGB) to have a mean of $0.5$ and standard deviation of $0.5$. No other data augmentation is used.
-    \item The weighting function is disabled, i.e. $w_b=1$.
-    \item The feature vector dimensionality is set to $d_\text{featvec}=32$.
+    \item The weighting function is disabled, i.e. $w_b(\cdot)=1$.
+    \item The feature vector dimensionality is set to $d_\text{featvec}=32$. We suspect this dimensionality to be high enough to allow for the compression of rank related image features. Within this work we did not tune this hyperparameter to find the optimal dimensionality.
     \item The training machine is equipped with an AMD Ryzen 5 1600 six-core processor and a Nvidia GeForce GTX 970 with 4039 MB of RAM.
 \end{itemize}
 
 \subsection{Human Evaluation}
 
-Many ML algorithms are developed to imitate and automate human like behavior on a hard problem, e.g. action recognition \cite{gu2018ava}. Human performance is often seen as the baseline for machine learning algorithms to outperform. We determine the performance of humans on vision-based page rank estimation and compare it to our ML models. 
+Many ML algorithms are developed to imitate and automate human like behavior on a hard problem, e.g. action recognition \cite{gu2018ava}. Human performance is often seen as the baseline for machine learning algorithms to outperform. We determine the performance of humans on vision-based page rank estimation and compare our ML models to it. 
 
-The human performance on page rank estimation is measured solely based on the vision of websites. In our experimental setup each test person has to select the website with the higher rank from a pair of distinct, randomly chosen websites from the dataset version 2. To reduce the distortion in our results caused by additional knowledge other than the screenshots of the website, we advised the test people to skip websites they know. The selection is based on all mobile and desktop screenshots of the given websites from the dataset, without knowledge of domain names.
+The human performance on page rank estimation is measured solely based on the look of websites. In our experimental setup each test person has to select the website with the higher rank from a pair of distinct, randomly chosen websites from dataset version~2. To reduce the distortion in our results caused by additional knowledge other than the screenshots of the website, we advised the test people to skip websites they know. The selection is based on all mobile and desktop screenshots of the given websites from the dataset, without knowledge of domain names.
 For each test person we calculate the accuracy from the number of correctly ranked website pairs and count the total number of pairs which were shown during the evaluation to each test person. In general there is no time limit for the decision making and the test is repeated for $n$ pairs.
 The whole evaluation took place in a web application developed just for that purpose, described in Section \ref{sec:humanevaltool}.
 
-We evaluated a total of 11 test people regarding their performance on estimating the pairwise page rank of websites, who, taken all together, rated $1900$ website pairs. The average performance of our test people is $57.8\%$, with accuracies ranging from $51.67\%$ to $63\%$.
+We evaluated a total of 11 test people regarding their performance on estimating the pairwise page rank of websites, who, taken all together, saw $1900$ website pairs. The average performance of our test people is $57.8\%$, with accuracies ranging from $51.67\%$ to $63\%$.
 
-Using a $Z$-test we ensure our test people are performing better than random guessing (which is equivalent to an accuracy of $50\%$) and the accuracies are not compromised by noise with a significance level of $p << 1\%$. Due to \textit{Central Limit Theorem} we can assume that our data underlies normal distribution. In addition, we ensure the best model outperforms humans, using a Welch's $t$-student test with $p << 1\%$.
+Using a $Z$-test we ensure our test people are performing better than random guessing (which is equivalent to an accuracy of $50\%$) and the accuracies are not compromised by noise with a significance level of $p \ll 1\%$. Due to \textit{Central Limit Theorem} we can assume that our data underlies a normal distribution. In addition, we ensure the best ML model outperforms humans, using a Welch's $t$-student test with $p \ll 1\%$.
 
 \begin{table}
 	\center
@@ -58,7 +62,7 @@ After an experiment, each test person was asked about the criteria they had used
 
 \begin{itemize}
 	\item \textbf{Positive factors}, i.e. websites meeting those criteria are assumed by the test people to have a higher rank: responsive and modern look; official, game, news, and personal content; high-content density; matching colors; professional look; article-like.
-	\item \textbf{Negative factors}, i.e. websites meeting those criteria are assumed by the test people to have a lower rank: unresponsive and old look; low-content density; personal sites of seemingly unpopular people; websites with domain parking or error placeholders
+	\item \textbf{Negative factors}, i.e. websites meeting those criteria are assumed by the test people to have a lower rank: unresponsive and old look; low-content density; personal sites of seemingly unpopular people; websites with domain parking or error placeholders; error pages (e.g. status codes 404 or 500).
 \end{itemize}
 
 The listed criteria clearly show that the test people did not estimate the page rank solely based on aspects in vision, but also using the content and errors they saw. Responsiveness refers to a website's optimization for different screen sizes, in our case that is mobile and desktop screens. In addition, another major factor was the type of the given website. For instance news, games, and official websites were clearly ranked above the other sample more often.
@@ -67,45 +71,50 @@ The human evaluation gives us a human baseline to compare our model to. It is al
 
 \subsection{Methods of Training}
 
-When introducing our model in Section~\ref{sec:method} we have already enumerated three different methods of training it (end-to-end training [e2e], pre-training without fine-tuning [woft], and pre-training with fine-tuning [wft]). Due to GPU memory constraints, the training modes [e2e] and [wft] allow for a maximum batch size of two, which we is seemingly harmful to proper gradient approximation. Besides that, both training modes require gradient propagation through the GN part of the model which is relatively slow. We therefore use [woft] for all experiments.
+When introducing our model in Section~\ref{sec:method} we enumerated three different methods of training it (end-to-end training [e2e], pre-training without fine-tuning [woft], and pre-training with fine-tuning [wft]). Due to GPU memory constraints, the training modes [e2e] and [wft] allow for a maximum batch size of two, which is seemingly harmful to proper gradient approximation. Besides that, both training modes require gradient propagation through the GN part of the model which is relatively slow. We therefore use [woft] in all experiments.
 
-For [woft] we attach a linear layer to the screenshot feature extractor and train it to output a scalar that ranks webpages. That way the model has only access to individual images without any context, i.e. screenshots of other pages, mobile/desktop in parallel, or graph edges. The loss function from Equation~\ref{eq:loss} is slightly modified to account for the variable number of screenshots per dataset sample: We weigh the loss with the inverse number of screenshots so the rank prediction of a sample with a single webpage has the same contribution to the loss as a sample with e.g. eight screenshots combined. After convergence of the feature extractor we compute all feature vectors for the entire dataset and use them as input to the GN part of our model. That way we reduce the computational overhead significantly by bypassing the CNN in the GN training. This gives us headroom for a greater number of experiments with GN variants.
+For [woft] we attach a linear layer to the screenshot feature extractor and train it to output a scalar that ranks web pages. That way the model has only access to individual images without any context (such as screenshots of other pages, mobile/desktop in parallel, or graph edges). The loss function of Equation~\ref{eq:loss} is slightly modified to account for the variable number of screenshots per dataset sample: We weigh the loss with the inverse number of screenshots a sample contains, so the rank prediction of a sample with a single web page has the same contribution to the loss as a sample with e.g. eight screenshots combined. 
 
-The results of [woft] and [woft] with GN are compared to the human baseline in Table~\ref{tab:accuracyonv2}.
+After convergence of the feature extractor we compute all feature vectors for the entire dataset and use them as input to the GN part of our model. That way we reduce the computational overhead significantly by bypassing the CNN in the GN training. This gives us headroom for a greater number of experiments with different GN variants. The cached feature graphs have a size of several hundred MB for the entire dataset.
+
+The results of [woft] without GN and [woft] with GN are compared to the human baseline in Table~\ref{tab:accuracyonv2}. The GN improves the performance of plain [woft] by $2\%$, which corresponds to a relative improvement of $18.7\%$ when considering random guessing at $50\%$ as the baseline.
 
 \begin{table}
     \centering
     \begin{tabular}{lr}
         \textbf{Mode} & \textbf{Accuracy}\\\hline
-        \textbf{Human} & $57.8\%$\\
-        \textbf{[woft]} & $60.7\%$\\
-        \textbf{[woft] + GN} & $\bm{62.7}\%$\\
+        \textbf{Random guessing} & $50.0\%$\\
+        \textbf{Human} & $57.8\%$ \\
+        \textbf{[woft]} & $60.7\%$ \\
+        \textbf{[woft] + GN} & $\bm{62.7\%}$
     \end{tabular}
-    \caption[Performance on dataset version 2]{Performance on dataset version 2. Human is the human baseline we compare to. Pre-training without fine-tuning [woft] is CNN-based per-image estimation of ranks. [woft] + GN is a combination of CNN feature extraction and GN, which achieves the best results.}
+    \caption[Performance on dataset version~2]{Performance on dataset version~2. Human is the human baseline we compare to. Pre-training without fine-tuning [woft] is CNN-based per-image estimation of ranks. [woft] + GN is a combination of CNN feature extraction and GN, which achieves the best results, with $+12.7\%$ above random guessing and $+4.9\%$ above the human score.}
     \label{tab:accuracyonv2}
 \end{table}
 
 \subsection{Weighting Function}
 
-Our loss term contains a weighting function $w_b$ (Equation~\ref{eq:weightingfactor}), parameterized by $b$. We evaluate its effect and helpfulness by fine tuning a graph network attached to a pre-trained feature extractor. For computation reasons, the feature extractor is pre-trained with $w_{10}$, so $b$ is only varied for the GN training. We initially expected the weighting function to aid generalization, however, results indicated it was rather useless. We therefore ran another training of the feature extractor with a constant weighting of $w_b=1$ for all samples, which exceeded the feature extractor with weighting function by more than two percent. The results can be found in Table~\ref{tab:weightingbase}.
-
-It can be concluded that a rank-based weighting as defined in Equation~\ref{eq:weightingfactor} does neither improve accuracy, nor generalization, as measured by our particular definition of accuracy. It must, however, be noted that in practical applications the correct relative ranking of higher ranked samples is often more important, see e.g. \cite{tfranking}. In such cases usage of the weighting function should be considered.
+Our loss term contains a weighting function $w_b$ (Equation~\ref{eq:weightingfactor}), parameterized by a base parameter $b$. We evaluate its effect and helpfulness by fine tuning a GN attached to a pre-trained feature extractor. For computation reasons, the feature extractor is pre-trained with $w_{10}$, so $b$ is only varied for the GN training. We initially expected the weighting function to aid generalization, however, results indicated it was rather useless. We therefore ran another training of the feature extractor with a constant weighting of $w_b(\cdot)=1$ for all samples, which exceeded the feature extractor with weighting function by more than two percent. The results can be found in Table~\ref{tab:weightingbase}.
 
 \begin{table}
     \centering
     \begin{tabular}{lrrr}
         \textbf{Feat. extr.} & \textbf{Weighting} & \textbf{Accuracy}\\\hline
-        & $w_b=1$ & $59.79\%$\\
+        & $w_b(\cdot)=1$ & $59.79\%$\\
         & $b=1$ & $59.83\%$\\
         $b=10$ & $b=2$ & $59.80\%$\\
         & $b=10$ & $59.85\%$\\
         & $b=100$ & $59.82\%$\\\hline
-        $w_b=1$ & $w_b=1$ & $62.55\%$\\
+        $w_b(\cdot)=1$ & $w_b(\cdot)=1$ & $62.55\%$\\
         
     \end{tabular}
     \caption[Effect of the sample weighting function]{Effect of the sample weighting function. The accuracies were determined in a two step procedure: (1) training of a screenshot feature extractor with a certain weighting function (left column) and subsequent (2) training of a GN attached to it with another weighting function (middle column). The best accuracy is achieved when setting the weighting function to be $w_b(\cdot)=1$ for all samples. }
     \label{tab:weightingbase}
 \end{table}
+
+It can be concluded that a rank-based weighting as defined in Equation~\ref{eq:weightingfactor} does neither improve accuracy, nor generalization, as measured by our particular definition of accuracy. It must, however, be noted that in practical applications the correct relative ranking of higher ranked samples is often more important, see e.g. \cite{tfranking}. In such cases usage of the weighting function should be considered.
+
+In early experiments with dataset version 1 we found the training function helpful when training with pointwise ranking loss. It improved the variance of the model output which would otherwise find a sweet spot at constantly predicting a relatively low rank for any sample.
 
 \subsection{GN Variants}
 
@@ -124,19 +133,18 @@ We compare the following GN variants to each other, all trained in [woft] fashio
         \textbf{[3-core-shared]}& $62.51\%$ & $+17.46\%$ & $41,217$ & 5\\
         \textbf{[6-core]}       & $\bm{62.68\%}$ & $\bm{+19.06\%}$ & $246,977$ & 8\\
     \end{tabular}
-    \caption[Comparison of GN variants]{Comparison of GN variants. [woft] is the CNN applied per image. \textbf{I AM A LONG SENTENCE} An accuracy of $50\%$ corresponds to random guessing which is why we compare the model's relative differences, where [woft] has $10.65\%$ and e.g. [baseline+avg] improves over it by $17.84\%$ by being $62.55\%$ above random guessing. The number of parameters is for the GN only, the CNN is omitted. The number of blocks are GN blocks. The best model is a GN with six core blocks which do not share weights. Edges were left as-is, i.e. [default], see Section \ref{sec:graphstructureusage}, except for [6-core] they are removed, [no-edges].}
+    \caption[Comparison of GN variants]{Comparison of GN variants. [woft] is the CNN applied per image. An accuracy of $50\%$ corresponds to random guessing which is why we compare the model's relative differences. [woft] has an absolute improvement of $10.65\%$ over random guessing and e.g. [baseline+avg] improves over it ([woft]) by a relative $17.84\%$ (it is $12.55\%$ above random guessing). The number of parameters is for the GN only, the CNN is omitted. The number of blocks are GN blocks. The best model is a GN with six core blocks which do not share weights. Edges were left as-is, i.e. [default], see Section \ref{sec:graphstructureusage}, except for [6-core] they are removed.}
     \label{tab:gnvariantscomparison}
 \end{table}
 
 \begin{itemize}
-    \item \textbf{[baseline+avg]}: The baseline multiplies a weight matrix with all node feature vectors in the graph independently, converting them into scalars. The scalars are then averaged, yielding the global state, which is the network's output.\\
-    Mathematically spoken, the node update function is the one stated in Equation~\ref{eq:dec:nodeupdate}, the node aggregation is $\rho^{v\rightarrow u}\left(\mathbb{V}'\right)=\operatorname{avg}\left(\mathbb{V}'\right)$, and the final global state is computed as $\phi^u\left(\bm{\overline{e}}',\overline{v},\bm{u}\right)=\overline{v}$.\\
+    \item \textbf{[baseline+avg]}: The baseline multiplies a weight matrix with all node feature vectors in the graph independently, converting them into scalars. The scalars are then averaged, yielding the global state, which is the network output. Mathematically spoken, the node update function is the one stated in Equation~\ref{eq:dec:nodeupdate}, the node aggregation is $\rho^{v\rightarrow u}\left(\mathbb{V}'\right)=\operatorname{avg}\left(\mathbb{V}'\right)$, and the final global state is computed as $\phi^u\left(\bm{\overline{e}}',\overline{v},\bm{u}\right)=\overline{v}$.\\
     This architecture can be seen as a baseline because it does not exploit any graph information and merges the information extracted from the pages in the simplest possible way. Each pages is regarded separately and the final website score is an average of the page-wise estimates.
     \item \textbf{[baseline+max]}: Same as [baseline+avg] except the node aggregation is $\rho^{v\rightarrow u}\left(\mathbb{V}'\right)=\operatorname{max}\left(\mathbb{V}'\right)$. Both [baseline+avg] and this variant do not make use of graph structure information, i.e. edges or number of nodes.
-    \item \textbf{[1-core]}: GN with encoder, single core, and decoder block; as described in Section~\ref{sec:gnblocks}.
-    \item \textbf{[3-core]}: Same as [1-core], except the core block is repeated three times without weight sharing.
-    \item \textbf{[3-core-shared]}: Same as [3-core], except the core blocks share their weights.
-    \item \textbf{[6-core]}: Deeper version of [3-core] but with edges remove, i.e. [no-edges]. Further, this model was trained without dropout and a slightly lower learning rate of $\eta=2\times10^{-6}$.
+    \item \textbf{[1-core]}: GN with encoder, single core, and decoder block.
+    \item \textbf{[3-core]}: Same as [1-core], except the core block is replicated three times without weight sharing.
+    \item \textbf{[3-core-shared]}: Same as [3-core], except the core blocks share weights.
+    \item \textbf{[6-core]}: Deeper version of [3-core] but with edges removed, i.e. [no-edges]. Further, this model was trained without dropout and a slightly lower learning rate of $\eta=2\times10^{-6}$.
 \end{itemize}
 
 The best performing GN is a encoder-core-decoder architecture with six core blocks. The core blocks do not share their weights. The model improves over the [woft] baseline by a relative $19.06\%$.
@@ -146,7 +154,7 @@ The best performing GN is a encoder-core-decoder architecture with six core bloc
 
 We seek to understand the extent of graph structure usage. Recall that the GN variants [baseline+avg] and [baseline+max] do not make use of edge information. An edge corresponds to a hyperlink between two nodes. We analyze how much the graph structure aids correct page rank estimation.
 
-The graphs, as yielded by the dataset, contain directed edges connecting web pages that link to each other. Besides that every graph is extended with reflexive edges, i.e. every node points to itself, to prevent a division by zero when averaging. We alter the graph structure to analyze its impact on ranking accuracy. We use the model [3-core] for these experiments because with its depth of three core blocks it is capable of performing message passing between nodes. The results of these experiments are in Table~\ref{tab:edgecomparison}.
+The graphs, as yielded by the dataset, contain directed edges connecting web pages that link to each other. Besides that every graph is extended with reflexive edges, i.e. every node points to itself, to prevent a division by zero when averaging. We alter the graph structure to analyze its impact on ranking accuracy. We use the model [3-core] for these experiments because with its depth of three core blocks it is capable of performing message passing between nodes. The results of these experiments are listed in Table~\ref{tab:edgecomparison}.
 
 \begin{table}
     \centering
@@ -164,14 +172,8 @@ The graphs, as yielded by the dataset, contain directed edges connecting web pag
 \begin{itemize}
     \item \textbf{[no-edges]}: Remove all but the reflexive edges from the graph.
     \item \textbf{[default]}: Use directed edges. This is the default variant as the graphs yielded by the dataset are not altered except for the mandatory addition of reflexive edges.
-    \item \textbf{[bi-directional]}: For every edge, add a directed edge pointing into the opposite direction. That way nodes are not only affected by who is referencing them but also by who they reference. The graph is still directed but every connection between two nodes is bi-directional.
+    \item \textbf{[bi-directional]}: For every edge, add a new directed edge pointing into the opposite direction. That way nodes are not only affected by who is referencing them but also by who they reference.
     \item \textbf{[full]}: The graph is fully connected, i.e. every node points to every other node.
 \end{itemize}
 
 All four versions have an equal performance on both, test and train data. This strongly suggests that the hyperlink information, as present in our dataset, is not correlated with the rank, unless our GN was not capable of learning the correlation.
-
-\subsection{Best Accuracy}
-
-Our best model on dataset version 2 is a GN with six core blocks (dubbed [6-core] above). It is processing graphs with feature vector tuples of $d_\text{featvec}=32$ with an encoder, six core, and one decoder block. It achieved a test accuracy of $62.68\%$ (train accuracy is at $63.10\%$). That is $4.88\%$ percentage points better than the human score and $12.68\%$ above random guessing.
-
-Our accuracies on \textbf{dataset version 1} were around $56\%$. In favor of version 2 we did not perform extensive experiments and hyperparameter tuning. It served solely as our experimentation basis where we validated the usefulness of the feature extractor architecture. Most likely, more tuning would lead to an improvement.

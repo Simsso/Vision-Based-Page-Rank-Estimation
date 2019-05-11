@@ -5,7 +5,7 @@ In this section we discuss our results and compare them to the human score. We e
 
 \subsection{Accuracy}
 
-The page rank estimation task is difficult. Our model is provided with screenshots of up to eight webpages of a domain as well as their link structure. Given two samples of that kind, guessing the relative ranking is hard. In the real world, a website's popularity depends on many factors other than its look. By achieving accuracies significantly beyond random guessing (50\%), we do however show that a website's look correlates to some extent with its rank. Obviously, a deduction on the causal relationship between look and rank (or the other way around?) would be purely speculative.
+The page rank estimation task is difficult. Our model is provided with screenshots of up to eight web pages of a domain as well as their link structure. Given two samples of that kind, guessing the relative ranking is hard. In the real world, a website's popularity depends on many factors other than its look. By achieving accuracies significantly beyond random guessing (50\%), we do however show that a website's look correlates to some extent with its rank. Obviously, a deduction on the causal relationship between look and rank (or the other way around?) would be purely speculative.
 
 The human score gives an idea of the performance of our model. Even though the model achieves super-human results, it seems unlikely that more sophisticated methods can push the accuracy much further to, say, 90\%. We suspect the upper limit of purely vision-based rank estimation to be below 70\%.
 
@@ -111,7 +111,7 @@ While it is a common method to look at the kernels of CNNs (see e.g. Figure 3 in
 
 \textbf{Activation maps} are internal representations (latent variables) of an input at intermediate stages of a deep model. Specifically, we consider the input as such, and activations of the CNN blocks Block1, Block2, Block3, and Block4 (before pooling and application of the ReLU function). The sizes of these tensors are listed in Table~\ref{tab:activationmaptensors}.
 
-A qualitative analysis of the activation maps suggests that the model learns to discriminate different elements of webpages such as natural images or text. We have observed some filters to get excited by layout elements such as edges and corners. Figure~\ref{fig:activationmaps} shows some cherry-picked filters from all layers.
+A qualitative analysis of the activation maps suggests that the model learns to discriminate different elements of web pages such as natural images or text. We have observed some filters to get excited by layout elements such as edges and corners. Figure~\ref{fig:activationmaps} shows some cherry-picked filters from all layers.
 
 \begin{table}
     \centering
