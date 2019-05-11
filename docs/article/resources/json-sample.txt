@@ -1,0 +1,23 @@
+{
+    "id": 1,
+    "baseUrl": "https://example.com",
+    "client_status" : null,
+    "loading_time": 8822,
+    "server_status": 200,
+    "startNode": true,
+    "size": 1222,
+    "title": "example.com",
+    "urls": [
+        {
+            "url": "https://example.com/2",
+            "url_text": "Second Page"
+        },
+        ...
+    ]
+},
+{
+    "id": 2,
+    "baseUrl": "https://example.com/2",
+    "startNode" : false,
+    ...
+}
