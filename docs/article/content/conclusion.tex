@@ -1,0 +1,30 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+\subsection{Summary}
+
+So far it is unknown whether a domain rank can be predicted using methods of ML, in particular CNNs and GNs. In this work we have defined the novel task of vision-based page rank estimation, where a model has to output the rank of a web domain based on screenshots of its web pages and graph information of the hyperlinks connecting them. Our concrete formulation was a pairwise comparison: In the beginning of our study it was unknown to us whether, and if so to what extent, the task could be solved. We consider our work a feasibility study, seeking to find a potential correlation between domain rank and web page look.
+
+We have created a comprehensive data set and collected data for 87,629 of the top 100,000 most popular global websites, according to Open PageRank. Each sample of the dataset corresponds to one domain, represented by a graph of up to eight web pages, attributed with screenshots in mobile and desktop format. For each hyperlink one edge is added to the graph. The total number of images is around one million. To crawl such a huge amount of web pages within a reasonable amount of time, we have developed a scalable data crawler relying on the Chromium web browser. We support future research in the area of page rank estimation by open-sourcing the data set.
+
+Our best performing model achieves an accuracy of 62.68\% on the pairwise web page ranking task. The significant deviation from the trivial baseline of random guessing (50\%) indicates the existence of a correlation between rank and visual appearance. This is the main finding of our work. The model has super-human performance in that it exceeds the human benchmark by an absolute 4.88 percentage points.
+
+We have achieved the scores by combining CNNs for image feature extraction with GNs for graph data processing. The latter handle the heterogenous, graph-like structure of data set samples gracefully. The combination of CNN and GN has proven to be a powerful way of dealing with feature rich, graph-like data.
+
+\subsection{Future Work}
+
+While carrying out the research and experiments of this project, we have touched several aspects qualifying as topics for future work. They are listed in the following.
+
+Our model did not overfit on the training samples of the dataset. It is therefore likely that it was not able to extract all fine-grained features that correlate with page ranks. The use of \textbf{higher capacity models} might help improve the accuracy on the task even more.
+
+Besides model capacity, the \textbf{model architecture} was not subject of extensive empirical evaluation in this work. We started off by building a variant of the CNN proposed by \cite{beltramelli:pix2code} and altered it only slightly to work well with the resolution of our images. Different architectures might achieve better results on the task.
+
+Due to GPU memory limitations and the implementation of our GN library, we were not able to train end-to-end with a batch size greater than two. \textbf{Increasing the batch size}, however, would lead to better estimations of the true gradient of the overall objective. Instead of training the [woft] + GN configuration, the model could then be trained end-to-end [e2e] which would likely improve the accuracy even more.
+
+Our \textbf{dataset} is a rich resource which could be used for other tasks as well. For instance a GAN \cite{goodfellow2014generative} could be trained to generate realistic websites.
+
+The page rank estimation tasks could be extended such that the model has access to \textbf{information other than screenshots and links}. The GN framework seems particularly appealing for such as an extension because it is naturally capable of dealing with text of variable length or HTML source code as well. The text could be embedded into a vector representation (e.g. using GloVe word embeddings \cite{pennington2014:glove}) and would simply extend the graph nodes by another attribute.
+
+The \textbf{pairwise loss term and the accuracy metric} do not regard the difficulty of a particular pairwise comparison. More sophisticated versions of Equations~\ref{eq:loss} and \ref{eq:acc} could e.g. ignore all samples within a certain range around a given sample. A wrong estimation of the samples \#40,000 and \#40,001 would not be penalized any longer, which seems intuitively reasonable.
+
+Section~\ref{sec:gnlibfuturefeatures} mentions future work related to the \textbf{GraphNets library}.

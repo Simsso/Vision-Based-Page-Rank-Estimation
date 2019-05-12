@@ -1,0 +1,42 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{Vision-based Page Rank Estimation with Graph Networks}
+\author{Timo Denk, Samed Güner}
+\date{May 2019}
+
+\input{config}
+\input{listings}
+
+\begin{document}
+
+\input{content/titlepage}
+\input{content/abstract}
+\input{content/authorsdeclaration}
+
+\newpage
+
+% table of contents, figures, tables, code, references, acronyms
+{\hypersetup{linkcolor=black}
+\input{content/lists/toc}\clearpage
+\input{content/lists/figures}
+\input{content/lists/tables}
+\input{content/lists/listings}}
+
+\newpage
+
+\setcounter{page}{1}
+\pagenumbering{arabic}
+
+\input{content/introduction}\clearpage
+\input{content/background}\clearpage
+\input{content/method}\clearpage
+\input{content/datasets}\clearpage
+\input{content/implementation}\clearpage
+\input{content/results}\clearpage
+\input{content/discussion}\clearpage
+\input{content/conclusion}\clearpage
+\input{content/references}\clearpage
+\input{content/appendix}
+
+\end{document}
