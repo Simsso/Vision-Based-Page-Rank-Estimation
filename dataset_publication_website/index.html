@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Vision-based Page Rank Estimation - Dataset</title>
+<script>
+window.onload = function() {
+    var data = 
+        [{
+        "id": 1,
+        "baseUrl": "https://example.com",
+        "client_status" : null,
+        "loading_time": 8822,
+        "server_status": 200,
+        "startNode": true,
+        "size": 1222,
+        "title": "example.com",
+        "urls": [
+            {
+                "url": "https://example.com/2",
+                "url_text": "Second Page"
+            }
+        ]}, 
+        {
+            "id": 2,
+            "baseUrl": "https://example.com/2",
+            "startNode" : false
+        }]
+
+    document.getElementById("json").innerHTML = JSON.stringify(data, undefined, 2);
+}
+</script>
+</head>
+<body>
+<h1>Vision-based Page Rank Estimation - Dataset</h1>
+<h2>Context</h2>
+<p>This dataset was created and used during the student research project <a href="" style="">
+"Vision-based Page Rank Estimation"</a> by <a href="https://timodenk.com">Timo Denk</a> (<a href="mailto:mail@timodenk.com">mail@timodenk.com</a>) and <a href="https://samedguener.com">Samed Güner</a> (<a href="mailto:doktorgibsonyt@gmail.com">doktorgibsonyt@gmail.com</a>). It was used to analyze, train Deep Graph Networks (<a href="">Citations et al. (2016)</a>, <a href="">Citations et al. (2016)</a> and <a href="">Citations et al. (2016)</a>) and to validate the correlation between page rank and perceived appearance of a website.
+</p>
+<h2>Content</h2>
+<p>The dataset contains 87,629 samples in total. Each sample has a rank and represents a enriched directed graph of the inner structure of a given website. While nodes are webpages, edges represent hyperlinks between webpages. In addition, each webpage found on a given website has a mobile and desktop version screenshot as a visitor would perceive within a common browser.</p>
+<p>Each sample has at most eight nodes. A sample consists of a directed graph in JSON format, whereas nodes contain following information:    
+    <ul>
+        <li>url</li>
+        <li>given node is the entry point to the website (such as the landing page)</li>
+        <li>client error status (e.g unverified SSL connection)</li>
+        <li>server error code (e.g 404 Not Found)</li>
+        <li>loading time</li>
+        <li>title</li>
+        <li>size</li>
+        <li>list of hyperlinks to other webpages with title</li>
+    </ul>
+    
+The dataset has following folder structure:<br>
+<p>
+\&lt;Rank of Website&gt;\&lt;Rank of Website&gt;.json<br>
+&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;\img\&lt;Image Number&gt;.jpeg<br>
+&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;\img\ &#x2026;<br>
+&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&#x22ee;<br>
+&emsp;&emsp;&emsp;&#x22ee;
+</p>
+<h3>Example Sample:</h3>
+<pre id="json"></pre>
+
+<h2>Acknowledgments</h2>
+The websites and their ranks are taken from the top 100,000 websites of <a href="https://www.domcop.com/openpagerank/what-is-openpagerank">Open PageRank</a>, which uses the number of total backlinks to rank websites. </p>
+<p></p>
+<h2>Download</h2>
+You can download the dataset for free <a href="mega-link">here</a>!
+<p></p>
+</body>
+</html>
