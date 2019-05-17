@@ -2,6 +2,8 @@ from typing import List
 import torch
 from torch import Tensor
 
+from rank_predictor.trainer.ranking.probabilistic_loss import ProbabilisticLoss
+
 
 def compute_multi_batch_accuracy(target_ranks_batches: List[Tensor], model_outputs_batches: List[Tensor])\
         -> (Tensor, Tensor):
@@ -55,3 +57,30 @@ def compute_batch_accuracy(target_ranks: Tensor, model_outputs: Tensor) -> (Tens
     correct_ratio = num_correct.float() / (n ** 2 - n)
 
     return correct_ratio, num_correct
+
+
+def per_sample_accuracy(r: Tensor, f: Tensor) -> Tensor:
+    """
+    Computes the accuracy the model hat for a given sample wrt. to all other samples (including itself).
+    :param r: Relative ranking of the samples, where r_i < r_j indicates that x_i is supposed to be ranked higher
+              than x_j, e.g. x_i is at position 10 and x_j at position 15. The scaling can be linear, log, ...
+              Vector size [n]
+    :param f: For every sample x_i in the batch, with i in {1, ..., n}, f_i is the network output f(x_i). Size [n].
+    :return: n-dim vector which accuracy scores for the i-th sample in [0,1].
+    """
+
+    n = r.size(0)
+    assert r.shape == f.shape, "Shapes of 'r' and 'f' must be equal."
+
+    # ground truth and prediction matrices
+    gt = ProbabilisticLoss.ground_truth_matrix(r)
+    pred = ProbabilisticLoss.discretize_model_prediction_matrix(ProbabilisticLoss.model_prediction_matrix(f))
+
+    # number of matches
+    correct = torch.eq(gt, pred).float()
+    correct_ctr = torch.sum(correct, dim=1, keepdim=False)
+
+    # accuracy
+    acc = correct_ctr / n
+
+    return acc
