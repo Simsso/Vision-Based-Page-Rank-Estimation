@@ -131,6 +131,10 @@ class DecoderGlobalStateUpdate(GlobalStateUpdate):
 
 
 class ScreenshotsFeatureExtractor(nn.Module):
+    """
+    Converts a screenshot tuple into a feature vector tuple.
+    """
+
     def __init__(self, drop_p: float):
         super().__init__()
         self.drop_p = drop_p
@@ -241,6 +245,9 @@ class ScreenshotsFeatureExtractor(nn.Module):
 
 
 class ScreenshotsFeatureExtractorWithHead(nn.Module):
+    """
+    Converts a screenshot tuple into a scalar by adding a linear layer to the `ScreenshotsFeatureExtractor`.
+    """
 
     def __init__(self, drop_p: float):
         super().__init__()

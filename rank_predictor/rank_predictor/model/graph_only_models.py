@@ -45,6 +45,15 @@ class GNDeep(nn.Module):
     """[n-core(-shared)]"""
 
     def __init__(self, drop_p: float, num_core_blocks: int, edge_mode: str, shared_weights: bool = False):
+        """
+        Deep graph network for domain rank estimation.
+        :param drop_p: Dropout probability
+        :param num_core_blocks: Number of stacked core blocks, >= 0
+        :param edge_mode: Whether to keep the graph edges, remove them altogether, or make them bi-directional. In any
+                          case, the existence of reflexive edges is ensured.
+        :param shared_weights:
+        """
+
         super().__init__()
 
         self.drop_p = drop_p

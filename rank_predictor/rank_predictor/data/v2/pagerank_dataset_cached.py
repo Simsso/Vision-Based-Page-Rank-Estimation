@@ -13,6 +13,10 @@ from rank_predictor.data.v2.pagerank_dataset import DatasetV2
 
 
 class DatasetV2Cached(DatasetV2):
+    """
+    The cached dataset loads cached graphs from the `feat_extr_weights_path`. Instead of loading the images and JSON
+    files from the dataset directory, it returns the cached graphs (which it holds in memory).
+    """
 
     graph_cache = None
 

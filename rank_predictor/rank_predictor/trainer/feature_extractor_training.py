@@ -5,7 +5,7 @@ from rank_predictor.trainer.logging import setup_custom_logger
 from rank_predictor.trainer.lr_scheduler.warmup_scheduler import GradualWarmupScheduler
 from rank_predictor.trainer.ranking.probabilistic_loss import ProbabilisticLoss
 from sacred import Experiment
-from rank_predictor.data.v2.pagerank_dataset import DatasetV2Screenshots
+from rank_predictor.data.v2.pagerank_dataset_screenshots import DatasetV2Screenshots
 from rank_predictor.model.graph_extractor_full import ScreenshotsFeatureExtractorWithHead
 from rank_predictor.trainer.training_run import FeatureExtractorTrainingRun
 

@@ -8,7 +8,7 @@ from torch import nn, optim
 from tensorboardX import SummaryWriter
 from torch.utils.data import Dataset, DataLoader
 from graph_nets.data_structures.graph import Graph
-from rank_predictor.data.v2.pagerank_dataset import DatasetV2Screenshots
+from rank_predictor.data.v2.pagerank_dataset_screenshots import DatasetV2Screenshots
 from rank_predictor.trainer.logging import setup_custom_logger
 from rank_predictor.trainer.lr_scheduler.warmup_scheduler import GradualWarmupScheduler
 from rank_predictor.trainer.ranking.utils import compute_batch_accuracy, compute_multi_batch_accuracy

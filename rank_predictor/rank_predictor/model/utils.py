@@ -108,6 +108,10 @@ class ListModule(nn.Module):
 
 
 def parameter_count(model: nn.Module) -> int:
+    """
+    :param model: A PyTorch module.
+    :return: Number of parameters in the passed module.
+    """
     params = [p for p in model.parameters()]
     param_count = map(lambda p: p.size(), params)
     param_count = map(lambda p_size: reduce(operator.mul, p_size, 1), param_count)

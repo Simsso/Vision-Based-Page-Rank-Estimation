@@ -1,3 +1,11 @@
+"""
+This script
+1. loads a dataset (split into three parts)
+2. for each model checkpoint (e.g. one per epoch) feeds the validation dataset through the model and stores the accuracy
+3. determines the checkpoint which had the highest accuracy
+4. feeds the test data through the best checkpoint and reports it
+"""
+
 import os
 from glob import glob
 import torch

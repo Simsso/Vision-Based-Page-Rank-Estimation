@@ -1,12 +1,14 @@
-# dataset
+"""
+Loads the dataset and feeds it through a feature extraction model.
+It stores the model outputs and writes them into files.
+"""
+
 import logging
 import os
 from typing import Dict
-
 import torch
 from graph_nets.data_structures.attribute import Attribute
 from torch import Tensor
-
 from graph_nets.data_structures.graph import Graph
 from torch.utils.data import DataLoader
 from tqdm import tqdm
@@ -75,4 +77,5 @@ with torch.no_grad():
             save_cached_graphs(cache, file_ctr)
             file_ctr += 1
             cache = {}
+
 save_cached_graphs(cache, file_ctr)
