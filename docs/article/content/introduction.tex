@@ -1,0 +1,28 @@
+\section{Introduction}
+\label{section:introduction}
+
+The world wide web has evolved to become a common source of information and entertainment for people from all around the globe. The number of available websites exceeds 100 million by far.
+People commonly access these sites through the internet using a webbrowser on their computer or hand-held device and consume the content in graphical or auditory format.
+
+Some website attract more visitors than others. As of May 2019, the Alexa page ranking\footnote{The top 500 sites on the web: \url{https://www.alexa.com/topsites}} lists \url{google.com}, \url{youtube.com}, \url{facebook.com}, \url{baidu.com}, and \url{wikipedia.org} as the top five global domains. Ordering websites by their popularity can be done in different ways: One might think of criteria such as the total number of links pointing to a website, the visitor count, or visitor count combined with the average time people spend on a site. Newly published websites will initially be assigned a low rank, until their popularity grows and statistics start reflecting that. An experienced user, however, might be able to have a rough feeling for whether a website they see has potential to become popular or not, solely based on its content and look. There is a shortcoming in tools, which estimate the expected popularity of a website, thereby replicating the behavior of a human visitor.
+
+In this work we model a page rank estimator using methods of computer vision. More specifically, we train a graph network (GN) with convolutional building blocks to \textit{look} at screenshots taken from web pages of a domain and try to predict the expected page rank. We thereby investigate to what extent a domain rank can be inferred from screenshots of web pages. To the best of our knowledge, this work is the first feasibility study analyzing the correlation between page rank and look.
+
+The world wide web has been designed with hyperlinks. They allow users to navigate between web pages. A website typically consists of several web pages, which (often, but not necessarily) point to each other with hyperlinks. Such a website can be interpreted as a graph, where nodes correspond to web pages and directed edges to hyperlinks connecting two of them. We try to exploit the information contained in the graph structure by applying GNs to the ranking problem.
+
+The advantages over statistical approaches (link counting, visitor counters with toolbars, etc.) are the following: Once trained, our model can generalize to new, unseen websites, without need to spend time crawling the web. It is purely vision-based and has therefore access to (most of) the information that website visitors consume. On the other hand, the ground truth used to train our model is the result of the aforementioned statistical analyzes. Consequently, its  predictions cannot be better on known websites.
+
+Traversing the web page graph of the internet or a single website is referred to as crawling. To create a screenshot dataset that contains the meta information we want, we develop a web crawler. It visits the top 100,000 most popular domains and takes screenshots of their web pages. The crawler is described in this document as well.
+
+Our main contributions are:
+\begin{itemize}
+\item Creation and release of a page rank dataset with two versions: (version 1) A single screenshot for each of the top 100k websites and (version 2) 100k graphs, where each graph represents one of the websites with screenshots and meta data.
+\item Design of a model consisting of convolutional neural network (CNN) and GN and its application to the problem of page rank estimation.
+\item Positive answering of the question whether purely vision-based information alone can be used to estimate a domain rank better than random guessing. Identification of a correlation between domain rank and web page look.
+\end{itemize}
+
+We release source code, model weights, and the dataset publicly.\footnote{\url{https://github.com/Simsso/Vision-Based-Page-Rank-Estimation}}
+
+%This work is a student research project carried out by two students of Applied Computer Science from Coorporative State University Baden-Wuerttemberg, Karlsruhe.
+
+The remainder of this document is structured as follows: In Section~\ref{sec:background} we explain the background required to understand our approach. In particular the notation for GNs introduced in Section~\ref{sec:graphnetworks} is used throughout the document. We then present our method in Section~\ref{sec:method}. The dataset we create is described in Section~\ref{sec:datasets}. The specifics of the software we wrote are outlined in Section~\ref{sec:implementationdetails}. Section~\ref{sec:results} lists the results our model achieves and introduces the human baseline we compare to. The results are then discussed in Section~\ref{sec:discussion} where we also analyze the model behavior in greater detail. We close with a conclusion as well as future work in Section~\ref{sec:conclusion}. The mathematical notation used in this work follows the one defined in the chapter \textit{Notation} of the Deep Learning book \cite{goodfellow:dlbook}. It can be found in our appendix in Section~\ref{sec:notation}.
