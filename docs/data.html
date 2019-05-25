@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Vision-based Page Rank Estimation Dataset</title>
+</head>
+<body>
+    
+    <h1>Vision-based Page Rank Estimation Dataset</h1>
+
+    <h2>Context</h2>
+    <p>
+        This dataset was created and used in the student research project <a href="https://timodenk.com/arxiv/201905-pagerank.pdf">Vision-based Page Rank Estimation</a> by <a href="https://timodenk.com">Timo Denk</a> and <a href="https://samedguener.com">Samed Güner</a>. It contains screenshots and meta information of some of the top 100k most popular domains on the web. It was used to train a combination of CNN and graph network <a href="https://arxiv.org/abs/1806.01261">Battaglia et al. (2018)</a> to determine the correlation between page rank and appearance of a web page.
+    </p>
+
+    <h2>Content</h2>
+    <h3>Dataset Version 1</h3>
+    <p>
+        The dataset contain 83,165 samples. Each sample is a screenshot of a given web page as a visitor would see it with a common web browser on a desktop machine. The dataset has the following folder structure (the rank is the image name):
+    </p>
+    <pre>
+    \&lt;domain-rank&gt;.jpg<br>
+    &emsp;&emsp;&emsp;&#x22ee;<br>
+    </pre>
+
+    <h3>Dataset Version 2</h3>
+    <p>
+        The dataset contains 83,165 samples. Each sample has a rank and represents an enriched directed graph of the link structure of a given domain. While nodes are web pages, edges represent hyperlinks between them. Each web page comes with mobile and desktop screenshot.
+    </p>
+
+    <p>
+        A sample is a directed graph with up to eight nodes. It is encoded in JSON format, where nodes contain the following information:    
+        <ul>
+            <li><code>id</code>: identifier of the node, corresponds to the <em>image number</em></li>
+            <li><code>baseUrl</code>: base URL of the website</li>
+            <li><code>client_status</code>: client error status (e.g unverified SSL connection)</li>
+            <li><code>server_status</code>: server status code (e.g 404 Not Found)</li>
+            <li><code>startNode</code>: given node is the entry point to the domain</li>
+            <li><code>loading_time</code> loading time in milliseconds</li>
+            <li><code>size</code>: size of the web page in kB</li>
+            <li><code>title</code>: web page title</li>
+            <li><code>urls</code>: list of hyperlinks to other web pages on the same domain</li>
+        </ul>
+    </p>
+
+    <p>
+    The dataset has the following folder structure:
+    <pre>
+        \&lt;domain-rank&gt;\&lt;domain-rank&gt;.json<br>
+        &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;\img\&lt;image-number&gt;.jpeg<br>
+        &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;\img\ &#x2026;<br>
+        &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&#x22ee;<br>
+        &emsp;&emsp;&emsp;&#x22ee;
+    </pre>
+    </p>
+
+    <h4>Sample JSON File</h4>
+    <pre id="json-sample"></pre>
+
+    <h2>Acknowledgments</h2>
+    <p>
+        The websites and their ranks are taken from the top 100,000 websites of <a href="https://www.domcop.com/openpagerank/what-is-openpagerank">Open PageRank</a>, which relies on the number of backlinks to rank websites.
+    </p>
+
+    <h2>Downloads</h2>
+    <ul>
+        <li>Dataset version 1: <a href="https://mega.nz/#!euwEjAKZ!U4EtHWrmHzTSuQ9URoPZQJBNPMiNOpHguRYp0xulzyU">v1-shared.zip</a> (1.80 GB)</li>
+        <li>Dataset version 2: <a href="https://mega.nz/#!fihSzSxB!5KAadiCAZrKHWbOEp_PU64iXrES_EXzv7lAb4djtR70">v2-shared.zip</a> (12.19 GB)</li>
+        <li>Open PageRank Top 100,000 Websites (mapping from rank to domain): <a href="https://mega.nz/#!fn5G1KLB!Ig1ETZzSeNIyLs1TYLVdb3lfKGJJll0H94_QGS8FmI0">top100000_plain.txt</a> (2.7 MB)</li>
+    </ul>
+
+    <h2>Reference</h2>
+    <p>Please cite our work on <a href="https://timodenk.com/arxiv/201905-pagerank.pdf">Vision-based Page Rank Estimation</a> if you intend to use this dataset.</p>
+
+    <hr>
+    <p><a href="https://timodenk.com/imprint">Legal</a></p>
+
+    <script>
+        window.onload = function() {
+            var data = 
+                [{
+                "id": 1,
+                "baseUrl": "https://example.com",
+                "client_status" : null,
+                "loading_time": 8822,
+                "server_status": 200,
+                "startNode": true,
+                "size": 1222,
+                "title": "example.com",
+                "urls": [
+                    {
+                        "url": "https://example.com/2",
+                        "url_text": "Second Page"
+                    }
+                ]}, 
+                {
+                    "id": 2,
+                    "baseUrl": "https://example.com/2",
+                    "startNode" : false
+                }]
+
+            document.getElementById("json-sample").innerHTML = JSON.stringify(data, undefined, 2);
+        }
+    </script>
+</body>
+</html>

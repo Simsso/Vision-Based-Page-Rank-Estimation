@@ -5,8 +5,7 @@ import json
 import os
 from typing import Set, Union, Dict, Tuple, List
 from torch.utils.data import Dataset
-from torchvision.transforms import ToPILImage, Resize, ToTensor, Normalize, Compose
-
+from torchvision.transforms import ToPILImage, ToTensor, Normalize, Compose
 from graph_nets.data_structures.attribute import Attribute
 from graph_nets.data_structures.edge import Edge
 from graph_nets.data_structures.graph import Graph
@@ -35,18 +34,19 @@ class DatasetV2(Dataset):
             ToPILImage(),
             # Resize((1920 // 4, 1080 // 4)),
             ToTensor(),
-            Normalize((.5, .5, .5, .5), (.5, .5, .5, .5)),
+            Normalize((.5, .5, .5), (.5, .5, .5)),
         ])
 
         self.mobile_img_transform = Compose([
             ToPILImage(),
             # Resize((333, 187)),
             ToTensor(),
-            Normalize((.5, .5, .5, .5), (.5, .5, .5, .5)),
+            Normalize((.5, .5, .5), (.5, .5, .5)),
         ])
 
         self.page_paths = sorted(list(page_paths))
         self.logrank_b = logrank_b
+        self.ranks = list(map(folder_to_rank, self.page_paths))
 
     def __getitem__(self, index) -> Dict[str, Union[int, Graph]]:
         page_path = self.page_paths[index]
@@ -67,7 +67,7 @@ class DatasetV2(Dataset):
         json_file_path = glob(os.path.join(path, '*.json'))
         assert len(json_file_path) == 1, "Number of json files in '{}' must be exactly one.".format(path)
         json_file_path = json_file_path[0]
-        with open(json_file_path) as json_file:
+        with open(json_file_path, encoding='utf-8') as json_file:
             pages_json: List = json.load(json_file)
 
         # read screenshot paths
@@ -145,8 +145,17 @@ class DatasetV2(Dataset):
 
         return images
 
+    def get_by_rank(self, rank: int) -> Dict[str, Union[int, Graph]]:
+        """
+        Returns the sample with the given rank, raises an error if there is no such sample.
+        """
+        return self[self.ranks.index(rank)]
+
     @staticmethod
-    def _get_page_paths(root_dir: str) -> Set[str]:
+    def get_page_paths(root_dir: str) -> Set[str]:
+        """
+        Returns all folder names in the given directory, sorted.
+        """
         assert os.path.isdir(root_dir), "The provided path '{}' is not a directory".format(root_dir)
 
         query_str = os.path.join(root_dir, '*', '')
@@ -156,12 +165,13 @@ class DatasetV2(Dataset):
         return set(page_paths)
 
     @staticmethod
-    def from_path(root_dir: str):
-        page_paths = DatasetV2._get_page_paths(root_dir)
-        return DatasetV2(page_paths)
+    def from_path(root_dir: str, logrank_b: float):
+        page_paths = DatasetV2.get_page_paths(root_dir)
+        return DatasetV2(page_paths, logrank_b)
 
     @staticmethod
-    def get_threefold(root_dir: str, train_ratio: float, valid_ratio: float, logrank_b: float) -> threefold.Data:
+    def get_threefold(root_dir: str, train_ratio: float, valid_ratio: float, logrank_b: float, **kwargs)\
+            -> threefold.Data:
         """
         Load dataset from root_dir and split it into three parts (train, validation, test).
         The function splits in a deterministic way.
@@ -173,5 +183,7 @@ class DatasetV2(Dataset):
         """
         assert os.path.isdir(root_dir), "The provided path '{}' is not a directory".format(root_dir)
 
-        page_paths = list(DatasetV2._get_page_paths(root_dir))
-        return get_threefold(DatasetV2, page_paths, train_ratio, valid_ratio, logrank_b)
+        page_paths = list(DatasetV2.get_page_paths(root_dir))
+        return get_threefold(DatasetV2, page_paths, train_ratio, valid_ratio, logrank_b, **kwargs)
+
+

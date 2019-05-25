@@ -2,7 +2,8 @@ from typing import List, Union
 import numpy as np
 import torch
 from unittest import TestCase
-from rank_predictor.trainer.ranking.utils import compute_batch_accuracy, compute_multi_batch_accuracy
+from rank_predictor.trainer.ranking.utils import compute_batch_accuracy, compute_multi_batch_accuracy, \
+    per_sample_accuracy
 
 
 class TestUtils(TestCase):
@@ -69,3 +70,14 @@ class TestUtils(TestCase):
                                         model_outputs_list=[[.2, .3], [.4, .1], [1.]],
                                         accuracy_target=12 / 20,
                                         correct_ctr_target=20 - 4 - 4)
+
+    def test_per_sample_acc(self):
+        r = torch.Tensor([1, 2, 3, 0])
+        f = torch.Tensor([1.1, 0.5, 0.6, 3.])
+        target_acc = np.array([1., .75, .75, 1.])
+
+        out_acc = per_sample_accuracy(r, f)
+        out_acc = out_acc.numpy()
+
+        match = np.allclose(out_acc, target_acc)
+        self.assertTrue(match)

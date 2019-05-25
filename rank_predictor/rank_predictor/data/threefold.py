@@ -7,8 +7,8 @@ from tqdm import tqdm
 Data = namedtuple('ThreefoldData', ['train', 'valid', 'test'])
 
 
-def get_threefold(klass: Type, sample_paths: List[str], train_ratio: float, valid_ratio: float, logrank_b: float)\
-        -> Data:
+def get_threefold(klass: Type, sample_paths: List[str], train_ratio: float, valid_ratio: float, logrank_b: float,
+                  **kwargs) -> Data:
     """
     :param klass: Dataset class, e.g. DatasetV2
     :param sample_paths: List of paths that point to the samples of the dataset
@@ -39,6 +39,6 @@ def get_threefold(klass: Type, sample_paths: List[str], train_ratio: float, vali
             test_paths.append(path)
 
     return Data(
-        train=klass(train_paths, logrank_b),
-        valid=klass(valid_paths, logrank_b),
-        test=klass(test_paths, logrank_b))
+        train=klass(train_paths, logrank_b, **kwargs),
+        valid=klass(valid_paths, logrank_b, **kwargs),
+        test=klass(test_paths, logrank_b, **kwargs))
