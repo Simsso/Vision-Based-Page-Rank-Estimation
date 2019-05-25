@@ -13,4 +13,4 @@ The **human evaluation tool** (`/human_eval/`) is a lightweight Node.js server w
 
 The **data crawler** (`/datacrawler`) served the purpose of creating the dataset. It visits web pages, takes screenshots, collects meta information, and stores the collected data. It was developed in C++ with special focus on scalability and modularity.
 
-## Quick Links: [Report]() · [Dataset]() · [Blog Post]() · [Slides]()
+## Quick Links: [Report](https://timodenk.com/arxiv/201905-pagerank.pdf) · [Dataset](https://timodenk.com/pagerank/data.html) · [Blog Post](https://timodenk.com/blog/pagerank-estimation-graph-networks/) · [Slides](https://docs.google.com/presentation/d/1hxQphtm4MucsJv3tr_imem82pwkNQZqvlw3_1ZE4b9o)
